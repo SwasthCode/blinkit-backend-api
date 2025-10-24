@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, IsBoolean, IsArray } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, IsBoolean, IsArray, IsEnum } from 'class-validator';
 import { CreateBaseDto } from '../../common/base/base.dto';
 
 export class CreateUserDto {
@@ -45,5 +45,25 @@ export class CreateUserDto {
   @IsString({ message: 'Password must be a string' })
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   password: string;
+
+  @ApiProperty({
+    description: 'The role of the user',
+    example: 'user',
+    enum: ['admin', 'user', 'moderator'],
+    default: 'user',
+  })
+  @IsOptional()
+  @IsEnum(['admin', 'user', 'moderator'], { message: 'Role must be one of: admin, user, moderator' })
+  role?: string;
+
+  @ApiProperty({
+    description: 'The status of the user',
+    example: 'active',
+    enum: ['active', 'inactive', 'suspended'],
+    default: 'active',
+  })
+  @IsOptional()
+  @IsEnum(['active', 'inactive', 'suspended'], { message: 'Status must be one of: active, inactive, suspended' })
+  status?: string;
 
 }
