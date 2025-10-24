@@ -1,18 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsPositive, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, IsBoolean, IsArray } from 'class-validator';
+import { CreateBaseDto } from '../../common/base/base.dto';
 
 export class CreateUserDto {
   @ApiProperty({
-    description: 'The name of the user',
-    example: 'John Doe',
+    description: 'The first name of the user',
+    example: 'John',
     minLength: 2,
     maxLength: 50,
   })
-  @IsNotEmpty({ message: 'Name is required' })
-  @IsString({ message: 'Name must be a string' })
-  @MinLength(2, { message: 'Name must be at least 2 characters long' })
-  @MaxLength(50, { message: 'Name cannot exceed 50 characters' })
-  name: string;
+  @IsNotEmpty({ message: 'First name is required' })
+  @IsString({ message: 'First name must be a string' })
+  @MinLength(2, { message: 'First name must be at least 2 characters long' })
+  @MaxLength(50, { message: 'First name cannot exceed 50 characters' })
+  first_name: string;
+
+  @ApiProperty({
+    description: 'The last name of the user',
+    example: 'Doe',
+    minLength: 2,
+    maxLength: 50,
+  })
+  @IsNotEmpty({ message: 'Last name is required' })
+  @IsString({ message: 'Last name must be a string' })
+  @MinLength(2, { message: 'Last name must be at least 2 characters long' })
+  @MaxLength(50, { message: 'Last name cannot exceed 50 characters' })
+  last_name: string;
 
   @ApiProperty({
     description: 'The email address of the user',
@@ -24,13 +37,13 @@ export class CreateUserDto {
   email: string;
 
   @ApiProperty({
-    description: 'The age of the user',
-    example: 25,
-    minimum: 1,
-    maximum: 120,
-    required: false,
+    description: 'The password of the user',
+    example: 'SecurePassword123!',
+    minLength: 8,
   })
-  @IsOptional()
-  @IsPositive({ message: 'Age must be a positive number' })
-  age?: number;
+  @IsNotEmpty({ message: 'Password is required' })
+  @IsString({ message: 'Password must be a string' })
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  password: string;
+
 }
