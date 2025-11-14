@@ -37,7 +37,7 @@ export class BaseService<T extends Document> {
     }
 
     return await this.model
-      .find(query as Parameters<typeof this.model.find>[0])
+      .find(query[0])
       .exec();
   }
 
