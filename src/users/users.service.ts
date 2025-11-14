@@ -46,7 +46,9 @@ export class UsersService extends BaseService<UserDocument> {
       const created = new this.model(userData);
       return created.save();
     } catch (error) {
-      throw new Error(`Failed to create user: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to create user: ${errorMessage}`);
     }
   }
 
@@ -74,7 +76,9 @@ export class UsersService extends BaseService<UserDocument> {
 
       return null;
     } catch (error) {
-      throw new Error(`Password verification failed: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Password verification failed: ${errorMessage}`);
     }
   }
 
@@ -116,7 +120,9 @@ export class UsersService extends BaseService<UserDocument> {
 
       return updated;
     } catch (error) {
-      throw new Error(`Failed to update password: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to update password: ${errorMessage}`);
     }
   }
 

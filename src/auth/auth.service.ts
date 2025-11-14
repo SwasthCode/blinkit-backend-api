@@ -21,15 +21,16 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    if ((user as any).status !== 'active') {
+    const userObj = user.toObject();
+    if (userObj.status !== 'active') {
       throw new UnauthorizedException('User account is not active');
     }
 
     const payload = {
       sub: user._id,
       email: user.email,
-      role: (user as any).role,
-      status: (user as any).status,
+      role: userObj.role,
+      status: userObj.status,
     };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -41,8 +42,8 @@ export class AuthService {
         access_token: accessToken,
         _id: user._id,
         email: user.email,
-        role: (user as any).role,
-        status: (user as any).status,
+        role: userObj.role,
+        status: userObj.status,
       },
       'Login successful',
       200,
@@ -51,9 +52,13 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.verifyPassword(email, password);
-    if (user && (user as any).status === 'active') {
-      const { password, ...result } = user.toObject();
-      return result;
+    if (user) {
+      const userObj = user.toObject();
+      if (userObj.status === 'active') {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password: _password, ...result } = userObj;
+        return result;
+      }
     }
     return null;
   }

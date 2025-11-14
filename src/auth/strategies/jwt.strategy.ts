@@ -17,21 +17,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: { sub: string }) {
     const user = await this.usersService.findOne(payload.sub);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
 
-    if ((user as any).status !== 'active') {
+    const userObj = user.toObject();
+    if (userObj.status !== 'active') {
       throw new UnauthorizedException('User account is not active');
     }
 
     return {
       _id: user._id,
       email: user.email,
-      role: (user as any).role,
-      status: (user as any).status,
+      role: userObj.role,
+      status: userObj.status,
       first_name: user.first_name,
       last_name: user.last_name,
     };

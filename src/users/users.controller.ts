@@ -129,7 +129,7 @@ export class UsersController extends BaseController<UserDocument> {
     description: 'User profile retrieved successfully',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getProfile(@Request() req) {
+  async getProfile(@Request() req: { user: { _id: string } }) {
     const user = await this.usersService.findOne(req.user._id);
     return successResponse(user, 'User profile retrieved successfully');
   }

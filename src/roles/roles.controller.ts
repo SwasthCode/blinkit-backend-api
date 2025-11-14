@@ -14,7 +14,6 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { RolesService } from './roles.service';
 import { CreateRoleDto, UpdateRoleDto } from './dto';

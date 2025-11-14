@@ -27,16 +27,18 @@ export class BaseService<T extends Document> {
   }
 
   // New Filter method
-  async filter(filters: any): Promise<T[]> {
-    const query: any = {};
+  async filter(filters: Record<string, unknown>): Promise<T[]> {
+    const query: Record<string, { $regex: RegExp }> = {};
 
     for (const key in filters) {
-      if (filters[key]) {
+      if (filters[key] && typeof filters[key] === 'string') {
         query[key] = { $regex: new RegExp(filters[key], 'i') };
       }
     }
 
-    return await this.model.find(query).exec();
+    return await this.model
+      .find(query as Parameters<typeof this.model.find>[0])
+      .exec();
   }
 
   // SELECT Logic
@@ -51,10 +53,13 @@ export class BaseService<T extends Document> {
       throw new UnauthorizedException('xToken is required');
     }
 
-    let decoded: any;
+    let decoded: { userId?: string };
     try {
-      decoded = jwt.verify(xToken, process.env.JWT_SECRET || 'defaultSecret');
-    } catch (error) {
+      decoded = jwt.verify(
+        xToken,
+        process.env.JWT_SECRET || 'defaultSecret',
+      ) as { userId?: string };
+    } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
@@ -67,6 +72,9 @@ export class BaseService<T extends Document> {
       throw new Error('User model not injected in BaseService');
     }
 
+    if (!decoded.userId) {
+      throw new UnauthorizedException('Token does not contain userId');
+    }
     const user = await this.model.findById(decoded.userId).exec();
     if (!user) {
       throw new NotFoundException('User not found for this token');
@@ -81,9 +89,13 @@ export class BaseService<T extends Document> {
     };
   }
 
-  async update(id: string, updateDto: any): Promise<T> {
+  async update(id: string, updateDto: Partial<T>): Promise<T> {
     const updated = await this.model
-      .findByIdAndUpdate(id, updateDto, { new: true })
+      .findByIdAndUpdate(
+        id,
+        updateDto as Parameters<typeof this.model.findByIdAndUpdate>[1],
+        { new: true },
+      )
       .exec();
     if (!updated) throw new NotFoundException(`Item not found with ID: ${id}`);
     return updated;

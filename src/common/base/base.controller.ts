@@ -10,12 +10,7 @@ import {
   HttpStatus,
   Query,
 } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { BaseService } from './base.service';
 import { successResponse } from './base.response';
@@ -64,7 +59,7 @@ export class BaseController<T extends Document> {
     description: 'Query parameters for filtering',
     type: Object,
   })
-  async filter(@Query() filters: any) {
+  async filter(@Query() filters: Record<string, unknown>) {
     const data = await this.baseService.filter(filters);
     return successResponse(data, 'Filtered data fetched successfully');
   }
@@ -91,7 +86,7 @@ export class BaseController<T extends Document> {
   @Post('check-token')
   @ApiOperation({ summary: 'Check x-token from body' })
   @ApiResponse({ status: 200, description: 'Token validated successfully' })
-  async checkToken(@Body('xToken') xToken: string) {
+  checkToken(@Body('xToken') xToken: string) {
     if (!xToken) {
       return successResponse(null, 'xToken is required', 400);
     }
@@ -105,7 +100,7 @@ export class BaseController<T extends Document> {
   @ApiResponse({ status: 200, description: 'Entity updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
   @ApiResponse({ status: 404, description: 'Entity not found' })
-  async update(@Param('id') id: string, @Body() updateDto: any) {
+  async update(@Param('id') id: string, @Body() updateDto: Partial<T>) {
     const data = await this.baseService.update(id, updateDto);
     return successResponse(data, 'Updated successfully');
   }

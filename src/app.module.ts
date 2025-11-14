@@ -13,7 +13,7 @@ import { RolesModule } from './roles/roles.module';
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async () => {
+      useFactory: () => {
         return {
           uri: process.env.MONGODB_URI,
           dbName: process.env.DATABASE_NAME || 'temp-api',
@@ -36,7 +36,7 @@ export class AppModule implements OnModuleInit {
       );
     });
 
-    mongoose.connection.on('error', (err) => {
+    mongoose.connection.on('error', (err: Error) => {
       console.error(`❌ MongoDB connection error: ${err.message}`);
       console.error('💡 Make sure MongoDB is running on your system!');
       console.error(
@@ -54,7 +54,8 @@ export class AppModule implements OnModuleInit {
       console.warn('⚠️ MongoDB disconnected.');
     });
 
-    // Check if already connected
+    // Check if already connected (1 = connected)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     if (mongoose.connection.readyState === 1) {
       console.log('✅ MongoDB already connected!');
       console.log(`📊 Database: ${mongoose.connection.db?.databaseName}`);

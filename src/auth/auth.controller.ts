@@ -23,7 +23,7 @@ export class AuthController {
 
   @Get('decrypt-password/:encryptedPassword')
   @HttpCode(HttpStatus.OK)
-  async decryptPassword(@Param('encryptedPassword') encryptedPassword: string) {
+  decryptPassword(@Param('encryptedPassword') encryptedPassword: string) {
     try {
       const decryptedPassword = PasswordUtil.decryptPassword(encryptedPassword);
       return {
@@ -35,7 +35,7 @@ export class AuthController {
           decryptedPassword: decryptedPassword,
         },
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         code: 400,

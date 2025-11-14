@@ -20,7 +20,9 @@ export class PasswordUtil {
       const salt = await bcrypt.genSalt(this.SALT_ROUNDS);
       return await bcrypt.hash(password, salt);
     } catch (error) {
-      throw new Error(`Password hashing failed: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Password hashing failed: ${errorMessage}`);
     }
   }
 
@@ -37,7 +39,9 @@ export class PasswordUtil {
     try {
       return await bcrypt.compare(password, hashedPassword);
     } catch (error) {
-      throw new Error(`Password comparison failed: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Password comparison failed: ${errorMessage}`);
     }
   }
 
@@ -54,7 +58,9 @@ export class PasswordUtil {
       ).toString();
       return encrypted;
     } catch (error) {
-      throw new Error(`Password encryption failed: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Password encryption failed: ${errorMessage}`);
     }
   }
 
@@ -71,7 +77,9 @@ export class PasswordUtil {
       );
       return decrypted.toString(CryptoJS.enc.Utf8);
     } catch (error) {
-      throw new Error(`Password decryption failed: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Password decryption failed: ${errorMessage}`);
     }
   }
 

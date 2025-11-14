@@ -10,7 +10,7 @@ export function successResponse<T>(
   data: T | T[] | null,
   message = 'Success',
   code = 200,
-  meta: any = null,
+  meta: unknown = null,
 ): BaseResponse<T> {
   return {
     code,
@@ -24,7 +24,7 @@ export function successResponse<T>(
 export function errorResponse(
   message = 'Something went wrong',
   code = 400,
-  meta: any = null,
+  meta: unknown = null,
 ): BaseResponse<null> {
   return {
     code,

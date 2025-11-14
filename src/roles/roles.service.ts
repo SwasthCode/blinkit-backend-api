@@ -59,7 +59,9 @@ export class RolesService extends BaseService<RoleDocument> {
       if (error instanceof ConflictException) {
         throw error;
       }
-      throw new Error(`Failed to create role: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to create role: ${errorMessage}`);
     }
   }
 
@@ -79,10 +81,14 @@ export class RolesService extends BaseService<RoleDocument> {
         throw new Error(`Role not found with ID: ${id}`);
       }
 
-      const updateData = updateRoleDto as any;
+      const updateData = updateRoleDto as Partial<RoleDocument>;
 
       // Check for duplicate key (excluding current role)
-      if (updateData.key && updateData.key !== existingRole.key) {
+      if (
+        updateData.key &&
+        typeof updateData.key === 'string' &&
+        updateData.key !== existingRole.key
+      ) {
         const existingKey = await this.model
           .findOne({ key: updateData.key })
           .exec();
@@ -94,7 +100,11 @@ export class RolesService extends BaseService<RoleDocument> {
       }
 
       // Check for duplicate role_id (excluding current role)
-      if (updateData.role_id && updateData.role_id !== existingRole.role_id) {
+      if (
+        updateData.role_id &&
+        typeof updateData.role_id === 'number' &&
+        updateData.role_id !== existingRole.role_id
+      ) {
         const existingId = await this.model
           .findOne({ role_id: updateData.role_id })
           .exec();
@@ -106,7 +116,11 @@ export class RolesService extends BaseService<RoleDocument> {
       }
 
       // Check for duplicate name and regenerate key if name changes
-      if (updateData.name && updateData.name !== existingRole.name) {
+      if (
+        updateData.name &&
+        typeof updateData.name === 'string' &&
+        updateData.name !== existingRole.name
+      ) {
         const existingName = await this.model
           .findOne({ name: updateData.name })
           .exec();
@@ -130,7 +144,11 @@ export class RolesService extends BaseService<RoleDocument> {
 
       // Update the role
       const updated = await this.model
-        .findByIdAndUpdate(id, updateData, { new: true })
+        .findByIdAndUpdate(
+          id,
+          updateData as Parameters<typeof this.model.findByIdAndUpdate>[1],
+          { new: true },
+        )
         .exec();
 
       if (!updated) {
@@ -142,7 +160,9 @@ export class RolesService extends BaseService<RoleDocument> {
       if (error instanceof ConflictException) {
         throw error;
       }
-      throw new Error(`Failed to update role: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to update role: ${errorMessage}`);
     }
   }
 
@@ -155,7 +175,9 @@ export class RolesService extends BaseService<RoleDocument> {
     try {
       return await this.model.findOne({ key }).exec();
     } catch (error) {
-      throw new Error(`Failed to find role by key: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to find role by key: ${errorMessage}`);
     }
   }
 
@@ -168,7 +190,9 @@ export class RolesService extends BaseService<RoleDocument> {
     try {
       return await this.model.findOne({ role_id: id }).exec();
     } catch (error) {
-      throw new Error(`Failed to find role by numeric ID: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to find role by numeric ID: ${errorMessage}`);
     }
   }
 
@@ -181,7 +205,9 @@ export class RolesService extends BaseService<RoleDocument> {
     try {
       return await this.model.find({ role_type: roleType }).exec();
     } catch (error) {
-      throw new Error(`Failed to find roles by type: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to find roles by type: ${errorMessage}`);
     }
   }
 }
