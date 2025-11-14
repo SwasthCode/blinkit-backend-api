@@ -6,7 +6,9 @@ import * as CryptoJS from 'crypto-js';
  */
 export class PasswordUtil {
   private static readonly SALT_ROUNDS = 12;
-  private static readonly ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'your-secret-encryption-key-change-this-in-production';
+  private static readonly ENCRYPTION_KEY =
+    process.env.ENCRYPTION_KEY ||
+    'your-secret-encryption-key-change-this-in-production';
 
   /**
    * Hash a password using bcrypt (one-way hashing)
@@ -28,7 +30,10 @@ export class PasswordUtil {
    * @param hashedPassword - Hashed password to compare against
    * @returns Promise<boolean> - True if passwords match, false otherwise
    */
-  static async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
+  static async comparePassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
     try {
       return await bcrypt.compare(password, hashedPassword);
     } catch (error) {
@@ -43,7 +48,10 @@ export class PasswordUtil {
    */
   static encryptPassword(password: string): string {
     try {
-      const encrypted = CryptoJS.AES.encrypt(password, this.ENCRYPTION_KEY).toString();
+      const encrypted = CryptoJS.AES.encrypt(
+        password,
+        this.ENCRYPTION_KEY,
+      ).toString();
       return encrypted;
     } catch (error) {
       throw new Error(`Password encryption failed: ${error.message}`);
@@ -57,7 +65,10 @@ export class PasswordUtil {
    */
   static decryptPassword(encryptedPassword: string): string {
     try {
-      const decrypted = CryptoJS.AES.decrypt(encryptedPassword, this.ENCRYPTION_KEY);
+      const decrypted = CryptoJS.AES.decrypt(
+        encryptedPassword,
+        this.ENCRYPTION_KEY,
+      );
       return decrypted.toString(CryptoJS.enc.Utf8);
     } catch (error) {
       throw new Error(`Password decryption failed: ${error.message}`);
@@ -69,7 +80,7 @@ export class PasswordUtil {
    * @returns string - Random encryption key
    */
   static generateEncryptionKey(): string {
-    return CryptoJS.lib.WordArray.random(256/8).toString();
+    return CryptoJS.lib.WordArray.random(256 / 8).toString();
   }
 
   /**
@@ -115,7 +126,9 @@ export class PasswordUtil {
 
     // Special character check
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      suggestions.push('Password should contain at least one special character');
+      suggestions.push(
+        'Password should contain at least one special character',
+      );
     } else {
       score += 1;
     }
@@ -123,7 +136,7 @@ export class PasswordUtil {
     return {
       isValid: score >= 4,
       score,
-      suggestions
+      suggestions,
     };
   }
 }

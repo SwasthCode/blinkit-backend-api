@@ -1,5 +1,23 @@
-import { Controller, Body, Param, Post, Put, HttpCode, HttpStatus, Get, UseGuards, Request } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Body,
+  Param,
+  Post,
+  Put,
+  HttpCode,
+  HttpStatus,
+  Get,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { BaseController } from '../common/base/base.controller';
@@ -48,17 +66,30 @@ export class UsersController extends BaseController<UserDocument> {
       type: 'object',
       properties: {
         email: { type: 'string', example: 'john.doe@example.com' },
-        password: { type: 'string', example: 'SecurePassword123!' }
+        password: { type: 'string', example: 'SecurePassword123!' },
       },
-      required: ['email', 'password']
-    }
+      required: ['email', 'password'],
+    },
   })
   @ApiResponse({ status: 200, description: 'Password verification successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async verifyPassword(@Body() body: { email: string; password: string }) {
-    const user = await this.usersService.verifyPassword(body.email, body.password);
+    const user = await this.usersService.verifyPassword(
+      body.email,
+      body.password,
+    );
     if (user) {
-      return successResponse({ user: { id: user._id, email: user.email, first_name: user.first_name, last_name: user.last_name } }, 'Password verification successful');
+      return successResponse(
+        {
+          user: {
+            id: user._id,
+            email: user.email,
+            first_name: user.first_name,
+            last_name: user.last_name,
+          },
+        },
+        'Password verification successful',
+      );
     } else {
       return { success: false, message: 'Invalid credentials' };
     }
@@ -72,15 +103,18 @@ export class UsersController extends BaseController<UserDocument> {
     schema: {
       type: 'object',
       properties: {
-        newPassword: { type: 'string', example: 'NewSecurePassword123!' }
+        newPassword: { type: 'string', example: 'NewSecurePassword123!' },
       },
-      required: ['newPassword']
-    }
+      required: ['newPassword'],
+    },
   })
   @ApiResponse({ status: 200, description: 'Password updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad request - Invalid password' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async updatePassword(@Param('id') id: string, @Body() body: { newPassword: string }) {
+  async updatePassword(
+    @Param('id') id: string,
+    @Body() body: { newPassword: string },
+  ) {
     const data = await this.usersService.updatePassword(id, body.newPassword);
     return successResponse({ id: data._id }, 'Password updated successfully');
   }
@@ -90,7 +124,10 @@ export class UsersController extends BaseController<UserDocument> {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({ status: 200, description: 'User profile retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile retrieved successfully',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProfile(@Request() req) {
     const user = await this.usersService.findOne(req.user._id);

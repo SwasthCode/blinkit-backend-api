@@ -19,9 +19,13 @@ export class RolesService extends BaseService<RoleDocument> {
   async create(createRoleDto: CreateRoleDto): Promise<RoleDocument> {
     try {
       // Check for duplicate name
-      const existingName = await this.model.findOne({ name: createRoleDto.name }).exec();
+      const existingName = await this.model
+        .findOne({ name: createRoleDto.name })
+        .exec();
       if (existingName) {
-        throw new ConflictException(`Role with name '${createRoleDto.name}' already exists`);
+        throw new ConflictException(
+          `Role with name '${createRoleDto.name}' already exists`,
+        );
       }
 
       // Generate key from name (lowercase, replace spaces with underscores)
@@ -65,7 +69,10 @@ export class RolesService extends BaseService<RoleDocument> {
    * @param updateRoleDto - Role data to update
    * @returns Promise<RoleDocument> - Updated role
    */
-  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<RoleDocument> {
+  async update(
+    id: string,
+    updateRoleDto: UpdateRoleDto,
+  ): Promise<RoleDocument> {
     try {
       const existingRole = await this.model.findById(id).exec();
       if (!existingRole) {
@@ -76,34 +83,48 @@ export class RolesService extends BaseService<RoleDocument> {
 
       // Check for duplicate key (excluding current role)
       if (updateData.key && updateData.key !== existingRole.key) {
-        const existingKey = await this.model.findOne({ key: updateData.key }).exec();
+        const existingKey = await this.model
+          .findOne({ key: updateData.key })
+          .exec();
         if (existingKey) {
-          throw new ConflictException(`Role with key '${updateData.key}' already exists`);
+          throw new ConflictException(
+            `Role with key '${updateData.key}' already exists`,
+          );
         }
       }
 
       // Check for duplicate role_id (excluding current role)
       if (updateData.role_id && updateData.role_id !== existingRole.role_id) {
-        const existingId = await this.model.findOne({ role_id: updateData.role_id }).exec();
+        const existingId = await this.model
+          .findOne({ role_id: updateData.role_id })
+          .exec();
         if (existingId) {
-          throw new ConflictException(`Role with role_id '${updateData.role_id}' already exists`);
+          throw new ConflictException(
+            `Role with role_id '${updateData.role_id}' already exists`,
+          );
         }
       }
 
       // Check for duplicate name and regenerate key if name changes
       if (updateData.name && updateData.name !== existingRole.name) {
-        const existingName = await this.model.findOne({ name: updateData.name }).exec();
+        const existingName = await this.model
+          .findOne({ name: updateData.name })
+          .exec();
         if (existingName) {
-          throw new ConflictException(`Role with name '${updateData.name}' already exists`);
+          throw new ConflictException(
+            `Role with name '${updateData.name}' already exists`,
+          );
         }
         // Generate new key from new name
         const newKey = updateData.name.toLowerCase().replace(/\s+/g, '_');
         updateData.key = newKey;
-        
+
         // Check for duplicate key
         const existingKey = await this.model.findOne({ key: newKey }).exec();
         if (existingKey) {
-          throw new ConflictException(`Role with key '${newKey}' already exists`);
+          throw new ConflictException(
+            `Role with key '${newKey}' already exists`,
+          );
         }
       }
 
@@ -111,11 +132,11 @@ export class RolesService extends BaseService<RoleDocument> {
       const updated = await this.model
         .findByIdAndUpdate(id, updateData, { new: true })
         .exec();
-      
+
       if (!updated) {
         throw new Error(`Role not found with ID: ${id}`);
       }
-      
+
       return updated;
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -164,4 +185,3 @@ export class RolesService extends BaseService<RoleDocument> {
     }
   }
 }
-

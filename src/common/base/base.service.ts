@@ -1,8 +1,11 @@
 import { Model, Document } from 'mongoose';
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 import * as jwt from 'jsonwebtoken';
-
 
 @Injectable()
 export class BaseService<T extends Document> {
@@ -36,16 +39,13 @@ export class BaseService<T extends Document> {
     return await this.model.find(query).exec();
   }
 
-
   // SELECT Logic
-async select(fields: string): Promise<T[]> {
-  const projection = fields.split(',').join(' ');
-  return await this.model.find({}, projection).exec();
-}
+  async select(fields: string): Promise<T[]> {
+    const projection = fields.split(',').join(' ');
+    return await this.model.find({}, projection).exec();
+  }
 
-
-
-// TOKEN CHECK LOGIC
+  // TOKEN CHECK LOGIC
   async checkToken(xToken: string): Promise<any> {
     if (!xToken) {
       throw new UnauthorizedException('xToken is required');
@@ -80,7 +80,6 @@ async select(fields: string): Promise<T[]> {
       message: 'Token authenticated successfully',
     };
   }
-
 
   async update(id: string, updateDto: any): Promise<T> {
     const updated = await this.model

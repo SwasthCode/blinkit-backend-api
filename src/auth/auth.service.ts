@@ -12,8 +12,11 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.verifyPassword(loginDto.email, loginDto.password);
-    
+    const user = await this.usersService.verifyPassword(
+      loginDto.email,
+      loginDto.password,
+    );
+
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
@@ -33,7 +36,6 @@ export class AuthService {
       expiresIn: '7d', // 7 days expiry
     });
 
-   
     return successResponse(
       {
         access_token: accessToken,
@@ -43,7 +45,7 @@ export class AuthService {
         status: (user as any).status,
       },
       'Login successful',
-      200
+      200,
     );
   }
 

@@ -11,13 +11,13 @@ export class BaseSchema extends Document {
 
   @Prop({ default: true })
   is_active: boolean;
-  
+
   @Prop({ default: false })
   is_deleted: boolean;
 
-  @Prop({ default:'active' })
+  @Prop({ default: 'active' })
   status: string;
-    
-    @Prop({ default:null })
-    roles: any[];
+
+  @Prop({ default: null })
+  roles: any[];
 }

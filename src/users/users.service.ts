@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto } from './dto';
 import { BaseService } from '../common/base/base.service';
 import { PasswordUtil } from '../common/utils';
 
@@ -20,20 +20,26 @@ export class UsersService extends BaseService<UserDocument> {
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     try {
       // Validate password strength
-      const passwordValidation = PasswordUtil.validatePasswordStrength(createUserDto.password);
+      const passwordValidation = PasswordUtil.validatePasswordStrength(
+        createUserDto.password,
+      );
       if (!passwordValidation.isValid) {
-        throw new Error(`Password does not meet security requirements: ${passwordValidation.suggestions.join(', ')}`);
+        throw new Error(
+          `Password does not meet security requirements: ${passwordValidation.suggestions.join(', ')}`,
+        );
       }
 
       // Encrypt the password
-      const encryptedPassword = PasswordUtil.encryptPassword(createUserDto.password);
-      
+      const encryptedPassword = PasswordUtil.encryptPassword(
+        createUserDto.password,
+      );
+
       // Create user data with encrypted password and default values
       const userData = {
         ...createUserDto,
         password: encryptedPassword,
         role: createUserDto.role || 'user',
-        status: createUserDto.status || 'active'
+        status: createUserDto.status || 'active',
       };
 
       // Create and save the user
@@ -50,7 +56,10 @@ export class UsersService extends BaseService<UserDocument> {
    * @param plainPassword - Plain text password to verify
    * @returns Promise<UserDocument | null> - User if password is correct, null otherwise
    */
-  async verifyPassword(email: string, plainPassword: string): Promise<UserDocument | null> {
+  async verifyPassword(
+    email: string,
+    plainPassword: string,
+  ): Promise<UserDocument | null> {
     try {
       const user = await this.model.findOne({ email }).exec();
       if (!user) {
@@ -62,7 +71,7 @@ export class UsersService extends BaseService<UserDocument> {
       if (decryptedPassword === plainPassword) {
         return user;
       }
-      
+
       return null;
     } catch (error) {
       throw new Error(`Password verification failed: ${error.message}`);
@@ -75,26 +84,36 @@ export class UsersService extends BaseService<UserDocument> {
    * @param newPassword - New plain text password
    * @returns Promise<UserDocument> - Updated user
    */
-  async updatePassword(userId: string, newPassword: string): Promise<UserDocument> {
+  async updatePassword(
+    userId: string,
+    newPassword: string,
+  ): Promise<UserDocument> {
     try {
       // Validate password strength
-      const passwordValidation = PasswordUtil.validatePasswordStrength(newPassword);
+      const passwordValidation =
+        PasswordUtil.validatePasswordStrength(newPassword);
       if (!passwordValidation.isValid) {
-        throw new Error(`Password does not meet security requirements: ${passwordValidation.suggestions.join(', ')}`);
+        throw new Error(
+          `Password does not meet security requirements: ${passwordValidation.suggestions.join(', ')}`,
+        );
       }
 
       // Encrypt the new password
       const encryptedPassword = PasswordUtil.encryptPassword(newPassword);
-      
+
       // Update the user's password
       const updated = await this.model
-        .findByIdAndUpdate(userId, { password: encryptedPassword }, { new: true })
+        .findByIdAndUpdate(
+          userId,
+          { password: encryptedPassword },
+          { new: true },
+        )
         .exec();
-      
+
       if (!updated) {
         throw new Error(`User not found with ID: ${userId}`);
       }
-      
+
       return updated;
     } catch (error) {
       throw new Error(`Failed to update password: ${error.message}`);

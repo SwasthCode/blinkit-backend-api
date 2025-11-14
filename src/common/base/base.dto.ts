@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsDateString, IsBoolean, IsString, IsArray } from 'class-validator';
+import {
+  IsOptional,
+  IsDateString,
+  IsBoolean,
+  IsString,
+  IsArray,
+} from 'class-validator';
 
 export class BaseDto {
   @ApiProperty({

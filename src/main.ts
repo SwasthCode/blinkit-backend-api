@@ -6,17 +6,19 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   console.log('🚀 Starting application...');
-  
+
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());
   // Enable validation globally
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  }));
-  
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('Base API')
@@ -37,10 +39,10 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  
+
   const port = process.env.PORT ?? 8000;
   await app.listen(port);
-  
+
   console.log(`Application is running on: http://localhost:${port}`);
   console.log(`Swagger documentation: http://localhost:${port}/api`);
 }

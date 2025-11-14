@@ -1,5 +1,21 @@
-import { Controller, Body, Param, Post, Put, HttpCode, HttpStatus, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Body,
+  Param,
+  Post,
+  Put,
+  HttpCode,
+  HttpStatus,
+  Get,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { RolesService } from './roles.service';
 import { CreateRoleDto, UpdateRoleDto } from './dto';
 import { BaseController } from '../common/base/base.controller';
@@ -16,11 +32,19 @@ export class RolesController extends BaseController<RoleDocument> {
   // Override create method with proper DTO type and Swagger documentation
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new role (auto-generates key, role_id, and role_type)' })
+  @ApiOperation({
+    summary: 'Create a new role (auto-generates key, role_id, and role_type)',
+  })
   @ApiBody({ type: CreateRoleDto })
-  @ApiResponse({ status: 201, description: 'Role created successfully with auto-generated fields' })
+  @ApiResponse({
+    status: 201,
+    description: 'Role created successfully with auto-generated fields',
+  })
   @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
-  @ApiResponse({ status: 409, description: 'Conflict - Role with same name already exists' })
+  @ApiResponse({
+    status: 409,
+    description: 'Conflict - Role with same name already exists',
+  })
   async create(@Body() createRoleDto: CreateRoleDto) {
     const data = await this.rolesService.create(createRoleDto);
     return successResponse(data, 'Role created successfully', 201);
@@ -34,7 +58,11 @@ export class RolesController extends BaseController<RoleDocument> {
   @ApiResponse({ status: 200, description: 'Role updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
   @ApiResponse({ status: 404, description: 'Role not found' })
-  @ApiResponse({ status: 409, description: 'Conflict - Role with same name, key, or role_id already exists' })
+  @ApiResponse({
+    status: 409,
+    description:
+      'Conflict - Role with same name, key, or role_id already exists',
+  })
   async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     const data = await this.rolesService.update(id, updateRoleDto);
     return successResponse(data, 'Role updated successfully');
@@ -72,7 +100,11 @@ export class RolesController extends BaseController<RoleDocument> {
   // Find roles by role type
   @Get('type/:roleType')
   @ApiOperation({ summary: 'Find roles by role type' })
-  @ApiParam({ name: 'roleType', description: 'Role type number', type: 'number' })
+  @ApiParam({
+    name: 'roleType',
+    description: 'Role type number',
+    type: 'number',
+  })
   @ApiResponse({ status: 200, description: 'Roles found' })
   async findByRoleType(@Param('roleType') roleType: string) {
     const type = parseInt(roleType, 10);
@@ -83,4 +115,3 @@ export class RolesController extends BaseController<RoleDocument> {
   // Additional role-specific endpoints can be added here
   // Other CRUD operations are inherited from BaseController
 }
-

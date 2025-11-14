@@ -1,4 +1,12 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  Param,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto';
 import { PasswordUtil } from '../common/utils';
@@ -24,15 +32,15 @@ export class AuthController {
         message: 'Password decrypted successfully',
         data: {
           encryptedPassword: encryptedPassword,
-          decryptedPassword: decryptedPassword
-        }
+          decryptedPassword: decryptedPassword,
+        },
       };
     } catch (error) {
       return {
         success: false,
         code: 400,
         message: 'Failed to decrypt password',
-        data: null
+        data: null,
       };
     }
   }

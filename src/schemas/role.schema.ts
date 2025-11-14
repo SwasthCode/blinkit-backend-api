@@ -23,10 +23,9 @@ export const RoleSchema = SchemaFactory.createForClass(Role);
 
 // Transform to remove is_deleted and roles from JSON response
 RoleSchema.set('toJSON', {
-  transform: function(doc, ret: Record<string, any>) {
+  transform: function (doc, ret: Record<string, any>) {
     delete ret.is_deleted;
     delete ret.roles;
     return ret;
-  }
+  },
 });
-

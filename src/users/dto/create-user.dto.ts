@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, IsBoolean, IsArray, IsEnum } from 'class-validator';
-import { CreateBaseDto } from '../../common/base/base.dto';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+  IsEnum,
+} from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -53,7 +60,9 @@ export class CreateUserDto {
     default: 'user',
   })
   @IsOptional()
-  @IsEnum(['admin', 'user', 'moderator'], { message: 'Role must be one of: admin, user, moderator' })
+  @IsEnum(['admin', 'user', 'moderator'], {
+    message: 'Role must be one of: admin, user, moderator',
+  })
   role?: string;
 
   @ApiProperty({
@@ -63,7 +72,8 @@ export class CreateUserDto {
     default: 'active',
   })
   @IsOptional()
-  @IsEnum(['active', 'inactive', 'suspended'], { message: 'Status must be one of: active, inactive, suspended' })
+  @IsEnum(['active', 'inactive', 'suspended'], {
+    message: 'Status must be one of: active, inactive, suspended',
+  })
   status?: string;
-
 }

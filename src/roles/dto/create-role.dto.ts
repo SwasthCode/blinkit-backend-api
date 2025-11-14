@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional, MaxLength, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateRoleDto {
   @ApiProperty({
@@ -14,4 +20,3 @@ export class CreateRoleDto {
   @MaxLength(100, { message: 'Name cannot exceed 100 characters' })
   name: string;
 }
-
