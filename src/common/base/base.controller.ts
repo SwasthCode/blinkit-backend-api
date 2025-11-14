@@ -8,8 +8,9 @@ import {
     Put,
     HttpCode,
     HttpStatus,
+    Query,
   } from '@nestjs/common';
-  import { ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
+  import { ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
   import { Document } from 'mongoose';
   import { BaseService } from './base.service';
   import { successResponse } from './base.response';
@@ -44,6 +45,42 @@ import {
       const data = await this.baseService.findOne(id);
       return successResponse(data, 'Record fetched successfully');
     }
+
+
+      // Filter API
+  @Get()
+  @ApiOperation({ summary: 'Filter entities based on query parameters' })
+  @ApiResponse({ status: 200, description: 'Filtered data fetched successfully' })
+  @ApiQuery({ name: 'filters', required: false, description: 'Query parameters for filtering', type: Object })
+  async filter(@Query() filters: any) {
+    const data = await this.baseService.filter(filters);
+    return successResponse(data, 'Filtered data fetched successfully');
+  }
+
+
+  // SELECT API
+@Get('select')
+@ApiOperation({ summary: 'Select specific fields from entity' })
+@ApiResponse({ status: 200, description: 'Selected fields fetched successfully' })
+@ApiQuery({ name: 'fields', required: true, description: 'Comma-separated field names' })
+async select(@Query('fields') fields: string) {
+  const data = await this.baseService.select(fields);
+  return successResponse(data, 'Selected fields fetched successfully');
+}
+
+
+  // X token API
+
+@Post('check-token')
+@ApiOperation({ summary: 'Check x-token from body' })
+@ApiResponse({ status: 200, description: 'Token validated successfully' })
+async checkToken(@Body('xToken') xToken: string) {
+  if (!xToken) {
+    return successResponse(null, 'xToken is required', 400);
+  }
+
+  return successResponse({ xToken }, 'xToken received successfully');
+}
 
     @Put(':id')
     @ApiOperation({ summary: 'Update entity by ID' })

@@ -1,5 +1,8 @@
 import { Model, Document } from 'mongoose';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+
+import * as jwt from 'jsonwebtoken';
+
 
 @Injectable()
 export class BaseService<T extends Document> {
@@ -19,6 +22,65 @@ export class BaseService<T extends Document> {
     if (!doc) throw new NotFoundException(`Item not found with ID: ${id}`);
     return doc;
   }
+
+  // New Filter method
+  async filter(filters: any): Promise<T[]> {
+    const query: any = {};
+
+    for (const key in filters) {
+      if (filters[key]) {
+        query[key] = { $regex: new RegExp(filters[key], 'i') };
+      }
+    }
+
+    return await this.model.find(query).exec();
+  }
+
+
+  // SELECT Logic
+async select(fields: string): Promise<T[]> {
+  const projection = fields.split(',').join(' ');
+  return await this.model.find({}, projection).exec();
+}
+
+
+
+// TOKEN CHECK LOGIC
+  async checkToken(xToken: string): Promise<any> {
+    if (!xToken) {
+      throw new UnauthorizedException('xToken is required');
+    }
+
+    let decoded: any;
+    try {
+      decoded = jwt.verify(xToken, process.env.JWT_SECRET || 'defaultSecret');
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+
+    const tokenExists = await this.model.findOne({ token: xToken }).exec();
+    if (!tokenExists) {
+      throw new UnauthorizedException('Token not found in database');
+    }
+
+    if (!this.model) {
+      throw new Error('User model not injected in BaseService');
+    }
+
+    const user = await this.model.findById(decoded.userId).exec();
+    if (!user) {
+      throw new NotFoundException('User not found for this token');
+    }
+
+    return {
+      token: xToken,
+      decodedData: decoded,
+      user,
+      isValid: true,
+      message: 'Token authenticated successfully',
+    };
+  }
+
 
   async update(id: string, updateDto: any): Promise<T> {
     const updated = await this.model
