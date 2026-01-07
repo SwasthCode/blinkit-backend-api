@@ -13,28 +13,32 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
   /**
-   * Override create method to encrypt password before saving
-   * @param createUserDto - User data including plain text password
-   * @returns Promise<UserDocument> - Created user with encrypted password
+   * Override create method to handle optional password
+   * @param createUserDto - User data
+   * @returns Promise<UserDocument> - Created user
    */
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     try {
-      // Validate password strength
-      const passwordValidation = PasswordUtil.validatePasswordStrength(
-        createUserDto.password,
-      );
-      if (!passwordValidation.isValid) {
-        throw new Error(
-          `Password does not meet security requirements: ${passwordValidation.suggestions.join(', ')}`,
+      let encryptedPassword: string | undefined = undefined;
+
+      if (createUserDto.password) {
+        // Validate password strength
+        const passwordValidation = PasswordUtil.validatePasswordStrength(
+          createUserDto.password,
+        );
+        if (!passwordValidation.isValid) {
+          throw new Error(
+            `Password does not meet security requirements: ${passwordValidation.suggestions.join(', ')}`,
+          );
+        }
+
+        // Encrypt the password
+        encryptedPassword = PasswordUtil.encryptPassword(
+          createUserDto.password,
         );
       }
 
-      // Encrypt the password
-      const encryptedPassword = PasswordUtil.encryptPassword(
-        createUserDto.password,
-      );
-
-      // Create user data with encrypted password and default values
+      // Create user data with encrypted password if provided
       const userData = {
         ...createUserDto,
         password: encryptedPassword,
@@ -53,6 +57,36 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
   /**
+   * Find user by phone number
+   * @param phone_number - User phone number
+   * @returns Promise<UserDocument | null>
+   */
+  async findByPhone(phone_number: string): Promise<UserDocument | null> {
+    return this.model.findOne({ phone_number }).exec();
+  }
+
+  /**
+   * Update user profile
+   * @param userId - User ID
+   * @param profileData - Data to update
+   * @returns Promise<UserDocument>
+   */
+  async updateProfile(
+    userId: string,
+    profileData: Partial<User>,
+  ): Promise<UserDocument> {
+    const updated = await this.model
+      .findByIdAndUpdate(userId, profileData, { new: true })
+      .exec();
+
+    if (!updated) {
+      throw new Error(`User not found with ID: ${userId}`);
+    }
+
+    return updated;
+  }
+
+  /**
    * Verify user password during login
    * @param email - User email
    * @param plainPassword - Plain text password to verify
@@ -64,7 +98,7 @@ export class UsersService extends BaseService<UserDocument> {
   ): Promise<UserDocument | null> {
     try {
       const user = await this.model.findOne({ email }).exec();
-      if (!user) {
+      if (!user || !user.password) {
         return null;
       }
 

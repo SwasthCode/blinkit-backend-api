@@ -35,23 +35,33 @@ export class CreateUserDto {
   last_name: string;
 
   @ApiProperty({
+    description: 'The phone number of the user',
+    example: '+919876543210',
+  })
+  @IsNotEmpty({ message: 'Phone number is required' })
+  @IsString({ message: 'Phone number must be a string' })
+  phone_number: string;
+
+  @ApiProperty({
     description: 'The email address of the user',
     example: 'john.doe@example.com',
     format: 'email',
+    required: false,
   })
-  @IsNotEmpty({ message: 'Email is required' })
+  @IsOptional()
   @IsEmail({}, { message: 'Please provide a valid email address' })
-  email: string;
+  email?: string;
 
   @ApiProperty({
     description: 'The password of the user',
     example: 'SecurePassword123!',
     minLength: 8,
+    required: false,
   })
-  @IsNotEmpty({ message: 'Password is required' })
+  @IsOptional()
   @IsString({ message: 'Password must be a string' })
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
-  password: string;
+  password?: string;
 
   @ApiProperty({
     description: 'The role of the user',
@@ -76,4 +86,13 @@ export class CreateUserDto {
     message: 'Status must be one of: active, inactive, suspended',
   })
   status?: string;
+
+  @ApiProperty({
+    description: 'The profile image URL of the user',
+    example: 'https://example.com/profile.jpg',
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'Profile image must be a string' })
+  profile_image?: string;
 }

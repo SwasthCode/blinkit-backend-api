@@ -119,7 +119,6 @@ export class UsersController extends BaseController<UserDocument> {
     return successResponse({ id: data._id }, 'Password updated successfully');
   }
 
-  // Get current user profile (protected route)
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
@@ -132,6 +131,24 @@ export class UsersController extends BaseController<UserDocument> {
   async getProfile(@Request() req: { user: { _id: string } }) {
     const user = await this.usersService.findOne(req.user._id);
     return successResponse(user, 'User profile retrieved successfully');
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @Post('profile')
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
+  async updateProfile(
+    @Request() req: { user: { _id: string } },
+    @Body() updateProfileDto: UpdateUserDto,
+  ) {
+    const data = await this.usersService.updateProfile(
+      req.user._id,
+      updateProfileDto,
+    );
+    return successResponse(data, 'Profile updated successfully');
   }
 
   // Additional user-specific endpoints can be added here

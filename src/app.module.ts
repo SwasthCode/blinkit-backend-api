@@ -5,11 +5,18 @@ import mongoose from 'mongoose';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
+import { BannersModule } from './banners/banners.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -20,9 +27,11 @@ import { RolesModule } from './roles/roles.module';
         };
       },
     }),
+
     UsersModule,
     AuthModule,
     RolesModule,
+    BannersModule,
   ],
 })
 export class AppModule implements OnModuleInit {

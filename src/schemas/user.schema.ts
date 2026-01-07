@@ -13,10 +13,16 @@ export class User extends BaseSchema {
   last_name: string;
 
   @Prop({ required: true, unique: true })
-  email: string;
+  phone_number: string;
 
-  @Prop({ required: true })
-  password: string;
+  @Prop({ required: false, unique: true, sparse: true })
+  email?: string;
+
+  @Prop({ required: false })
+  password?: string;
+
+  @Prop({ required: false })
+  profile_image?: string;
 
   @Prop({
     required: true,
