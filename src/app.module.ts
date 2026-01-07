@@ -1,76 +1,42 @@
-import { Module, OnModuleInit } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import { AppService } from './app.service';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { BannersModule } from './banners/banners.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
-    }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: () => {
-        return {
-          uri: process.env.MONGODB_URI,
-          dbName: process.env.DATABASE_NAME || 'temp-api',
-        };
+    MongooseModule.forRoot(
+      'mongodb+srv://vedatmanepc:uvnNRUsi2tS0HFLN@cluster0.hjuni3e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+      {
+        dbName: process.env.DATABASE_NAME,
       },
+    ),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_CONSTANTS_SECRET || 'base-api-secret-key',
+      signOptions: { expiresIn: '1440h' },
     }),
+    MongooseModule.forFeature([
 
+
+    ]),
     UsersModule,
     AuthModule,
     RolesModule,
     BannersModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
+  exports: [AppService],
 })
-export class AppModule implements OnModuleInit {
-  onModuleInit() {
-    // Set up connection event listeners
-    mongoose.connection.on('connected', () => {
-      console.log('✅ MongoDB connected successfully!');
-      console.log(`📊 Database: ${mongoose.connection.db?.databaseName}`);
-      console.log(
-        `🔗 Host: ${mongoose.connection.host}:${mongoose.connection.port}`,
-      );
-    });
-
-    mongoose.connection.on('error', (err: Error) => {
-      console.error(`❌ MongoDB connection error: ${err.message}`);
-      console.error('💡 Make sure MongoDB is running on your system!');
-      console.error(
-        '   - Install MongoDB: https://docs.mongodb.com/manual/installation/',
-      );
-      console.error(
-        '   - Or use Docker: docker run -d -p 27017:27017 --name mongodb mongo:latest',
-      );
-      console.error(
-        '   - Or use MongoDB Atlas (cloud): https://www.mongodb.com/cloud/atlas',
-      );
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      console.warn('⚠️ MongoDB disconnected.');
-    });
-
-    // Check if already connected (1 = connected)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-    if (mongoose.connection.readyState === 1) {
-      console.log('✅ MongoDB already connected!');
-      console.log(`📊 Database: ${mongoose.connection.db?.databaseName}`);
-      console.log(
-        `🔗 Host: ${mongoose.connection.host}:${mongoose.connection.port}`,
-      );
-    }
-  }
-}
+export class AppModule { }
