@@ -31,36 +31,36 @@ export class CloudinaryService {
     });
   }
 
-  async uploadImage(
-    file: Express.Multer.File,
-    folder: string,
-    resourceType: 'image' | 'raw' | 'video' = 'image',
-  ): Promise<
-    { url: string; result: UploadApiResponse } | UploadApiErrorResponse
-  > {
-    return new Promise((resolve, reject) => {
-      if (!file || !file.buffer) {
-        return reject(new Error('File is undefined or does not have a buffer'));
-      }
+  // async uploadImage(
+  //   file: Express.Multer.File,
+  //   folder: string,
+  //   resourceType: 'image' | 'raw' | 'video' = 'image',
+  // ): Promise<
+  //   { url: string; result: UploadApiResponse } | UploadApiErrorResponse
+  // > {
+  //   return new Promise((resolve, reject) => {
+  //     if (!file || !file.buffer) {
+  //       return reject(new Error('File is undefined or does not have a buffer'));
+  //     }
 
-      const upload = v2.uploader.upload_stream(
-        {
-          public_id: `${Date.now()}`,
-          folder: `deal-swipe/${folder}`,
-          resource_type: resourceType,
-        },
-        (error, result: any) => {
-          if (error) return reject(error);
-          resolve({
-            url: result.secure_url,
-            result,
-          });
-        },
-      );
+  //     const upload = v2.uploader.upload_stream(
+  //       {
+  //         public_id: `${Date.now()}`,
+  //         folder: `deal-swipe/${folder}`,
+  //         resource_type: resourceType,
+  //       },
+  //       (error, result: any) => {
+  //         if (error) return reject(error);
+  //         resolve({
+  //           url: result.secure_url,
+  //           result,
+  //         });
+  //       },
+  //     );
 
-      toStream(file.buffer).pipe(upload);
-    });
-  }
+  //     toStream(file.buffer).pipe(upload);
+  //   });
+  // }
 
   async uploadImageFromPath(filePath: string): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {

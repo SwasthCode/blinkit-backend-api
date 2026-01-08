@@ -21,37 +21,37 @@ export class CloudinaryController {
   //     storage: memoryStorage(),
   //   }),
   // )
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    required: true,
-    type: 'multipart/form-data',
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    console.log('Received file:', file);
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({
+  //   required: true,
+  //   type: 'multipart/form-data',
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       file: {
+  //         type: 'string',
+  //         format: 'binary',
+  //       },
+  //     },
+  //   },
+  // })
+  // async uploadImage(@UploadedFile() file: Express.Multer.File) {
+  //   console.log('Received file:', file);
 
-    if (!file || !file.buffer) {
-      throw new BadRequestException(
-        'File is not provided or does not have a buffer',
-      );
-    }
-    // Upload to Cloudinary
-    const cloudinaryResponse = await this.cloudinaryService.uploadImage(
-      file,
-      'Skill-links',
-    );
+  //   if (!file || !file.buffer) {
+  //     throw new BadRequestException(
+  //       'File is not provided or does not have a buffer',
+  //     );
+  //   }
+  //   // Upload to Cloudinary
+  //   const cloudinaryResponse = await this.cloudinaryService.uploadImage(
+  //     file,
+  //     'Skill-links',
+  //   );
 
-    return {
-      url: cloudinaryResponse.url,
-      result: cloudinaryResponse.result,
-    };
-  }
+  //   return {
+  //     url: cloudinaryResponse.url,
+  //     result: cloudinaryResponse.result,
+  //   };
+  // }
 }

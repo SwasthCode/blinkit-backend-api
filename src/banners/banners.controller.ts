@@ -31,56 +31,56 @@ export class BannersController {
     private readonly cloudinaryService: CloudinaryService,
   ) { }
 
-  @Post('upload')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Upload a new banner with image' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        title: { type: 'string' },
-        link_url: { type: 'string' },
-        priority: { type: 'number' },
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadBanner(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: any,
-  ) {
-    if (!file) {
-      throw new Error('File is required');
-    }
+  // @Post('upload')
+  // @HttpCode(HttpStatus.CREATED)
+  // @ApiOperation({ summary: 'Upload a new banner with image' })
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       title: { type: 'string' },
+  //       link_url: { type: 'string' },
+  //       priority: { type: 'number' },
+  //       file: {
+  //         type: 'string',
+  //         format: 'binary',
+  //       },
+  //     },
+  //   },
+  // })
+  // @UseInterceptors(FileInterceptor('file'))
+  // async uploadBanner(
+  //   @UploadedFile() file: Express.Multer.File,
+  //   @Body() body: any,
+  // ) {
+  //   if (!file) {
+  //     throw new Error('File is required');
+  //   }
 
-    // Upload to Cloudinary
-    const cloudinaryResponse = await this.cloudinaryService.uploadImage(
-      file,
-      'banners',
-    );
+  //   // Upload to Cloudinary
+  //   const cloudinaryResponse = await this.cloudinaryService.uploadImage(
+  //     file,
+  //     'banners',
+  //   );
 
-    let imageUrl = '';
-    if ('url' in cloudinaryResponse) {
-      imageUrl = cloudinaryResponse.url;
-    } else {
-      throw new Error('Failed to upload image to Cloudinary');
-    }
+  //   let imageUrl = '';
+  //   if ('url' in cloudinaryResponse) {
+  //     imageUrl = cloudinaryResponse.url;
+  //   } else {
+  //     throw new Error('Failed to upload image to Cloudinary');
+  //   }
 
-    const createBannerDto: CreateBannerDto = {
-      title: body.title,
-      image_url: imageUrl,
-      link_url: body.link_url,
-      priority: body.priority ? parseInt(body.priority) : 0,
-      status: 'active',
-    };
-    const data = await this.bannersService.createBanner(createBannerDto);
-    return successResponse(data, 'Banner uploaded successfully', 201);
-  }
+  //   const createBannerDto: CreateBannerDto = {
+  //     title: body.title,
+  //     image_url: imageUrl,
+  //     link_url: body.link_url,
+  //     priority: body.priority ? parseInt(body.priority) : 0,
+  //     status: 'active',
+  //   };
+  //   const data = await this.bannersService.createBanner(createBannerDto);
+  //   return successResponse(data, 'Banner uploaded successfully', 201);
+  // }
 
   @Get()
   @ApiOperation({ summary: 'Get all active banners' })
