@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
-import { ENV } from '../../env';
 import toStream from 'buffer-to-stream';
 import { v2 as cloudinary } from 'cloudinary';
 import { Readable } from 'stream';
@@ -9,9 +8,9 @@ import { Readable } from 'stream';
 export class CloudinaryService {
   constructor() {
     v2.config({
-      cloud_name: ENV.CLOUDINARY_CLOUD_NAME,
-      api_key: ENV.CLOUDINARY_API_KEY,
-      api_secret: ENV.CLOUDINARY_API_SECRET,
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
     });
   }
 
@@ -23,9 +22,9 @@ export class CloudinaryService {
           folder: `external-event-qr`,
           resource_type: 'image',
         },
-        (error, result) => {
+        (error, result: any) => {
           if (error) return reject(error);
-          resolve(result.secure_url);
+          resolve(result?.secure_url);
         },
       );
       Readable.from(buffer).pipe(uploadStream);
@@ -50,7 +49,7 @@ export class CloudinaryService {
           folder: `deal-swipe/${folder}`,
           resource_type: resourceType,
         },
-        (error, result) => {
+        (error, result: any) => {
           if (error) return reject(error);
           resolve({
             url: result.secure_url,
@@ -76,7 +75,7 @@ export class CloudinaryService {
           folder: 'skillLink/resumes',
           resource_type: resourceType,
         },
-        (error, result) => {
+        (error, result: any) => {
           if (error) {
             console.error('Cloudinary upload error:', error);
             return reject(error);

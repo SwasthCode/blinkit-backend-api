@@ -28,52 +28,57 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.verifyPassword(
-      loginDto.email,
-      loginDto.password,
+    const user = await this.usersService.findByPhone(
+      loginDto.phone_number,
     );
 
     if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
+      // throw new UnauthorizedException('Invalid phone number');
+      return successResponse(
+        {
+        },
+        'Otp sent successfully',
+        200,
+      );
     }
+    else {
 
-    const userObj = user.toObject();
-    if (userObj.status !== 'active') {
-      throw new UnauthorizedException('User account is not active');
-    }
 
-    const payload = {
-      sub: user._id,
-      email: user.email,
-      phone_number: user.phone_number,
-      role: userObj.role,
-      status: userObj.status,
-    };
+      const userObj = user.toObject();
+      const role = [1]
+      // if (userObj.status !== 'active') {
+      //   throw new UnauthorizedException('User account is not active');
+      // }
 
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '7d', // 7 days expiry
-    });
-
-    return successResponse(
-      {
-        access_token: accessToken,
-        _id: user._id,
-        email: user.email,
+      const payload = {
+        id: user._id,
         phone_number: user.phone_number,
-        role: userObj.role,
+        role,
         status: userObj.status,
-      },
-      'Login successful',
-      200,
-    );
+      };
+
+      const accessToken = this.jwtService.sign(payload, {
+        expiresIn: '7d', // 7 days expiry
+      });
+
+      return successResponse(
+        {
+          ...userObj,
+          access_token: accessToken,
+          role,
+        },
+        'Login successful',
+        200,
+      );
+    }
   }
 
   async loginWithOtp(loginWithOtpDto: LoginWithOtpDto) {
     try {
-      // 1. Verify Firebase Token
       let decodedToken;
       try {
-        decodedToken = await admin.auth().verifyIdToken(loginWithOtpDto.firebase_token);
+        0
+        decodedToken = await admin.auth().verifyIdToken(loginWithOtpDto.phone_number);
       } catch (error) {
         console.error('Firebase token verification failed:', error);
         throw new UnauthorizedException('Invalid Firebase token');
@@ -87,11 +92,10 @@ export class AuthService {
       // 2. Find or Create User
       let user = await this.usersService.findByPhone(phoneNumber);
       if (!user) {
-        // Register new user if not exists
-        // We might want to request more info from frontend, but for now we create a basic user
+
         user = await this.usersService.create({
           phone_number: phoneNumber,
-          first_name: 'User', // Default values
+          first_name: 'User',
           last_name: phoneNumber.slice(-4),
         } as any);
       }

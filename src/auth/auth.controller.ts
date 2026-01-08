@@ -19,8 +19,8 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Login with email and password' })
-  @ApiResponse({ status: 200, description: 'Login successful' })
+  @ApiOperation({ summary: 'Login with Phone Number' })
+  @ApiResponse({ status: 200, description: 'Otp sent successfully' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
@@ -28,7 +28,7 @@ export class AuthController {
   @Post('login-with-otp')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login or register with Firebase OTP token' })
-  @ApiResponse({ status: 200, description: 'Login/Registration successful' })
+  @ApiResponse({ status: 200, description: 'Otp sent successfully' })
   async loginWithOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
     return this.authService.loginWithOtp(loginWithOtpDto);
   }

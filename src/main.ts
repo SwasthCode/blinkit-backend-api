@@ -32,8 +32,8 @@ async function createApp(): Promise<express.Express> {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('Base API')
-    .setDescription('The Base API description')
+    .setTitle('Blinkt API')
+    .setDescription('The Blinkt API description')
     .setVersion('1.0')
     .addTag('api')
     .addBearerAuth(

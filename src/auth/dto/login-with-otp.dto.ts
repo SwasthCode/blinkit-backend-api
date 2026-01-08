@@ -4,9 +4,9 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class LoginWithOtpDto {
     @ApiProperty({
         description: 'The Firebase ID Token received after OTP verification',
-        example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6...',
+        example: '+919876543210',
     })
-    @IsNotEmpty({ message: 'Firebase token is required' })
-    @IsString({ message: 'Firebase token must be a string' })
-    firebase_token: string;
+    @IsNotEmpty({ message: 'Phone number is required' })
+    @IsString({ message: 'Phone number must be a string' })
+    phone_number: string;
 }
