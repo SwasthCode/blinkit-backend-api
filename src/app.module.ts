@@ -7,8 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
-import { BannersModule } from './banners/banners.module';
-import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -30,8 +28,6 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     UsersModule,
     AuthModule,
     RolesModule,
-    BannersModule,
-    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
