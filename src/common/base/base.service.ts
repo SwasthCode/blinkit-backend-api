@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 
 import * as jwt from 'jsonwebtoken';
+import { UpdateUserDto } from 'src/users/dto';
 
 @Injectable()
 export class BaseService<T extends Document> {
@@ -119,17 +120,20 @@ export class BaseService<T extends Document> {
     };
   }
 
-  async update(id: string, updateDto: Partial<T>): Promise<T> {
-    const updated = await this.model
-      .findByIdAndUpdate(
-        id,
-        updateDto as Parameters<typeof this.model.findByIdAndUpdate>[1],
-        { new: true },
-      )
-      .exec();
-    if (!updated) throw new NotFoundException(`Item not found with ID: ${id}`);
-    return updated;
+  async updateProfile(userId: string, updateDto: UpdateUserDto) {
+    const user = await this.model.findByIdAndUpdate(
+      userId,
+      { $set: updateDto },
+      { new: true, runValidators: true },
+    );
+
+    if (!user) throw new NotFoundException('User not found');
+
+    return user;
   }
+
+
+
 
   async remove(id: string): Promise<void> {
     const result = await this.model.findByIdAndDelete(id).exec();

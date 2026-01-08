@@ -9,6 +9,10 @@ import {
   Get,
   UseGuards,
   Request,
+  UploadedFile,
+  Req,
+  UseInterceptors,
+
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -17,7 +21,10 @@ import {
   ApiBody,
   ApiParam,
   ApiBearerAuth,
+  ApiConsumes,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { BaseController } from '../common/base/base.controller';
@@ -42,19 +49,6 @@ export class UsersController extends BaseController<UserDocument> {
   async create(@Body() createUserDto: CreateUserDto) {
     const data = await this.usersService.create(createUserDto);
     return successResponse(data, 'User created successfully', 201);
-  }
-
-  // Override update method with proper DTO type and Swagger documentation
-  @Put(':id')
-  @ApiOperation({ summary: 'Update user by ID' })
-  @ApiParam({ name: 'id', description: 'User ID' })
-  @ApiBody({ type: UpdateUserDto })
-  @ApiResponse({ status: 200, description: 'User updated successfully' })
-  @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const data = await this.usersService.update(id, updateUserDto);
-    return successResponse(data, 'User updated successfully');
   }
 
   // Password verification endpoint
@@ -119,37 +113,26 @@ export class UsersController extends BaseController<UserDocument> {
     return successResponse({ id: data._id }, 'Password updated successfully');
   }
 
-  @Get('profile')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({
-    status: 200,
-    description: 'User profile retrieved successfully',
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getProfile(@Request() req: { user: { _id: string } }) {
-    const user = await this.usersService.findOne(req.user._id);
-    return successResponse(user, 'User profile retrieved successfully');
-  }
 
-  @HttpCode(HttpStatus.OK)
+
+  @Get('profile')
   @UseGuards(JwtAuthGuard)
   @Post('profile')
   @ApiOperation({ summary: 'Update current user profile' })
   @ApiBearerAuth('JWT-auth')
   @ApiBody({ type: UpdateUserDto })
   @ApiResponse({ status: 200, description: 'Profile updated successfully' })
-  async updateProfile(
+  async getProfile(
     @Request() req: { user: { _id: string } },
     @Body() updateProfileDto: UpdateUserDto,
   ) {
-    const data = await this.usersService.update(
+    const data = await this.usersService.getProfile(
       req.user._id,
-      updateProfileDto,
     );
     return successResponse(data, 'Profile updated successfully');
   }
+
+
 
   // Additional user-specific endpoints can be added here
   // Other CRUD operations are inherited from BaseController

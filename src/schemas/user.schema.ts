@@ -21,8 +21,7 @@ export class User extends BaseSchema {
   @Prop({ required: false })
   password?: string;
 
-  @Prop({ required: false })
-  profile_image?: string;
+
 
   @Prop({
     required: true,

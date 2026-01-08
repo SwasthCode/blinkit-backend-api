@@ -87,12 +87,5 @@ export class CreateUserDto {
   })
   status?: string;
 
-  @ApiProperty({
-    description: 'The profile image URL of the user',
-    example: 'https://example.com/profile.jpg',
-    required: false,
-  })
-  @IsOptional()
-  @IsString({ message: 'Profile image must be a string' })
-  profile_image?: string;
+
 }

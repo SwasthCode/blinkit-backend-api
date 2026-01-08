@@ -9,11 +9,18 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { BaseService } from './base.service';
 import { successResponse } from './base.response';
+import { UpdateUserDto } from 'src/users/dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 export class BaseController<T extends Document> {
   constructor(protected readonly baseService: BaseService<T>) { }
@@ -68,26 +75,62 @@ export class BaseController<T extends Document> {
 
   // X token API
 
-  @Post('check-token')
-  @ApiOperation({ summary: 'Check x-token from body' })
-  @ApiResponse({ status: 200, description: 'Token validated successfully' })
-  checkToken(@Body('xToken') xToken: string) {
-    if (!xToken) {
-      return successResponse(null, 'xToken is required', 400);
+  // @Post('check-token')
+  // @ApiOperation({ summary: 'Check x-token from body' })
+  // @ApiResponse({ status: 200, description: 'Token validated successfully' })
+  // checkToken(@Body('xToken') xToken: string) {
+  //   if (!xToken) {
+  //     return successResponse(null, 'xToken is required', 400);
+  //   }
+
+  //   return successResponse({ xToken }, 'xToken received successfully');
+  // }
+
+  // @Put(':id')
+  // @ApiOperation({ summary: 'Update entity by ID' })
+  // @ApiParam({ name: 'id', description: 'Entity ID' })
+  // @ApiResponse({ status: 200, description: 'Entity updated successfully' })
+  // @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
+  // @ApiResponse({ status: 404, description: 'Entity not found' })
+  // async update(@Param('id') id: string, @Body() updateDto: UpdateUserDto) {
+  //   const data = await this.baseService.updateProfile(id, updateDto);
+  //   return successResponse(data, 'Updated successfully');
+  // }
+
+  @Put('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('profile_image'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        first_name: { type: 'string' },
+        last_name: { type: 'string' },
+        email: { type: 'string' },
+        profile_image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async updateProfile(
+    @Req() req: any,
+    @Body() updateDto: UpdateUserDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (file) {
+      updateDto.profile_image = `/uploads/${file.filename}`;
     }
 
-    return successResponse({ xToken }, 'xToken received successfully');
-  }
+    const data = await this.baseService.updateProfile(
+      req.user._id,
+      updateDto,
+    );
 
-  @Put(':id')
-  @ApiOperation({ summary: 'Update entity by ID' })
-  @ApiParam({ name: 'id', description: 'Entity ID' })
-  @ApiResponse({ status: 200, description: 'Entity updated successfully' })
-  @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
-  @ApiResponse({ status: 404, description: 'Entity not found' })
-  async update(@Param('id') id: string, @Body() updateDto: Partial<T>) {
-    const data = await this.baseService.update(id, updateDto);
-    return successResponse(data, 'Updated successfully');
+    return successResponse(data, 'Profile updated successfully');
   }
 
   @Delete(':id')

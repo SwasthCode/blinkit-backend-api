@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
-import { CreateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { BaseService } from '../common/base/base.service';
 import { PasswordUtil } from '../common/utils';
 
@@ -139,7 +139,21 @@ export class UsersService extends BaseService<UserDocument> {
         error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to update password: ${errorMessage}`);
     }
+
+
   }
+
+
+  async getProfile(userId: string) {
+    const user = await this.model.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
 
   // Additional user-specific methods can be added here
   // The basic CRUD operations are inherited from BaseService

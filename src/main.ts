@@ -35,7 +35,7 @@ async function createApp(): Promise<express.Express> {
     .setTitle('Blinkt API')
     .setDescription('The Blinkt API description')
     .setVersion('1.0')
-    .addTag('api')
+    // .addTag('api')
     .addBearerAuth(
       {
         type: 'http',
