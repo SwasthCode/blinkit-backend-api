@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -26,10 +25,7 @@ import { BannersModule } from './banners/banners.module';
       secret: process.env.JWT_CONSTANTS_SECRET || 'base-api-secret-key',
       signOptions: { expiresIn: '1440h' },
     }),
-    MongooseModule.forFeature([
-
-
-    ]),
+    MongooseModule.forFeature([]),
     UsersModule,
     AuthModule,
     RolesModule,
@@ -39,4 +35,4 @@ import { BannersModule } from './banners/banners.module';
   providers: [AppService],
   exports: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

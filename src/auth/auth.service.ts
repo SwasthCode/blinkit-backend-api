@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { LoginDto, LoginWithOtpDto } from './dto';
@@ -28,24 +32,14 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.findByPhone(
-      loginDto.phone_number,
-    );
+    const user = await this.usersService.findByPhone(loginDto.phone_number);
 
     if (!user) {
       // throw new UnauthorizedException('Invalid phone number');
-      return successResponse(
-        {
-        },
-        'Otp sent successfully',
-        200,
-      );
-    }
-    else {
-
-
+      return successResponse({}, 'Otp sent successfully', 200);
+    } else {
       const userObj = user.toObject();
-      const role = [1]
+      const role = [1];
       // if (userObj.status !== 'active') {
       //   throw new UnauthorizedException('User account is not active');
       // }
@@ -77,8 +71,10 @@ export class AuthService {
     try {
       let decodedToken;
       try {
-        0
-        decodedToken = await admin.auth().verifyIdToken(loginWithOtpDto.phone_number);
+        0;
+        decodedToken = await admin
+          .auth()
+          .verifyIdToken(loginWithOtpDto.phone_number);
       } catch (error) {
         console.error('Firebase token verification failed:', error);
         throw new UnauthorizedException('Invalid Firebase token');
@@ -92,7 +88,6 @@ export class AuthService {
       // 2. Find or Create User
       let user = await this.usersService.findByPhone(phoneNumber);
       if (!user) {
-
         user = await this.usersService.create({
           phone_number: phoneNumber,
           first_name: 'User',
@@ -147,4 +142,3 @@ export class AuthService {
     return null;
   }
 }
-

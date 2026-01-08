@@ -8,19 +8,19 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from './cloudinary.service';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { memoryStorage } from 'multer';
+// import { memoryStorage } from 'multer';
 
 @ApiTags('Cloudinary Image Uploader')
 @Controller('upload')
 export class CloudinaryController {
-  constructor(private readonly cloudinaryService: CloudinaryService) {}
+  constructor(private readonly cloudinaryService: CloudinaryService) { }
 
-  @Post('image')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: memoryStorage(),
-    }),
-  )
+  // @Post('image')
+  // @UseInterceptors(
+  //   FileInterceptor('file', {
+  //     storage: memoryStorage(),
+  //   }),
+  // )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     required: true,
