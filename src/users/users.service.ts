@@ -65,26 +65,7 @@ export class UsersService extends BaseService<UserDocument> {
     return this.model.findOne({ phone_number }).exec();
   }
 
-  /**
-   * Update user profile
-   * @param userId - User ID
-   * @param profileData - Data to update
-   * @returns Promise<UserDocument>
-   */
-  async updateProfile(
-    userId: string,
-    profileData: Partial<User>,
-  ): Promise<UserDocument> {
-    const updated = await this.model
-      .findByIdAndUpdate(userId, profileData, { new: true })
-      .exec();
 
-    if (!updated) {
-      throw new Error(`User not found with ID: ${userId}`);
-    }
-
-    return updated;
-  }
 
   /**
    * Verify user password during login

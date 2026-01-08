@@ -16,7 +16,7 @@ import { BaseService } from './base.service';
 import { successResponse } from './base.response';
 
 export class BaseController<T extends Document> {
-  constructor(protected readonly baseService: BaseService<T>) {}
+  constructor(protected readonly baseService: BaseService<T>) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -29,10 +29,30 @@ export class BaseController<T extends Document> {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all entities' })
-  @ApiResponse({ status: 200, description: 'List of all entities' })
-  async findAll() {
-    const data = await this.baseService.findAll();
+  @ApiOperation({ summary: 'Get all entities with advanced filtering, sorting, and pagination' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of entities',
+  })
+  @ApiQuery({ name: 'filter', required: false, type: String, description: 'JSON string filter, e.g. {"status":"active"}' })
+  @ApiQuery({ name: 'select', required: false, type: String, description: 'Fields to select (comma/space separated), e.g. "name email"' })
+  @ApiQuery({ name: 'sort', required: false, type: String, description: 'Sort order (JSON or fields), e.g. {"createdAt":-1} or "createdAt -name"' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Limit the number of results, e.g. 10' })
+  @ApiQuery({ name: 'skip', required: false, type: Number, description: 'Skip a number of results (offset), e.g. 20' })
+  async findAll(
+    @Query('filter') filter?: string,
+    @Query('select') select?: string,
+    @Query('sort') sort?: string,
+    @Query('limit') limit?: number,
+    @Query('skip') skip?: number,
+  ) {
+    const data = await this.baseService.findAll({
+      filter,
+      select,
+      sort,
+      limit,
+      skip,
+    });
     return successResponse(data, 'Data fetched successfully');
   }
 
@@ -44,41 +64,6 @@ export class BaseController<T extends Document> {
   async findOne(@Param('id') id: string) {
     const data = await this.baseService.findOne(id);
     return successResponse(data, 'Record fetched successfully');
-  }
-
-  // Filter API
-  @Get()
-  @ApiOperation({ summary: 'Filter entities based on query parameters' })
-  @ApiResponse({
-    status: 200,
-    description: 'Filtered data fetched successfully',
-  })
-  @ApiQuery({
-    name: 'filters',
-    required: false,
-    description: 'Query parameters for filtering',
-    type: Object,
-  })
-  async filter(@Query() filters: Record<string, unknown>) {
-    const data = await this.baseService.filter(filters);
-    return successResponse(data, 'Filtered data fetched successfully');
-  }
-
-  // SELECT API
-  @Get('select')
-  @ApiOperation({ summary: 'Select specific fields from entity' })
-  @ApiResponse({
-    status: 200,
-    description: 'Selected fields fetched successfully',
-  })
-  @ApiQuery({
-    name: 'fields',
-    required: true,
-    description: 'Comma-separated field names',
-  })
-  async select(@Query('fields') fields: string) {
-    const data = await this.baseService.select(fields);
-    return successResponse(data, 'Selected fields fetched successfully');
   }
 
   // X token API

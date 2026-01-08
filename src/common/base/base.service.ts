@@ -9,40 +9,72 @@ import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class BaseService<T extends Document> {
-  constructor(protected readonly model: Model<T>) {}
+  constructor(protected readonly model: Model<T>) { }
 
   async create(createDto: any): Promise<T> {
     const created = new this.model(createDto);
     return created.save();
   }
 
-  async findAll(): Promise<T[]> {
-    return this.model.find().exec();
+  async findAll(options: {
+    filter?: string;
+    select?: string;
+    sort?: string;
+    limit?: number;
+    skip?: number;
+  }): Promise<T[]> {
+    const { filter, select, sort, limit, skip } = options;
+
+    // Parse filter
+    let query = {};
+    if (filter) {
+      try {
+        query = JSON.parse(filter);
+        // Basic sanitization or transformation could go here if needed
+        // For regex search support in JSON, we might need a custom parser or convention
+        // For now, assuming standard MongoDB query object structure
+      } catch (e) {
+        // Fallback for simple key-value if not JSON, or just ignore (or throw)
+        console.warn('Invalid JSON filter:', filter);
+      }
+    }
+
+    // Parse sort
+    let sortOptions: any = {};
+    if (sort) {
+      try {
+        sortOptions = JSON.parse(sort);
+      } catch (e) {
+        // Handle "field" or "-field" string format
+        sortOptions = sort;
+      }
+    }
+
+    let q = this.model.find(query);
+
+    if (select) {
+      q = q.select(select.split(',').join(' '));
+    }
+
+    if (sortOptions) {
+      q = q.sort(sortOptions);
+    }
+
+    if (skip) {
+      q = q.skip(Number(skip));
+    }
+
+    if (limit) {
+      q = q.limit(Number(limit));
+    }
+
+    return q.exec();
   }
 
   async findOne(id: string): Promise<T> {
     const doc = await this.model.findById(id).exec();
     if (!doc) throw new NotFoundException(`Item not found with ID: ${id}`);
     return doc;
-  }
-
-  // New Filter method
-  async filter(filters: Record<string, unknown>): Promise<T[]> {
-    const query: Record<string, { $regex: RegExp }> = {};
-
-    for (const key in filters) {
-      if (filters[key] && typeof filters[key] === 'string') {
-        query[key] = { $regex: new RegExp(filters[key], 'i') };
-      }
-    }
-
-    return await this.model.find(query).exec();
-  }
-
-  // SELECT Logic
-  async select(fields: string): Promise<T[]> {
-    const projection = fields.split(',').join(' ');
-    return await this.model.find({}, projection).exec();
   }
 
   // TOKEN CHECK LOGIC

@@ -144,7 +144,7 @@ export class UsersController extends BaseController<UserDocument> {
     @Request() req: { user: { _id: string } },
     @Body() updateProfileDto: UpdateUserDto,
   ) {
-    const data = await this.usersService.updateProfile(
+    const data = await this.usersService.update(
       req.user._id,
       updateProfileDto,
     );
