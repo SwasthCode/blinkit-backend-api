@@ -115,25 +115,6 @@ export class UsersController extends BaseController<UserDocument> {
 
 
 
-  @Get('profile')
-  @UseGuards(JwtAuthGuard)
-  @Post('profile')
-  @ApiOperation({ summary: 'Update current user profile' })
-  @ApiBearerAuth('JWT-auth')
-  @ApiBody({ type: UpdateUserDto })
-  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
-  async getProfile(
-    @Request() req: { user: { _id: string } },
-    @Body() updateProfileDto: UpdateUserDto,
-  ) {
-    const data = await this.usersService.getProfile(
-      req.user._id,
-    );
-    return successResponse(data, 'Profile updated successfully');
-  }
 
 
-
-  // Additional user-specific endpoints can be added here
-  // Other CRUD operations are inherited from BaseController
 }
