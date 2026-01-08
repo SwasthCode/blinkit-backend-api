@@ -39,7 +39,7 @@ export class AuthService {
       return successResponse({}, 'Otp sent successfully', 200);
     } else {
       const userObj = user.toObject();
-      const role = [1];
+      const role = [10]; // customer
       // if (userObj.status !== 'active') {
       //   throw new UnauthorizedException('User account is not active');
       // }

@@ -9,4 +9,13 @@ export class LoginWithOtpDto {
   @IsNotEmpty({ message: 'Phone number is required' })
   @IsString({ message: 'Phone number must be a string' })
   phone_number: string;
+
+
+  @ApiProperty({
+    description: 'The OTP received after OTP verification',
+    example: '123456',
+  })
+  @IsNotEmpty({ message: 'OTP is required' })
+  @IsString({ message: 'OTP must be a string' })
+  otp: string;
 }
