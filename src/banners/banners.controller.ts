@@ -19,15 +19,17 @@ import {
 } from '@nestjs/swagger';
 import { BannersService } from './banners.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
-// import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @ApiTags('Banners')
 @Controller('banners')
 export class BannersController {
-  constructor(private readonly bannersService: BannersService) { }
+  constructor(
+    private readonly bannersService: BannersService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) { }
 
   @Post('upload')
   @HttpCode(HttpStatus.CREATED)
@@ -47,27 +49,31 @@ export class BannersController {
       },
     },
   })
-  // @UseInterceptors(
-  //   FileInterceptor('file', {
-  //     storage: diskStorage({
-  //       destination: './uploads/banners',
-  //       filename: (req, file, cb) => {
-  //         const randomName = Array(32)
-  //           .fill(null)
-  //           .map(() => Math.round(Math.random() * 16).toString(16))
-  //           .join('');
-  //         return cb(null, `${randomName}${extname(file.originalname)}`);
-  //       },
-  //     }),
-  //   }),
-  // )
+  @UseInterceptors(FileInterceptor('file'))
   async uploadBanner(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: any,
   ) {
+    if (!file) {
+      throw new Error('File is required');
+    }
+
+    // Upload to Cloudinary
+    const cloudinaryResponse = await this.cloudinaryService.uploadImage(
+      file,
+      'banners',
+    );
+
+    let imageUrl = '';
+    if ('url' in cloudinaryResponse) {
+      imageUrl = cloudinaryResponse.url;
+    } else {
+      throw new Error('Failed to upload image to Cloudinary');
+    }
+
     const createBannerDto: CreateBannerDto = {
       title: body.title,
-      image_url: `/uploads/banners/${file.filename}`,
+      image_url: imageUrl,
       link_url: body.link_url,
       priority: body.priority ? parseInt(body.priority) : 0,
       status: 'active',
