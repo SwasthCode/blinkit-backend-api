@@ -6,12 +6,6 @@ import {
   Put,
   HttpCode,
   HttpStatus,
-  Get,
-  UseGuards,
-  Request,
-  UploadedFile,
-  Req,
-  UseInterceptors,
 
 } from '@nestjs/common';
 import {
@@ -20,15 +14,11 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
-  ApiBearerAuth,
-  ApiConsumes,
 } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto } from './dto';
 import { BaseController } from '../common/base/base.controller';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserDocument } from '../schemas/user.schema';
 import { successResponse } from '../common/base/base.response';
 
@@ -39,7 +29,6 @@ export class UsersController extends BaseController<UserDocument> {
     super(usersService);
   }
 
-  // Override create method with proper DTO type and Swagger documentation
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new user' })
@@ -51,7 +40,6 @@ export class UsersController extends BaseController<UserDocument> {
     return successResponse(data, 'User created successfully', 201);
   }
 
-  // Password verification endpoint
   @Post('verify-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify user password' })
@@ -112,9 +100,4 @@ export class UsersController extends BaseController<UserDocument> {
     const data = await this.usersService.updatePassword(id, body.newPassword);
     return successResponse({ id: data._id }, 'Password updated successfully');
   }
-
-
-
-
-
 }

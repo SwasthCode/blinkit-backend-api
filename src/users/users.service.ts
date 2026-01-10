@@ -12,11 +12,7 @@ export class UsersService extends BaseService<UserDocument> {
     super(userModel);
   }
 
-  /**
-   * Override create method to handle optional password
-   * @param createUserDto - User data
-   * @returns Promise<UserDocument> - Created user
-   */
+
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     try {
       let encryptedPassword: string | undefined = undefined;
@@ -56,23 +52,14 @@ export class UsersService extends BaseService<UserDocument> {
     }
   }
 
-  /**
-   * Find user by phone number
-   * @param phone_number - User phone number
-   * @returns Promise<UserDocument | null>
-   */
+
   async findByPhone(phone_number: string): Promise<UserDocument | null> {
     return this.model.findOne({ phone_number }).exec();
   }
 
 
 
-  /**
-   * Verify user password during login
-   * @param email - User email
-   * @param plainPassword - Plain text password to verify
-   * @returns Promise<UserDocument | null> - User if password is correct, null otherwise
-   */
+
   async verifyPassword(
     email: string,
     plainPassword: string,
@@ -83,7 +70,6 @@ export class UsersService extends BaseService<UserDocument> {
         return null;
       }
 
-      // Decrypt stored password and compare
       const decryptedPassword = PasswordUtil.decryptPassword(user.password);
       if (decryptedPassword === plainPassword) {
         return user;
@@ -97,12 +83,7 @@ export class UsersService extends BaseService<UserDocument> {
     }
   }
 
-  /**
-   * Update user password
-   * @param userId - User ID
-   * @param newPassword - New plain text password
-   * @returns Promise<UserDocument> - Updated user
-   */
+
   async updatePassword(
     userId: string,
     newPassword: string,
@@ -155,6 +136,5 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
 
-  // Additional user-specific methods can be added here
-  // The basic CRUD operations are inherited from BaseService
+ 
 }
