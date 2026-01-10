@@ -20,7 +20,9 @@ import { BaseService } from './base.service';
 import { successResponse } from './base.response';
 import { UpdateUserDto } from 'src/users/dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+// import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+
 
 export class BaseController<T extends Document> {
   constructor(protected readonly baseService: BaseService<T>) { }
