@@ -15,7 +15,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -25,9 +25,9 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Post('login-with-otp')
+  @Post('verify-otp')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Login or register with Firebase OTP token' })
+  @ApiOperation({ summary: 'Verify OTP' })
   @ApiResponse({ status: 200, description: 'Otp sent successfully' })
   async loginWithOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
     return this.authService.loginWithOtp(loginWithOtpDto);

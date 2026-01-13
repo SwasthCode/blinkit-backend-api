@@ -1,5 +1,22 @@
-import { Controller, Put, Param, Body, Post, HttpCode, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import {
+    Controller,
+    Put,
+    Param,
+    Body,
+    Post,
+    HttpCode,
+    HttpStatus,
+    UseInterceptors,
+    UploadedFile,
+} from '@nestjs/common';
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiParam,
+    ApiBody,
+    ApiConsumes,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { BaseController } from '../common/base/base.controller';
@@ -33,7 +50,7 @@ export class CategoriesController extends BaseController<CategoryDocument> {
                     format: 'binary',
                 },
             },
-            // required: ['name'],
+            required: ['name'],
         },
     })
     @ApiResponse({ status: 201, description: 'Category created successfully' })
@@ -42,26 +59,12 @@ export class CategoriesController extends BaseController<CategoryDocument> {
         @Body() createCategoryDto: CreateCategoryDto,
         @UploadedFile() file?: Express.Multer.File,
     ) {
-        console.log('Create Category Request:', { createCategoryDto, file: file ? file.originalname : 'no file' });
-        try {
-            if (file) {
-                console.log('Uploading to Cloudinary...');
-                const { url } = await uploadToCloudinaryBuffer(
-                    `category_${Date.now()}`,
-                    file.buffer,
-                ) as { url: string };
-                createCategoryDto.image = url;
-                console.log('Cloudinary Upload Success:', url);
-            }
-            const data = await this.categoriesService.create(createCategoryDto);
-            console.log('Database Save Success:', data._id);
-            return successResponse(data, 'Category created successfully', 201);
-        } catch (error) {
-            console.error('Create Category Error:', error);
-            throw error;
+        if (file) {
+            createCategoryDto.image = `/uploads/${file.filename}`;
         }
+        const data = await this.categoriesService.create(createCategoryDto);
+        return successResponse(data, 'Category created successfully', 201);
     }
-    
 
     @Put(':id')
     @ApiOperation({ summary: 'Update category by ID' })
@@ -90,11 +93,7 @@ export class CategoriesController extends BaseController<CategoryDocument> {
         @UploadedFile() file?: Express.Multer.File,
     ) {
         if (file) {
-            const { url } = await uploadToCloudinaryBuffer(
-                `category_${Date.now()}`,
-                file.buffer,
-            ) as { url: string };
-            updateCategoryDto.image = url;
+            updateCategoryDto.image = `/uploads/${file.filename}`;
         }
         const data = await this.categoriesService.update(id, updateCategoryDto);
         return successResponse(data, 'Category updated successfully');

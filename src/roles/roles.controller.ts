@@ -62,7 +62,10 @@ export class RolesController extends BaseController<RoleDocument> {
     description:
       'Conflict - Role with same name, key, or role_id already exists',
   })
-  async updateRole(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
+  async updateRole(
+    @Param('id') id: string,
+    @Body() updateRoleDto: UpdateRoleDto,
+  ) {
     const data = await this.rolesService.update(id, updateRoleDto);
     return successResponse(data, 'Role updated successfully');
   }

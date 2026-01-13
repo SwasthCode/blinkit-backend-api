@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsOptional,
-  IsDateString,
-  IsBoolean,
-  IsString,
-  IsArray,
-} from 'class-validator';
+import { IsOptional, IsDateString, IsBoolean, IsString } from 'class-validator';
 
 export class BaseDto {
   @ApiProperty({
@@ -55,14 +49,14 @@ export class CreateBaseDto {
   @IsString({ message: 'Status must be a string' })
   status?: string;
 
-  @ApiProperty({
-    description: 'Entity roles',
-    example: [],
-    required: false,
-  })
-  @IsOptional()
-  @IsArray({ message: 'Roles must be an array' })
-  roles?: any[];
+  // @ApiProperty({
+  //   description: 'Entity roles',
+  //   example: [],
+  //   required: false,
+  // })
+  // @IsOptional()
+  // @IsArray({ message: 'Roles must be an array' })
+  // roles?: any[];
 }
 
 export class UpdateBaseDto {
@@ -93,12 +87,12 @@ export class UpdateBaseDto {
   @IsString({ message: 'Status must be a string' })
   status?: string;
 
-  @ApiProperty({
-    description: 'Entity roles',
-    example: [],
-    required: false,
-  })
-  @IsOptional()
-  @IsArray({ message: 'Roles must be an array' })
-  roles?: any[];
+  // @ApiProperty({
+  //   description: 'Entity roles',
+  //   example: [],
+  //   required: false,
+  // })
+  // @IsOptional()
+  // @IsArray({ message: 'Roles must be an array' })
+  // roles?: any[];
 }

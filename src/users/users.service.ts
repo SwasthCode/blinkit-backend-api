@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto } from './dto';
 import { BaseService } from '../common/base/base.service';
 import { PasswordUtil } from '../common/utils';
 
@@ -11,7 +11,6 @@ export class UsersService extends BaseService<UserDocument> {
   constructor(@InjectModel(User.name) userModel: Model<UserDocument>) {
     super(userModel);
   }
-
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     try {
@@ -35,54 +34,61 @@ export class UsersService extends BaseService<UserDocument> {
       }
 
       // Create user data with encrypted password if provided
-      const userData = {
+      const userData: any = {
         ...createUserDto,
         password: encryptedPassword,
-        role: createUserDto.role || 'user',
-        status: createUserDto.status || 'active',
+        // role: createUserDto.role || 'user',
+        // status: createUserDto.status || 'active',
       };
+
+      if (!userData.email) {
+        delete userData.email;
+      }
 
       // Create and save the user
       const created = new this.model(userData);
-      return created.save();
+      return await created.save();
     } catch (error) {
+      if (error && error.code === 11000) {
+        if (error.keyPattern.phone_number) {
+          throw new Error('User with this phone number already exists');
+        }
+        if (error.keyPattern.email) {
+          throw new Error('User with this email already exists');
+        }
+      }
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to create user: ${errorMessage}`);
     }
   }
 
-
   async findByPhone(phone_number: string): Promise<UserDocument | null> {
     return this.model.findOne({ phone_number }).exec();
   }
 
+  // async verifyPassword(
+  //   email: string,
+  //   plainPassword: string,
+  // ): Promise<UserDocument | null> {
+  //   try {
+  //     const user = await this.model.findOne({ email }).exec();
+  //     if (!user || !user.password) {
+  //       return null;
+  //     }
 
+  //     const decryptedPassword = PasswordUtil.decryptPassword(user.password);
+  //     if (decryptedPassword === plainPassword) {
+  //       return user;
+  //     }
 
-
-  async verifyPassword(
-    email: string,
-    plainPassword: string,
-  ): Promise<UserDocument | null> {
-    try {
-      const user = await this.model.findOne({ email }).exec();
-      if (!user || !user.password) {
-        return null;
-      }
-
-      const decryptedPassword = PasswordUtil.decryptPassword(user.password);
-      if (decryptedPassword === plainPassword) {
-        return user;
-      }
-
-      return null;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Password verification failed: ${errorMessage}`);
-    }
-  }
-
+  //     return null;
+  //   } catch (error) {
+  //     const errorMessage =
+  //       error instanceof Error ? error.message : 'Unknown error';
+  //     throw new Error(`Password verification failed: ${errorMessage}`);
+  //   }
+  // }
 
   async updatePassword(
     userId: string,
@@ -120,10 +126,7 @@ export class UsersService extends BaseService<UserDocument> {
         error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to update password: ${errorMessage}`);
     }
-
-
   }
-
 
   async getProfile(userId: string) {
     const user = await this.model.findById(userId);
@@ -134,7 +137,4 @@ export class UsersService extends BaseService<UserDocument> {
 
     return user;
   }
-
-
- 
 }

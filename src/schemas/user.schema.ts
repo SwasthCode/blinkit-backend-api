@@ -6,10 +6,10 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
 export class User extends BaseSchema {
-  @Prop({ required: true })
+  @Prop({ required: false })
   first_name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   last_name: string;
 
   @Prop({ required: true, unique: true })
@@ -20,8 +20,6 @@ export class User extends BaseSchema {
 
   @Prop({ required: false })
   password?: string;
-
-
 
   @Prop({
     required: true,

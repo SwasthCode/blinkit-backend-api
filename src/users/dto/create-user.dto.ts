@@ -16,11 +16,11 @@ export class CreateUserDto {
     minLength: 2,
     maxLength: 50,
   })
-  @IsNotEmpty({ message: 'First name is required' })
+  @IsOptional()
   @IsString({ message: 'First name must be a string' })
   @MinLength(2, { message: 'First name must be at least 2 characters long' })
   @MaxLength(50, { message: 'First name cannot exceed 50 characters' })
-  first_name: string;
+  first_name?: string;
 
   @ApiProperty({
     description: 'The last name of the user',
@@ -28,15 +28,15 @@ export class CreateUserDto {
     minLength: 2,
     maxLength: 50,
   })
-  @IsNotEmpty({ message: 'Last name is required' })
+  @IsOptional()
   @IsString({ message: 'Last name must be a string' })
   @MinLength(2, { message: 'Last name must be at least 2 characters long' })
   @MaxLength(50, { message: 'Last name cannot exceed 50 characters' })
-  last_name: string;
+  last_name?: string;
 
   @ApiProperty({
     description: 'The phone number of the user',
-    example: '+919876543210',
+    example: '9876543210',
   })
   @IsNotEmpty({ message: 'Phone number is required' })
   @IsString({ message: 'Phone number must be a string' })
@@ -70,10 +70,8 @@ export class CreateUserDto {
     default: 'user',
   })
   @IsOptional()
-  @IsEnum(['admin', 'user', 'moderator'], {
-    message: 'Role must be one of: admin, user, moderator',
-  })
-  role?: string;
+  @IsEnum([10], { message: 'Role must be one of: admin, user, moderator' })
+  role?: [];
 
   @ApiProperty({
     description: 'The status of the user',
@@ -86,6 +84,4 @@ export class CreateUserDto {
     message: 'Status must be one of: active, inactive, suspended',
   })
   status?: string;
-
-
 }

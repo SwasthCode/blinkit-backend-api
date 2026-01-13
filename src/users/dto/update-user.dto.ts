@@ -1,6 +1,5 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
-import { IsEmail, IsEnum, IsOptional } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -9,7 +8,9 @@ export class UpdateUserDto {
     minLength: 2,
     maxLength: 50,
   })
-  first_name: string;
+  @IsOptional()
+  @IsString()
+  first_name?: string;
 
   @ApiProperty({
     description: 'The last name of the user',
@@ -17,13 +18,17 @@ export class UpdateUserDto {
     minLength: 2,
     maxLength: 50,
   })
-  last_name: string;
+  @IsOptional()
+  @IsString()
+  last_name?: string;
 
   @ApiProperty({
     description: 'The phone number of the user',
     example: '+919876543210',
   })
-  phone_number: string;
+  @IsOptional()
+  @IsString()
+  phone_number?: string;
 
   @ApiProperty({
     description: 'The email address of the user',
