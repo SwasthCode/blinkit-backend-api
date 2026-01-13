@@ -99,41 +99,41 @@ export class BaseController<T extends Document> {
   //   return successResponse(data, 'Updated successfully');
   // }
 
-  @Put('profile')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('profile_image'))
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        first_name: { type: 'string' },
-        last_name: { type: 'string' },
-        email: { type: 'string' },
-        profile_image: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  async updateProfile(
-    @Req() req: any,
-    @Body() updateDto: UpdateUserDto,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-    if (file) {
-      updateDto.profile_image = `/uploads/${file.filename}`;
-    }
+  // @Put('profile')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth('JWT-auth')
+  // @ApiConsumes('multipart/form-data')
+  // @UseInterceptors(FileInterceptor('profile_image'))
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       first_name: { type: 'string' },
+  //       last_name: { type: 'string' },
+  //       email: { type: 'string' },
+  //       profile_image: {
+  //         type: 'string',
+  //         format: 'binary',
+  //       },
+  //     },
+  //   },
+  // })
+  // async updateProfile(
+  //   @Req() req: any,
+  //   @Body() updateDto: UpdateUserDto,
+  //   @UploadedFile() file?: Express.Multer.File,
+  // ) {
+  //   if (file) {
+  //     updateDto.profile_image = `/uploads/${file.filename}`;
+  //   }
 
-    const data = await this.baseService.updateProfile(
-      req.user._id,
-      updateDto,
-    );
+  //   const data = await this.baseService.updateProfile(
+  //     req.user._id,
+  //     updateDto,
+  //   );
 
-    return successResponse(data, 'Profile updated successfully');
-  }
+  //   return successResponse(data, 'Profile updated successfully');
+  // }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete entity by ID' })
