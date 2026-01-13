@@ -3,8 +3,8 @@ import { IsNotEmpty, IsString, IsOptional, IsEnum } from 'class-validator';
 
 export class CreateCategoryDto {
     @ApiProperty({ example: 'Electronics', description: 'The name of the category' })
-    @IsNotEmpty()
     @IsString()
+    @IsNotEmpty()
     name: string;
 
     @ApiProperty({ example: 'Mobile phones and laptops', description: 'Category description', required: false })
