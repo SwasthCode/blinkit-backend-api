@@ -30,7 +30,6 @@ import { UserDocument } from '../schemas/user.schema';
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-
 @ApiTags('users')
 @Controller('users')
 export class UsersController extends BaseController<UserDocument> {
@@ -53,7 +52,10 @@ export class UsersController extends BaseController<UserDocument> {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get user profile' })
-  @ApiResponse({ status: 200, description: 'User profile fetched successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile fetched successfully',
+  })
   async getProfile(@Req() req: any) {
     const data = await this.usersService.getProfile(req.user._id);
     return successResponse(data, 'User profile fetched successfully');
@@ -65,7 +67,10 @@ export class UsersController extends BaseController<UserDocument> {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('profile_image'))
   @ApiOperation({ summary: 'Update user profile' })
-  @ApiResponse({ status: 200, description: 'User profile updated successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile updated successfully',
+  })
   async updateProfile(
     @Req() req: any,
     @Body() updateUserDto: UpdateUserDto,
@@ -74,7 +79,10 @@ export class UsersController extends BaseController<UserDocument> {
     if (file) {
       updateUserDto.profile_image = `/uploads/${file.filename}`;
     }
-    const data = await this.usersService.updateProfile(req.user._id, updateUserDto);
+    const data = await this.usersService.updateProfile(
+      req.user._id,
+      updateUserDto,
+    );
     return successResponse(data, 'User profile updated successfully');
   }
 

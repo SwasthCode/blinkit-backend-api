@@ -7,21 +7,24 @@ import { UpdateCategoryDto } from './dto';
 
 @Injectable()
 export class CategoriesService extends BaseService<CategoryDocument> {
-    constructor(
-        @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
-    ) {
-        super(categoryModel);
+  constructor(
+    @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
+  ) {
+    super(categoryModel);
+  }
+
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<CategoryDocument> {
+    const updatedCategory = await this.categoryModel
+      .findByIdAndUpdate(id, updateCategoryDto, { new: true })
+      .exec();
+
+    if (!updatedCategory) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
     }
 
-    async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<CategoryDocument> {
-        const updatedCategory = await this.categoryModel
-            .findByIdAndUpdate(id, updateCategoryDto, { new: true })
-            .exec();
-
-        if (!updatedCategory) {
-            throw new NotFoundException(`Category with ID ${id} not found`);
-        }
-
-        return updatedCategory;
-    }
+    return updatedCategory;
+  }
 }

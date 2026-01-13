@@ -10,7 +10,6 @@ export class LoginWithOtpDto {
   @IsString({ message: 'Phone number must be a string' })
   phone_number: string;
 
-
   @ApiProperty({
     description: 'The OTP received after OTP verification',
     example: '1234',

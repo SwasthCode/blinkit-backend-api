@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { LoginDto, LoginWithOtpDto } from './dto';
@@ -82,7 +78,11 @@ export class AuthService {
         } as any);
       } catch (error) {
         // Handle race condition: if user was created by another request in the meantime
-        if ((error as Error).message.includes('User with this phone number already exists')) {
+        if (
+          (error as Error).message.includes(
+            'User with this phone number already exists',
+          )
+        ) {
           user = await this.usersService.findByPhone(phone_number);
           if (!user) {
             throw error; // If still not found, rethrow the original error
@@ -114,7 +114,6 @@ export class AuthService {
       200,
     );
   }
-
 
   // async validateUser(email: string, password: string): Promise<any> {
   //   const user = await this.usersService.verifyPassword(email, password);

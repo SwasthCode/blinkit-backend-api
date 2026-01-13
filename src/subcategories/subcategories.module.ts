@@ -5,11 +5,13 @@ import { SubCategoriesController } from './subcategories.controller';
 import { SubCategory, SubCategorySchema } from '../schemas/subcategory.schema';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([{ name: SubCategory.name, schema: SubCategorySchema }]),
-    ],
-    controllers: [SubCategoriesController],
-    providers: [SubCategoriesService],
-    exports: [SubCategoriesService],
+  imports: [
+    MongooseModule.forFeature([
+      { name: SubCategory.name, schema: SubCategorySchema },
+    ]),
+  ],
+  controllers: [SubCategoriesController],
+  providers: [SubCategoriesService],
+  exports: [SubCategoriesService],
 })
-export class SubCategoriesModule { }
+export class SubCategoriesModule {}

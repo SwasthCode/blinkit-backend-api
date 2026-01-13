@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto } from './dto';
 import { BaseService } from '../common/base/base.service';
 import { PasswordUtil } from '../common/utils';
 
@@ -11,7 +11,6 @@ export class UsersService extends BaseService<UserDocument> {
   constructor(@InjectModel(User.name) userModel: Model<UserDocument>) {
     super(userModel);
   }
-
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     try {
@@ -50,11 +49,11 @@ export class UsersService extends BaseService<UserDocument> {
       const created = new this.model(userData);
       return await created.save();
     } catch (error) {
-      if (error && (error as any).code === 11000) {
-        if ((error as any).keyPattern.phone_number) {
+      if (error && error.code === 11000) {
+        if (error.keyPattern.phone_number) {
           throw new Error('User with this phone number already exists');
         }
-        if ((error as any).keyPattern.email) {
+        if (error.keyPattern.email) {
           throw new Error('User with this email already exists');
         }
       }
@@ -64,13 +63,9 @@ export class UsersService extends BaseService<UserDocument> {
     }
   }
 
-
   async findByPhone(phone_number: string): Promise<UserDocument | null> {
     return this.model.findOne({ phone_number }).exec();
   }
-
-
-
 
   // async verifyPassword(
   //   email: string,
@@ -94,7 +89,6 @@ export class UsersService extends BaseService<UserDocument> {
   //     throw new Error(`Password verification failed: ${errorMessage}`);
   //   }
   // }
-
 
   async updatePassword(
     userId: string,
@@ -132,10 +126,7 @@ export class UsersService extends BaseService<UserDocument> {
         error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to update password: ${errorMessage}`);
     }
-
-
   }
-
 
   async getProfile(userId: string) {
     const user = await this.model.findById(userId);
@@ -146,7 +137,4 @@ export class UsersService extends BaseService<UserDocument> {
 
     return user;
   }
-
-
-
 }

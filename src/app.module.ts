@@ -37,4 +37,4 @@ import { SubCategoriesModule } from './subcategories/subcategories.module';
   providers: [AppService],
   exports: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

@@ -5,27 +5,17 @@ import {
   Get,
   Param,
   Post,
-  Put,
   HttpCode,
   HttpStatus,
   Query,
-  Req,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { BaseService } from './base.service';
 import { successResponse } from './base.response';
-import { UpdateUserDto } from 'src/users/dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-// import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-
 
 export class BaseController<T extends Document> {
-  constructor(protected readonly baseService: BaseService<T>) { }
+  constructor(protected readonly baseService: BaseService<T>) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -38,16 +28,45 @@ export class BaseController<T extends Document> {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all entities with advanced filtering, sorting, and pagination' })
+  @ApiOperation({
+    summary:
+      'Get all entities with advanced filtering, sorting, and pagination',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of entities',
   })
-  @ApiQuery({ name: 'filter', required: false, type: String, description: 'JSON string filter, e.g. {"status":"active"}' })
-  @ApiQuery({ name: 'select', required: false, type: String, description: 'Fields to select (comma/space separated), e.g. "name email"' })
-  @ApiQuery({ name: 'sort', required: false, type: String, description: 'Sort order (JSON or fields), e.g. {"createdAt":-1} or "createdAt -name"' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Limit the number of results, e.g. 10' })
-  @ApiQuery({ name: 'skip', required: false, type: Number, description: 'Skip a number of results (offset), e.g. 20' })
+  @ApiQuery({
+    name: 'filter',
+    required: false,
+    type: String,
+    description: 'JSON string filter, e.g. {"status":"active"}',
+  })
+  @ApiQuery({
+    name: 'select',
+    required: false,
+    type: String,
+    description: 'Fields to select (comma/space separated), e.g. "name email"',
+  })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    type: String,
+    description:
+      'Sort order (JSON or fields), e.g. {"createdAt":-1} or "createdAt -name"',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Limit the number of results, e.g. 10',
+  })
+  @ApiQuery({
+    name: 'skip',
+    required: false,
+    type: Number,
+    description: 'Skip a number of results (offset), e.g. 20',
+  })
   async findAll(
     @Query('filter') filter?: string,
     @Query('select') select?: string,

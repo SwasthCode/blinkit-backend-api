@@ -84,6 +84,4 @@ export class CreateUserDto {
     message: 'Status must be one of: active, inactive, suspended',
   })
   status?: string;
-
-
 }

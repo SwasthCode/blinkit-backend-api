@@ -21,8 +21,6 @@ export class User extends BaseSchema {
   @Prop({ required: false })
   password?: string;
 
-
-
   @Prop({
     required: true,
     default: 'user',
