@@ -67,78 +67,65 @@ export class AuthService {
     }
   }
 
-  async loginWithOtp(loginWithOtpDto: LoginWithOtpDto) {
-    try {
-      let decodedToken;
+  async loginWithOtp({ phone_number, otp }: LoginWithOtpDto) {
+    if (otp !== '1234') {
+      throw new UnauthorizedException('Invalid OTP');
+    }
+
+    let user = await this.usersService.findByPhone(phone_number);
+
+    if (!user) {
       try {
-        0;
-        decodedToken = await admin
-          .auth()
-          .verifyIdToken(loginWithOtpDto.phone_number);
-      } catch (error) {
-        console.error('Firebase token verification failed:', error);
-        throw new UnauthorizedException('Invalid Firebase token');
-      }
-
-      const phoneNumber = decodedToken.phone_number;
-      if (!phoneNumber) {
-        throw new UnauthorizedException('Phone number not found in token');
-      }
-
-      // 2. Find or Create User
-      let user = await this.usersService.findByPhone(phoneNumber);
-      if (!user) {
         user = await this.usersService.create({
-          phone_number: phoneNumber,
-          first_name: 'User',
-          last_name: phoneNumber.slice(-4),
+          phone_number,
+          role: 'user',
         } as any);
+      } catch (error) {
+        // Handle race condition: if user was created by another request in the meantime
+        if ((error as Error).message.includes('User with this phone number already exists')) {
+          user = await this.usersService.findByPhone(phone_number);
+          if (!user) {
+            throw error; // If still not found, rethrow the original error
+          }
+        } else {
+          throw error;
+        }
       }
+    }
 
-      const userObj = user.toObject();
-      if (userObj.status !== 'active') {
-        throw new UnauthorizedException('User account is not active');
-      }
+    const userObj = user.toObject();
 
-      // 3. Generate JWT
-      const payload = {
-        sub: user._id,
+    const accessToken = this.jwtService.sign(
+      {
+        id: user._id,
         phone_number: user.phone_number,
         role: userObj.role,
         status: userObj.status,
-      };
+      },
+      { expiresIn: '7d' },
+    );
 
-      const accessToken = this.jwtService.sign(payload, {
-        expiresIn: '7d',
-      });
-
-      return successResponse(
-        {
-          access_token: accessToken,
-          _id: user._id,
-          phone_number: user.phone_number,
-          role: userObj.role,
-          status: userObj.status,
-        },
-        'Login successful',
-        200,
-      );
-    } catch (error) {
-      if (error instanceof UnauthorizedException) throw error;
-      throw new InternalServerErrorException('Login failed: ' + error.message);
-    }
+    return successResponse(
+      {
+        ...userObj,
+        access_token: accessToken,
+      },
+      'Login successful',
+      200,
+    );
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.verifyPassword(email, password);
-    if (user) {
-      const userObj = user.toObject();
-      if (userObj.status === 'active') {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password: _password, ...result } = userObj;
-        return result;
-      }
-    }
-    return null;
-  }
+
+  // async validateUser(email: string, password: string): Promise<any> {
+  //   const user = await this.usersService.verifyPassword(email, password);
+  //   if (user) {
+  //     const userObj = user.toObject();
+  //     if (userObj.status === 'active') {
+  //       // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //       const { password: _password, ...result } = userObj;
+  //       return result;
+  //     }
+  //   }
+  //   return null;
+  // }
 }

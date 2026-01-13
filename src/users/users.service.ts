@@ -35,17 +35,29 @@ export class UsersService extends BaseService<UserDocument> {
       }
 
       // Create user data with encrypted password if provided
-      const userData = {
+      const userData: any = {
         ...createUserDto,
         password: encryptedPassword,
-        role: createUserDto.role || 'user',
-        status: createUserDto.status || 'active',
+        // role: createUserDto.role || 'user',
+        // status: createUserDto.status || 'active',
       };
+
+      if (!userData.email) {
+        delete userData.email;
+      }
 
       // Create and save the user
       const created = new this.model(userData);
-      return created.save();
+      return await created.save();
     } catch (error) {
+      if (error && (error as any).code === 11000) {
+        if ((error as any).keyPattern.phone_number) {
+          throw new Error('User with this phone number already exists');
+        }
+        if ((error as any).keyPattern.email) {
+          throw new Error('User with this email already exists');
+        }
+      }
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to create user: ${errorMessage}`);
@@ -60,28 +72,28 @@ export class UsersService extends BaseService<UserDocument> {
 
 
 
-  async verifyPassword(
-    email: string,
-    plainPassword: string,
-  ): Promise<UserDocument | null> {
-    try {
-      const user = await this.model.findOne({ email }).exec();
-      if (!user || !user.password) {
-        return null;
-      }
+  // async verifyPassword(
+  //   email: string,
+  //   plainPassword: string,
+  // ): Promise<UserDocument | null> {
+  //   try {
+  //     const user = await this.model.findOne({ email }).exec();
+  //     if (!user || !user.password) {
+  //       return null;
+  //     }
 
-      const decryptedPassword = PasswordUtil.decryptPassword(user.password);
-      if (decryptedPassword === plainPassword) {
-        return user;
-      }
+  //     const decryptedPassword = PasswordUtil.decryptPassword(user.password);
+  //     if (decryptedPassword === plainPassword) {
+  //       return user;
+  //     }
 
-      return null;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Password verification failed: ${errorMessage}`);
-    }
-  }
+  //     return null;
+  //   } catch (error) {
+  //     const errorMessage =
+  //       error instanceof Error ? error.message : 'Unknown error';
+  //     throw new Error(`Password verification failed: ${errorMessage}`);
+  //   }
+  // }
 
 
   async updatePassword(
@@ -136,5 +148,5 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
 
- 
+
 }

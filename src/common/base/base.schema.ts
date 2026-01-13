@@ -18,6 +18,6 @@ export class BaseSchema extends Document {
   @Prop({ default: 'active' })
   status: string;
 
-  @Prop({ default: null })
-  roles: any[];
+  // @Prop({ default: null })
+  // roles: any[];
 }

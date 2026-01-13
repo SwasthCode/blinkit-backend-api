@@ -55,14 +55,14 @@ export class CreateBaseDto {
   @IsString({ message: 'Status must be a string' })
   status?: string;
 
-  @ApiProperty({
-    description: 'Entity roles',
-    example: [],
-    required: false,
-  })
-  @IsOptional()
-  @IsArray({ message: 'Roles must be an array' })
-  roles?: any[];
+  // @ApiProperty({
+  //   description: 'Entity roles',
+  //   example: [],
+  //   required: false,
+  // })
+  // @IsOptional()
+  // @IsArray({ message: 'Roles must be an array' })
+  // roles?: any[];
 }
 
 export class UpdateBaseDto {
@@ -93,12 +93,12 @@ export class UpdateBaseDto {
   @IsString({ message: 'Status must be a string' })
   status?: string;
 
-  @ApiProperty({
-    description: 'Entity roles',
-    example: [],
-    required: false,
-  })
-  @IsOptional()
-  @IsArray({ message: 'Roles must be an array' })
-  roles?: any[];
+  // @ApiProperty({
+  //   description: 'Entity roles',
+  //   example: [],
+  //   required: false,
+  // })
+  // @IsOptional()
+  // @IsArray({ message: 'Roles must be an array' })
+  // roles?: any[];
 }
