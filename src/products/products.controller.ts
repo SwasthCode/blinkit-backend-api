@@ -46,12 +46,7 @@ export class ProductsController extends BaseController<ProductDocument> {
         @Body() createProductDto: CreateProductDto,
         @UploadedFiles() files?: Express.Multer.File[],
     ) {
-        if (files && files.length > 0) {
-            createProductDto.images = files.map(file => ({
-                url: `/uploads/${file.filename}`
-            }));
-        }
-        const data = await this.productsService.create(createProductDto);
+        const data = await this.productsService.create(createProductDto, files);
         return successResponse(data, 'Product created successfully', 201);
     }
 
@@ -64,12 +59,7 @@ export class ProductsController extends BaseController<ProductDocument> {
         @Body() updateProductDto: UpdateProductDto,
         @UploadedFiles() files?: Express.Multer.File[],
     ) {
-        if (files && files.length > 0) {
-            updateProductDto.images = files.map(file => ({
-                url: `/uploads/${file.filename}`
-            }));
-        }
-        const data = await this.productsService.update(id, updateProductDto);
+        const data = await this.productsService.update(id, updateProductDto, files);
         return successResponse(data, 'Product updated successfully');
     }
 }

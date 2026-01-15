@@ -1,29 +1,21 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { BaseSchema } from '../common/base/base.schema';
+import { Document } from 'mongoose';
 
-export type BannerDocument = HydratedDocument<Banner>;
+export type BannerDocument = Banner & Document;
 
 @Schema({ timestamps: true })
-export class Banner extends BaseSchema {
-  @Prop({ required: true })
-  title: string;
-
+export class Banner {
   @Prop({ required: true })
   image_url: string;
 
-  @Prop({ required: false })
-  link_url?: string;
+  @Prop({ required: true, enum: ['home_main', 'home_secondary', 'category'], default: 'home_main' })
+  position: string;
 
-  @Prop({
-    required: true,
-    default: 'active',
-    enum: ['active', 'inactive'],
-  })
-  declare status: string;
+  @Prop({ default: true })
+  isActive: boolean;
 
-  @Prop({ required: false, default: 0 })
-  priority: number;
+  @Prop()
+  target_url: string; // e.g., link to a product or category
 }
 
 export const BannerSchema = SchemaFactory.createForClass(Banner);

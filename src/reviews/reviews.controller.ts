@@ -54,7 +54,6 @@ export class ReviewsController extends BaseController<ReviewDocument> {
         @UploadedFiles() files?: Express.Multer.File[],
     ) {
         console.log('Request User:', req.user);
-        // console.log('Request Headers:', req.headers);
 
         if (!req.user) {
             console.error('User is undefined in request. JwtAuthGuard might have failed or not attached user.');
@@ -62,16 +61,7 @@ export class ReviewsController extends BaseController<ReviewDocument> {
 
         createReviewDto['user_id'] = req.user?._id;
 
-        if (files && files.length > 0) {
-            createReviewDto.images = files.map(file => ({
-                url: `/uploads/${file.filename}`
-            }));
-        } else {
-            if (!Array.isArray(createReviewDto.images)) {
-                delete createReviewDto.images;
-            }
-        }
-        const data = await this.reviewsService.create(createReviewDto);
+        const data = await this.reviewsService.create(createReviewDto, files);
         return successResponse(data, 'Review created successfully', 201);
     }
 
@@ -86,12 +76,7 @@ export class ReviewsController extends BaseController<ReviewDocument> {
         @Body() updateReviewDto: UpdateReviewDto,
         @UploadedFiles() files?: Express.Multer.File[],
     ) {
-        if (files && files.length > 0) {
-            updateReviewDto.images = files.map(file => ({
-                url: `/uploads/${file.filename}`
-            }));
-        }
-        const data = await this.reviewsService.update(id, updateReviewDto);
+        const data = await this.reviewsService.update(id, updateReviewDto, files);
         return successResponse(data, 'Review updated successfully');
     }
 
