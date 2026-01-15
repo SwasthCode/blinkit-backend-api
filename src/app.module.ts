@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { CategoriesModule } from './categories/categories.module';
 import { SubCategoriesModule } from './subcategories/subcategories.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SubCategoriesModule } from './subcategories/subcategories.module';
     RolesModule,
     CategoriesModule,
     SubCategoriesModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
