@@ -2,13 +2,17 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
+import { Role, RoleDocument } from '../schemas/role.schema';
 import { CreateUserDto } from './dto';
 import { BaseService } from '../common/base/base.service';
 import { PasswordUtil } from '../common/utils';
 
 @Injectable()
 export class UsersService extends BaseService<UserDocument> {
-  constructor(@InjectModel(User.name) userModel: Model<UserDocument>) {
+  constructor(
+    @InjectModel(User.name) userModel: Model<UserDocument>,
+    @InjectModel(Role.name) private userRoleModel: Model<RoleDocument>,
+  ) {
     super(userModel);
   }
 
@@ -129,10 +133,28 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
   async getProfile(userId: string) {
-    const user = await this.model.findById(userId);
+    const user: any = await this.model.findById(userId).lean();
 
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    // describe role
+    // if user.role=[1,2,3]
+    // then user.role=1
+    if (user.role && user.role.length > 1) {
+      // get each role info
+      const newRole: any[] = [];
+      const roles = await this.userRoleModel.find({
+        role_type: { $in: user.role },
+      });
+      for (const role of roles) {
+        newRole.push(role);
+      }
+      user.role = newRole;
+    } else {
+      const role = await this.userRoleModel.findOne({ role_type: user.role });
+      user.role = [role];
     }
 
     return user;
