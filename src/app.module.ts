@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { CategoriesModule } from './categories/categories.module';
 import { SubCategoriesModule } from './subcategories/subcategories.module';
+import { AddressesModule } from './addresses/addresses.module';
 import { ProductsModule } from './products/products.module';
 import { ReviewsModule } from './reviews/reviews.module';
 
@@ -36,6 +37,8 @@ import { ReviewsModule } from './reviews/reviews.module';
     SubCategoriesModule,
     ProductsModule,
     ReviewsModule,
+    AddressesModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],

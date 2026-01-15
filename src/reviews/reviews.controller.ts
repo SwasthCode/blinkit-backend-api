@@ -32,7 +32,7 @@ import { ReviewDocument } from '../schemas/review.schema';
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@ApiTags('reviews')
+@ApiTags('Reviews')
 @Controller('reviews')
 export class ReviewsController extends BaseController<ReviewDocument> {
     constructor(private readonly reviewsService: ReviewsService) {
@@ -41,7 +41,7 @@ export class ReviewsController extends BaseController<ReviewDocument> {
 
     @Post()
     @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
+    @ApiBearerAuth('authentication')
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Create a new review' })
     @ApiConsumes('multipart/form-data')
@@ -53,12 +53,23 @@ export class ReviewsController extends BaseController<ReviewDocument> {
         @Body() createReviewDto: CreateReviewDto,
         @UploadedFiles() files?: Express.Multer.File[],
     ) {
-        createReviewDto['user_id'] = req.user._id;
+        console.log('Request User:', req.user);
+        // console.log('Request Headers:', req.headers);
+
+        if (!req.user) {
+            console.error('User is undefined in request. JwtAuthGuard might have failed or not attached user.');
+        }
+
+        createReviewDto['user_id'] = req.user?._id;
 
         if (files && files.length > 0) {
             createReviewDto.images = files.map(file => ({
                 url: `/uploads/${file.filename}`
             }));
+        } else {
+            if (!Array.isArray(createReviewDto.images)) {
+                delete createReviewDto.images;
+            }
         }
         const data = await this.reviewsService.create(createReviewDto);
         return successResponse(data, 'Review created successfully', 201);
@@ -66,7 +77,7 @@ export class ReviewsController extends BaseController<ReviewDocument> {
 
     @Put(':id')
     @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
+    @ApiBearerAuth('authentication')
     @ApiOperation({ summary: 'Update review by ID' })
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FilesInterceptor('images', 5))

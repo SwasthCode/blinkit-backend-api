@@ -26,7 +26,7 @@ import { UpdateCategoryDto, CreateCategoryDto } from './dto';
 import { successResponse } from '../common/base/base.response';
 import { uploadToCloudinaryBuffer } from '../common/utils/cloudinary.util';
 
-@ApiTags('categories')
+@ApiTags('Categories')
 @Controller('categories')
 export class CategoriesController extends BaseController<CategoryDocument> {
     constructor(private readonly categoriesService: CategoriesService) {

@@ -28,7 +28,8 @@ import { BaseController } from '../common/base/base.controller';
 import { ProductDocument } from '../schemas/product.schema';
 import { successResponse } from '../common/base/base.response';
 
-@ApiTags('products')
+
+@ApiTags('Products')
 @Controller('products')
 export class ProductsController extends BaseController<ProductDocument> {
     constructor(private readonly productsService: ProductsService) {

@@ -26,7 +26,7 @@ import { SubCategoriesService } from './subcategories.service';
 import { UpdateSubCategoryDto, CreateSubCategoryDto } from './dto';
 import { successResponse } from '../common/base/base.response';
 
-@ApiTags('subcategories')
+@ApiTags('Subcategories')
 @Controller('subcategories')
 export class SubCategoriesController extends BaseController<SubCategoryDocument> {
   constructor(private readonly subCategoriesService: SubCategoriesService) {

@@ -1,11 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsMongoId, Min, Max } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateReviewDto {
-    @ApiProperty({ example: 'Product ID' })
-    @IsNotEmpty()
-    @IsMongoId()
+    @ApiProperty({ example: 'Product ID', required: false })
+    @IsOptional()
     product_id: string;
 
     @ApiProperty({ example: 5, minimum: 1, maximum: 5 })
