@@ -8,7 +8,7 @@ import {
     Delete,
     Query,
     UseInterceptors,
-    UploadedFile,
+    UploadedFiles,
     Put,
     HttpCode,
     HttpStatus,
@@ -21,7 +21,7 @@ import {
     ApiBody,
     ApiConsumes,
 } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { BaseController } from '../common/base/base.controller';
@@ -39,14 +39,16 @@ export class ProductsController extends BaseController<ProductDocument> {
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Create a new product' })
     @ApiConsumes('multipart/form-data')
-    @UseInterceptors(FileInterceptor('image'))
+    @UseInterceptors(FilesInterceptor('images', 10))
     @ApiResponse({ status: 201, description: 'Product created successfully' })
     async create(
         @Body() createProductDto: CreateProductDto,
-        @UploadedFile() file?: Express.Multer.File,
+        @UploadedFiles() files?: Express.Multer.File[],
     ) {
-        if (file) {
-            createProductDto.image = `/uploads/${file.filename}`;
+        if (files && files.length > 0) {
+            createProductDto.images = files.map(file => ({
+                url: `/uploads/${file.filename}`
+            }));
         }
         const data = await this.productsService.create(createProductDto);
         return successResponse(data, 'Product created successfully', 201);
@@ -55,14 +57,16 @@ export class ProductsController extends BaseController<ProductDocument> {
     @Put(':id')
     @ApiOperation({ summary: 'Update product by ID' })
     @ApiConsumes('multipart/form-data')
-    @UseInterceptors(FileInterceptor('image'))
+    @UseInterceptors(FilesInterceptor('images', 10))
     async update(
         @Param('id') id: string,
         @Body() updateProductDto: UpdateProductDto,
-        @UploadedFile() file?: Express.Multer.File,
+        @UploadedFiles() files?: Express.Multer.File[],
     ) {
-        if (file) {
-            updateProductDto.image = `/uploads/${file.filename}`;
+        if (files && files.length > 0) {
+            updateProductDto.images = files.map(file => ({
+                url: `/uploads/${file.filename}`
+            }));
         }
         const data = await this.productsService.update(id, updateProductDto);
         return successResponse(data, 'Product updated successfully');

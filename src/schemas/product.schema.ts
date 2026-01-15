@@ -3,6 +3,12 @@ import { Document, Types } from 'mongoose';
 
 export type ProductDocument = Product & Document;
 
+@Schema({ _id: true })
+export class ProductImage {
+    @Prop({ required: true })
+    url: string;
+}
+
 @Schema({ timestamps: true })
 export class Product {
     @Prop({ required: true })
@@ -20,8 +26,8 @@ export class Product {
     @Prop({ required: true })
     unit: string;
 
-    @Prop()
-    image: string;
+    @Prop({ type: [ProductImage], default: [] })
+    images: ProductImage[];
 
     @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
     category_id: Types.ObjectId;

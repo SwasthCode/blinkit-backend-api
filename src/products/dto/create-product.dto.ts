@@ -30,10 +30,9 @@ export class CreateProductDto {
     @IsString()
     unit: string;
 
-    @ApiProperty({ type: 'string', format: 'binary', required: false })
+    @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' }, required: false })
     @IsOptional()
-    @IsString()
-    image?: string;
+    images?: any[];
 
     @ApiProperty({ example: 'Product Category ID' })
     @IsNotEmpty()
