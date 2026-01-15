@@ -74,7 +74,7 @@ export class AuthService {
       try {
         user = await this.usersService.create({
           phone_number,
-          role: 'user',
+          role: [1],
         } as any);
       } catch (error) {
         // Handle race condition: if user was created by another request in the meantime
