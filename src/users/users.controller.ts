@@ -50,7 +50,7 @@ export class UsersController extends BaseController<UserDocument> {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth('authentication')
   @ApiOperation({ summary: 'Get user profile' })
   @ApiResponse({
     status: 200,
@@ -63,7 +63,7 @@ export class UsersController extends BaseController<UserDocument> {
 
   @Put('profile')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth('authentication')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('profile_image'))
   @ApiOperation({ summary: 'Update user profile' })
