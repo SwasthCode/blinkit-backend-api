@@ -23,10 +23,11 @@ export class User extends BaseSchema {
 
   @Prop({
     required: true,
-    default: 'user',
-    enum: ['admin', 'user', 'moderator'],
+    type: [],
+    // default: 'user',
+    // enum: ['admin', 'user', 'moderator'],
   })
-  role: string;
+  role: [];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
