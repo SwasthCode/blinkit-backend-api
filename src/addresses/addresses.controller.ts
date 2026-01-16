@@ -63,18 +63,7 @@ export class AddressesController extends BaseController<AddressDocument> {
         return successResponse(data, 'Addresses fetched successfully');
     }
 
-    // @Put(':id')
-    // @UseGuards(JwtAuthGuard)
-    // @ApiBearerAuth('authentication')
-    // @ApiOperation({ summary: 'Update address by ID' })
-    // async update(
-    //     @Param('id') id: string,
-    //     @Body() updateAddressDto: UpdateAddressDto,
-    // ) {
-    //     const data = await this.addressesService.update(id, updateAddressDto);
-    //     return successResponse(data, 'Address updated successfully');
-    // }
-
+    
     @Delete(':id')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('authentication')
