@@ -8,7 +8,11 @@ export class Banner {
   @Prop({ required: true })
   image_url: string;
 
-  @Prop({ required: true, enum: ['home_main', 'home_secondary', 'category'], default: 'home_main' })
+  @Prop({
+    required: true,
+    enum: ['home_main', 'home_secondary', 'category'],
+    default: 'home_main',
+  })
   position: string;
 
   @Prop({ default: true })

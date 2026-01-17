@@ -52,26 +52,24 @@ export class CreateUserDto {
   @IsEmail({}, { message: 'Please provide a valid email address' })
   email?: string;
 
-  @ApiProperty({
-    description: 'The password of the user',
-    example: 'SecurePassword123!',
-    minLength: 8,
-    required: false,
-  })
-  @IsOptional()
-  @IsString({ message: 'Password must be a string' })
-  @MinLength(8, { message: 'Password must be at least 8 characters long' })
-  password?: string;
+  // @ApiProperty({
+  //   description: 'The password of the user',
+  //   example: 'SecurePassword123!',
+  //   minLength: 8,
+  //   required: false,
+  // })
+  // @IsOptional()
+  // @IsString({ message: 'Password must be a string' })
+  // @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  // password?: string;
 
   @ApiProperty({
     description: 'The role of the user',
-    example: 'user',
-    enum: ['admin', 'user', 'moderator'],
-    default: 'user',
+    default: [],
+    type: [Number],
   })
   @IsOptional()
-  // @IsEnum([10], { message: 'Role must be one of: admin, user, moderator' })
-  role?: [];
+  role?: number[];
 
   @ApiProperty({
     description: 'The status of the user',

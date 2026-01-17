@@ -32,9 +32,9 @@ import { User, UserSchema } from './schemas/user.schema';
       isGlobal: true,
     }),
     MongooseModule.forRoot(
-      'mongodb+srv://vedatmanepc:uvnNRUsi2tS0HFLN@cluster0.hjuni3e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+      'mongodb+srv://anshu:Anshu123@testingcluster.s2vkdgu.mongodb.net/?appName=TestingCluster',
       {
-        dbName: process.env.DATABASE_NAME,
+        dbName: 'blinket',
       },
     ),
     JwtModule.register({
@@ -53,7 +53,6 @@ import { User, UserSchema } from './schemas/user.schema';
       { name: SubCategory.name, schema: SubCategorySchema },
       { name: Role.name, schema: RoleSchema },
       { name: User.name, schema: UserSchema },
-
     ]),
     UsersModule,
     AuthModule,
@@ -66,10 +65,9 @@ import { User, UserSchema } from './schemas/user.schema';
     AddressesModule,
     OrdersModule,
     ReviewsModule,
-
   ],
   controllers: [AppController],
   providers: [AppService],
   exports: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

@@ -8,60 +8,67 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService extends BaseService<ProductDocument> {
-    constructor(
-        @InjectModel(Product.name) private productModel: Model<ProductDocument>,
-    ) {
-        super(productModel);
-    }
+  constructor(
+    @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+  ) {
+    super(productModel);
+  }
 
-    async create(createProductDto: CreateProductDto, files?: Express.Multer.File[]): Promise<ProductDocument> {
-        if (files && files.length > 0) {
-            createProductDto.images = files.map(file => ({
-                url: `/uploads/${file.filename}`
-            }));
-        }
-        const createdProduct = new this.productModel(createProductDto);
-        return createdProduct.save();
+  async create(
+    createProductDto: CreateProductDto,
+    files?: Express.Multer.File[],
+  ): Promise<ProductDocument> {
+    if (files && files.length > 0) {
+      createProductDto.images = files.map((file) => ({
+        url: `/uploads/${file.filename}`,
+      }));
     }
+    const createdProduct = new this.productModel(createProductDto);
+    return createdProduct.save();
+  }
 
-    // ... findAll and findOne methods unchanged ...
+  // ... findAll and findOne methods unchanged ...
 
-    async update(id: string, updateProductDto: UpdateProductDto, files?: Express.Multer.File[]): Promise<ProductDocument> {
-        if (files && files.length > 0) {
-            updateProductDto.images = files.map(file => ({
-                url: `/uploads/${file.filename}`
-            }));
-        }
-        const updatedProduct = await this.productModel
-            .findByIdAndUpdate(id, updateProductDto, { new: true })
-            .exec();
-        if (!updatedProduct) {
-            throw new NotFoundException(`Product with ID ${id} not found`);
-        }
-        return updatedProduct;
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+    files?: Express.Multer.File[],
+  ): Promise<ProductDocument> {
+    if (files && files.length > 0) {
+      updateProductDto.images = files.map((file) => ({
+        url: `/uploads/${file.filename}`,
+      }));
     }
-
-    async remove(id: string): Promise<any> {
-        const deletedProduct = await this.productModel.findByIdAndDelete(id).exec();
-        if (!deletedProduct) {
-            throw new NotFoundException(`Product with ID ${id} not found`);
-        }
-        return deletedProduct;
+    const updatedProduct = await this.productModel
+      .findByIdAndUpdate(id, updateProductDto, { new: true })
+      .exec();
+    if (!updatedProduct) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    return updatedProduct;
+  }
 
-    async findByCategory(categoryId: string): Promise<ProductDocument[]> {
-        return this.productModel
-            .find({ category_id: categoryId })
-            .populate('category_id')
-            .populate('subcategory_id')
-            .exec();
+  async remove(id: string): Promise<any> {
+    const deletedProduct = await this.productModel.findByIdAndDelete(id).exec();
+    if (!deletedProduct) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    return deletedProduct;
+  }
 
-    async findBySubCategory(subCategoryId: string): Promise<ProductDocument[]> {
-        return this.productModel
-            .find({ subcategory_id: subCategoryId })
-            .populate('category_id')
-            .populate('subcategory_id')
-            .exec();
-    }
+  async findByCategory(categoryId: string): Promise<ProductDocument[]> {
+    return this.productModel
+      .find({ category_id: categoryId })
+      .populate('category_id')
+      .populate('subcategory_id')
+      .exec();
+  }
+
+  async findBySubCategory(subCategoryId: string): Promise<ProductDocument[]> {
+    return this.productModel
+      .find({ subcategory_id: subCategoryId })
+      .populate('category_id')
+      .populate('subcategory_id')
+      .exec();
+  }
 }

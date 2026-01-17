@@ -5,17 +5,17 @@ export type CategoryDocument = Category & Document;
 
 @Schema({ timestamps: true })
 export class Category {
-    @Prop({ required: true })
-    name: string;
+  @Prop({ required: true })
+  name: string;
 
-    @Prop()
-    description: string;
+  @Prop()
+  description: string;
 
-    @Prop()
-    image: string;
+  @Prop()
+  image: string;
 
-    // @Prop({ enum: ['active', 'inactive'], default: 'active' })
-    // status: string;
+  // @Prop({ enum: ['active', 'inactive'], default: 'active' })
+  // status: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
