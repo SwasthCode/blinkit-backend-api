@@ -70,7 +70,7 @@ export class CreateUserDto {
     default: 'user',
   })
   @IsOptional()
-  @IsEnum([10], { message: 'Role must be one of: admin, user, moderator' })
+  // @IsEnum([10], { message: 'Role must be one of: admin, user, moderator' })
   role?: [];
 
   @ApiProperty({
