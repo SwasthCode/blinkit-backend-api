@@ -6,6 +6,7 @@ async function fixIndex() {
             dbName: process.env.DATABASE_NAME || 'base-api', // Assuming 'base-api' from error message
         });
 
+        
         const collection = mongoose.connection.db.collection('users');
         const indexes = await collection.indexes();
         console.log('Current Indexes:', indexes);
