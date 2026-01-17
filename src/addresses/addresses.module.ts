@@ -6,12 +6,12 @@ import { Address, AddressSchema } from '../schemas/address.schema';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([{ name: Address.name, schema: AddressSchema }]),
-        AuthModule,
-    ],
-    controllers: [AddressesController],
-    providers: [AddressesService],
-    exports: [AddressesService],
+  imports: [
+    MongooseModule.forFeature([{ name: Address.name, schema: AddressSchema }]),
+    AuthModule,
+  ],
+  controllers: [AddressesController],
+  providers: [AddressesService],
+  exports: [AddressesService],
 })
-export class AddressesModule { }
+export class AddressesModule {}

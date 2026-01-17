@@ -6,12 +6,12 @@ import { Cart, CartSchema } from '../schemas/cart.schema';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([{ name: Cart.name, schema: CartSchema }]),
-        AuthModule,
-    ],
-    controllers: [CartController],
-    providers: [CartService],
-    exports: [CartService],
+  imports: [
+    MongooseModule.forFeature([{ name: Cart.name, schema: CartSchema }]),
+    AuthModule,
+  ],
+  controllers: [CartController],
+  providers: [CartService],
+  exports: [CartService],
 })
-export class CartModule { }
+export class CartModule {}

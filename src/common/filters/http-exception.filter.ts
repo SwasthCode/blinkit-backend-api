@@ -35,15 +35,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof Error) {
       message = exception.message;
       if (exception.name === 'ValidationError') {
-        return response.status(HttpStatus.BAD_REQUEST).json(errorResponse(message, HttpStatus.BAD_REQUEST));
+        return response
+          .status(HttpStatus.BAD_REQUEST)
+          .json(errorResponse(message, HttpStatus.BAD_REQUEST));
       }
-      if (exception.name === 'MongoError' || (exception as any).code === 11000) {
+      if (
+        exception.name === 'MongoError' ||
+        (exception as any).code === 11000
+      ) {
         message = 'Duplicate key error';
-        return response.status(HttpStatus.BAD_REQUEST).json(errorResponse(message, HttpStatus.BAD_REQUEST));
+        return response
+          .status(HttpStatus.BAD_REQUEST)
+          .json(errorResponse(message, HttpStatus.BAD_REQUEST));
       }
     } else {
       // Handle cases where exception is not an instance of Error or HttpException
-      message = typeof exception === 'string' ? exception : (exception as any)?.message || JSON.stringify(exception);
+      message =
+        typeof exception === 'string'
+          ? exception
+          : (exception as any)?.message || JSON.stringify(exception);
     }
 
     const errorResponseObject = errorResponse(message, status);

@@ -6,12 +6,12 @@ import { Banner, BannerSchema } from '../schemas/banner.schema';
 import { AuthModule } from '../auth/auth.module'; // Important for Auth Guards
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([{ name: Banner.name, schema: BannerSchema }]),
-        AuthModule,
-    ],
-    controllers: [BannersController],
-    providers: [BannersService],
-    exports: [BannersService],
+  imports: [
+    MongooseModule.forFeature([{ name: Banner.name, schema: BannerSchema }]),
+    AuthModule,
+  ],
+  controllers: [BannersController],
+  providers: [BannersService],
+  exports: [BannersService],
 })
-export class BannersModule { }
+export class BannersModule {}

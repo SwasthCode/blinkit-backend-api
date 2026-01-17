@@ -8,55 +8,62 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewsService extends BaseService<ReviewDocument> {
-    constructor(
-        @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
-    ) {
-        super(reviewModel);
-    }
+  constructor(
+    @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
+  ) {
+    super(reviewModel);
+  }
 
-    async create(createReviewDto: CreateReviewDto, files?: Express.Multer.File[]): Promise<ReviewDocument> {
-        if (files && files.length > 0) {
-            createReviewDto.images = files.map(file => ({
-                url: `/uploads/${file.filename}`
-            }));
-        } else {
-            if (!Array.isArray(createReviewDto.images)) {
-                delete createReviewDto.images;
-            }
-        }
-        const createdReview = new this.reviewModel(createReviewDto);
-        return createdReview.save();
+  async create(
+    createReviewDto: CreateReviewDto,
+    files?: Express.Multer.File[],
+  ): Promise<ReviewDocument> {
+    if (files && files.length > 0) {
+      createReviewDto.images = files.map((file) => ({
+        url: `/uploads/${file.filename}`,
+      }));
+    } else {
+      if (!Array.isArray(createReviewDto.images)) {
+        delete createReviewDto.images;
+      }
     }
+    const createdReview = new this.reviewModel(createReviewDto);
+    return createdReview.save();
+  }
 
-    // ... findAll method unchanged ...
+  // ... findAll method unchanged ...
 
-    async update(id: string, updateReviewDto: UpdateReviewDto, files?: Express.Multer.File[]): Promise<ReviewDocument> {
-        if (files && files.length > 0) {
-            updateReviewDto.images = files.map(file => ({
-                url: `/uploads/${file.filename}`
-            }));
-        }
-        const updatedReview = await this.reviewModel
-            .findByIdAndUpdate(id, updateReviewDto, { new: true })
-            .exec();
-        if (!updatedReview) {
-            throw new NotFoundException(`Review with ID ${id} not found`);
-        }
-        return updatedReview;
+  async update(
+    id: string,
+    updateReviewDto: UpdateReviewDto,
+    files?: Express.Multer.File[],
+  ): Promise<ReviewDocument> {
+    if (files && files.length > 0) {
+      updateReviewDto.images = files.map((file) => ({
+        url: `/uploads/${file.filename}`,
+      }));
     }
-
-    async remove(id: string): Promise<any> {
-        const deletedReview = await this.reviewModel.findByIdAndDelete(id).exec();
-        if (!deletedReview) {
-            throw new NotFoundException(`Review with ID ${id} not found`);
-        }
-        return deletedReview;
+    const updatedReview = await this.reviewModel
+      .findByIdAndUpdate(id, updateReviewDto, { new: true })
+      .exec();
+    if (!updatedReview) {
+      throw new NotFoundException(`Review with ID ${id} not found`);
     }
+    return updatedReview;
+  }
 
-    async findByProduct(productId: string): Promise<ReviewDocument[]> {
-        return this.reviewModel
-            .find({ product_id: productId })
-            .populate('user_id', 'first_name last_name profile_image')
-            .exec();
+  async remove(id: string): Promise<any> {
+    const deletedReview = await this.reviewModel.findByIdAndDelete(id).exec();
+    if (!deletedReview) {
+      throw new NotFoundException(`Review with ID ${id} not found`);
     }
+    return deletedReview;
+  }
+
+  async findByProduct(productId: string): Promise<ReviewDocument[]> {
+    return this.reviewModel
+      .find({ product_id: productId })
+      .populate('user_id', 'first_name last_name profile_image')
+      .exec();
+  }
 }
