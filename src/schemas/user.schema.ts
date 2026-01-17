@@ -18,16 +18,16 @@ export class User extends BaseSchema {
   @Prop({ required: false, unique: true, sparse: true })
   email?: string;
 
-  // @Prop({ required: false })
-  // password?: string;
+  @Prop({ required: false })
+  password?: string;
 
   @Prop({
     required: true,
-    type: [],
+    type: [Number],
     // default: 'user',
     // enum: ['admin', 'user', 'moderator'],
   })
-  role: [];
+  role: number[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

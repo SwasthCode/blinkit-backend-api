@@ -115,6 +115,99 @@ export class AuthService {
     );
   }
 
+  async adminLogin(loginDto: LoginDto) {
+    // Same as regular login, just send OTP
+    // Admin users will be identified during OTP verification
+    return successResponse({}, 'OTP sent successfully', 200);
+  }
+
+  async adminVerifyOtp({ phone_number, otp }: LoginWithOtpDto) {
+    if (otp !== '1234') {
+      throw new UnauthorizedException('Invalid OTP');
+    }
+
+    let user = await this.usersService.findByPhone(phone_number);
+
+    if (!user) {
+      // Create new admin user with role = 1
+      try {
+        user = await this.usersService.create({
+          phone_number,
+          role: [1], // Admin role
+        } as any);
+      } catch (error) {
+        // Handle race condition
+        if (
+          (error as Error).message.includes(
+            'User with this phone number already exists',
+          )
+        ) {
+          user = await this.usersService.findByPhone(phone_number);
+          if (!user) {
+            throw error;
+          }
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      // Check if existing user has admin role
+      const userObj = user.toObject();
+      if (!userObj.role || !Array.isArray(userObj.role) || !userObj.role.includes(1)) {
+        throw new UnauthorizedException('Access denied. Admin privileges required.');
+      }
+    }
+
+    const userObj = user.toObject();
+
+    const accessToken = this.jwtService.sign(
+      {
+        id: user._id,
+        phone_number: user.phone_number,
+        role: userObj.role,
+        status: userObj.status,
+      },
+      { expiresIn: '7d' },
+    );
+
+    return successResponse(
+      {
+        ...userObj,
+        access_token: accessToken,
+      },
+      'Admin login successful',
+      200,
+    );
+  }
+
+  async createAdmin(adminData: any) {
+    // Ensure role is set to 1 (admin)
+    const userData = {
+      ...adminData,
+      role: [1], // Force admin role
+    };
+
+    const user = await this.usersService.create(userData);
+    const userObj = user.toObject();
+
+    return successResponse(
+      userObj,
+      'Admin user created successfully',
+      201,
+    );
+  }
+
+  async getAdmins() {
+    // Fetch users with role 1
+    const admins = await this.usersService.findAdmins();
+
+    return successResponse(
+      admins,
+      'Admin users fetched successfully',
+      200,
+    );
+  }
+
   // async validateUser(email: string, password: string): Promise<any> {
   //   const user = await this.usersService.verifyPassword(email, password);
   //   if (user) {
