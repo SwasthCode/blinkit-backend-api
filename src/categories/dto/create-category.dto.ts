@@ -28,8 +28,7 @@ export class CreateCategoryDto {
     @IsString()
     image?: string;
 
-    // @ApiProperty({ enum: ['active', 'inactive'], default: 'active', description: 'Status of the category', required: false })
-    // @IsOptional()
-    // @IsEnum(['active', 'inactive'])
-    // status?: string;
+    @ApiProperty({ default: 'active', description: 'Status of the category', required: false })
+    @IsOptional()
+    status?: string;
 }

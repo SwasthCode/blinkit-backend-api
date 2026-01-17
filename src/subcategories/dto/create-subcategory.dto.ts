@@ -32,4 +32,9 @@ export class CreateSubCategoryDto {
   @IsOptional()
   @IsString()
   image?: string;
+
+
+  @ApiProperty({ default: 'active', description: 'Status of the subcategory', required: false })
+  @IsOptional()
+  status?: string;
 }

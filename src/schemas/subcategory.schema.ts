@@ -17,8 +17,8 @@ export class SubCategory {
   @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
   category_id: Types.ObjectId;
 
-  // @Prop({ enum: ['active', 'inactive'], default: 'active' })
-  // status: string;
+  @Prop({ default: 'active' })
+  status: string;
 }
 
 export const SubCategorySchema = SchemaFactory.createForClass(SubCategory);

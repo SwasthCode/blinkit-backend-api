@@ -14,8 +14,8 @@ export class Category {
     @Prop()
     image: string;
 
-    // @Prop({ enum: ['active', 'inactive'], default: 'active' })
-    // status: string;
+    @Prop({ default: 'active' })
+    status: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
