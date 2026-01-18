@@ -34,4 +34,12 @@ export class CreateReviewDto {
   })
   @IsOptional()
   images?: any[];
+
+  @ApiProperty({ example: 'User ID', required: false })
+  @IsOptional()
+  user_id?: string;
+
+  @ApiProperty({ example: 'active', required: false })
+  @IsOptional()
+  status?: string;
 }

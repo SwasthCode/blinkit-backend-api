@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   HttpCode,
   HttpStatus,
   Query,
@@ -15,7 +16,7 @@ import { BaseService } from './base.service';
 import { successResponse } from './base.response';
 
 export class BaseController<T extends Document> {
-  constructor(protected readonly baseService: BaseService<T>) {}
+  constructor(protected readonly baseService: BaseService<T>) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -107,16 +108,16 @@ export class BaseController<T extends Document> {
   //   return successResponse({ xToken }, 'xToken received successfully');
   // }
 
-  // @Put(':id')
-  // @ApiOperation({ summary: 'Update entity by ID' })
-  // @ApiParam({ name: 'id', description: 'Entity ID' })
-  // @ApiResponse({ status: 200, description: 'Entity updated successfully' })
-  // @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
-  // @ApiResponse({ status: 404, description: 'Entity not found' })
-  // async update(@Param('id') id: string, @Body() updateDto: UpdateUserDto) {
-  //   const data = await this.baseService.updateProfile(id, updateDto);
-  //   return successResponse(data, 'Updated successfully');
-  // }
+  @Put(':id')
+  @ApiOperation({ summary: 'Update entity by ID' })
+  @ApiParam({ name: 'id', description: 'Entity ID' })
+  @ApiResponse({ status: 200, description: 'Entity updated successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
+  @ApiResponse({ status: 404, description: 'Entity not found' })
+  async update(@Param('id') id: string, @Body() updateDto: any) {
+    const data = await this.baseService.update(id, updateDto);
+    return successResponse(data, 'Updated successfully');
+  }
 
   // @Put('profile')
   // @UseGuards(JwtAuthGuard)

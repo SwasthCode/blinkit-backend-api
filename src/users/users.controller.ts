@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   UploadedFile,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -76,6 +77,11 @@ export class UsersController extends BaseController<UserDocument> {
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
+    // if token contains role user / admin then allow to update profile, role is [{ key: 'user' }, { key: 'admin' }] array
+    const allowedRoles = ['user', 'admin'];
+    if (!allowedRoles.includes(req.user.role?.key)) {
+      throw new UnauthorizedException('Unauthorized');
+    }
     if (file) {
       updateUserDto.profile_image = `/uploads/${file.filename}`;
     }

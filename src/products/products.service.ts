@@ -71,4 +71,12 @@ export class ProductsService extends BaseService<ProductDocument> {
       .populate('subcategory_id')
       .exec();
   }
+
+  async getRecentProducts(limit: number = 5): Promise<ProductDocument[]> {
+    return this.productModel
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .exec();
+  }
 }

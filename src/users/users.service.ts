@@ -12,7 +12,7 @@ import { populateUserRoles } from '../common/utils/rolePopulat.util';
 export class UsersService extends BaseService<UserDocument> {
   constructor(
     @InjectModel(User.name) userModel: Model<UserDocument>,
-    @InjectModel(Role.name) private userRoleModel: Model<RoleDocument>,
+    @InjectModel(Role.name) public userRoleModel: Model<RoleDocument>,
   ) {
     super(userModel);
   }
@@ -195,13 +195,17 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
   async findAdmins(): Promise<UserDocument[]> {
-    const admins = await this.model.find({ role: { $in: [1, 2] } }).lean().exec();
+    const admins = await this.model.find({ role: { $in: [1] } }).lean().exec();
     await populateUserRoles(this.userRoleModel, admins);
     return admins as any;
   }
 
   async findByEmail(email: string): Promise<UserDocument | null> {
     return this.model.findOne({ email }).exec();
+  }
+
+  async findByUsername(username: string): Promise<UserDocument | null> {
+    return this.model.findOne({ username }).exec();
   }
 
   async findByIdentifier(identifier: string): Promise<UserDocument | null> {
@@ -299,5 +303,60 @@ export class UsersService extends BaseService<UserDocument> {
     }
 
     return user;
+  }
+
+  async getUserStats() {
+    // Assuming role 1 is Admin. We might want to filter only customers (e.g. role != 1) or count all.
+    // User requested "customer[user] details", usually implying end-users.
+    // Let's count where role is NOT filtering for now to be safe, or just filter standard users.
+    // Given the role structure is [Number], let's assume we want all users for now or filter if needed.
+    // If we want only customers, we might need to know the customer role ID.
+    // For now, I'll aggregate ALL users to be generic, or maybe filter role { $ne: [1] } if [1] is admin.
+
+    const totalUsers = await this.model.countDocuments();
+
+    const monthlyCounts = await this.model.aggregate([
+      {
+        $group: {
+          _id: { $month: '$createdAt' },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          month: '$_id',
+          count: 1,
+        },
+      },
+    ]);
+
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+
+    const formattedMonthlyCounts = monthNames.map((monthName, index) => {
+      const found = monthlyCounts.find((item) => item.month === index + 1);
+      return {
+        month: monthName,
+        count: found ? found.count : 0,
+      };
+    });
+
+    return {
+      grand_total_users: totalUsers,
+      monthly_counts: formattedMonthlyCounts,
+    };
   }
 }

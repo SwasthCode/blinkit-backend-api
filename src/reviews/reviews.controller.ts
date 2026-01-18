@@ -35,28 +35,15 @@ export class ReviewsController extends BaseController<ReviewDocument> {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new review' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FilesInterceptor('images', 5))
   @ApiResponse({ status: 201, description: 'Review created successfully' })
-  // @ts-ignore
   async create(
-    @Req() req: any,
     @Body() createReviewDto: CreateReviewDto,
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
-    console.log('Request User:', req.user);
-
-    if (!req.user) {
-      console.error(
-        'User is undefined in request. JwtAuthGuard might have failed or not attached user.',
-      );
-    }
-
-    createReviewDto['user_id'] = req.user?._id;
 
     const data = await this.reviewsService.create(createReviewDto, files);
     return successResponse(data, 'Review created successfully', 201);

@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   Get,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -114,6 +115,17 @@ export class RolesController extends BaseController<RoleDocument> {
     return successResponse(roles, 'Roles fetched successfully');
   }
 
+
+  // delete role
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete role by ID' })
+  @ApiParam({ name: 'id', description: 'Role MongoDB ID' })
+  @ApiResponse({ status: 200, description: 'Role deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Role not found' })
+  async deleteRole(@Param('id') id: string) {
+    const role = await this.rolesService.delete(id);
+    return successResponse(role, 'Role deleted successfully');
+  }
   // Additional role-specific endpoints can be added here
   // Other CRUD operations are inherited from BaseController
 }

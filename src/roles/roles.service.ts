@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Role, RoleDocument } from '../schemas/role.schema';
 import { CreateRoleDto, UpdateRoleDto } from './dto';
 import { BaseService } from '../common/base/base.service';
+import { RoleType } from 'src/common/utils/enum';
 
 @Injectable()
 export class RolesService extends BaseService<RoleDocument> {
@@ -208,6 +209,30 @@ export class RolesService extends BaseService<RoleDocument> {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to find roles by type: ${errorMessage}`);
+    }
+  }
+
+
+  // delete role
+  async delete(id: string): Promise<RoleDocument> {
+    try {
+
+      // if role = admin, throw error
+      const role = await this.model.findById(id).exec();
+      if (!role) {
+        throw new Error(`Role not found with ID: ${id}`);
+      }
+      if (role.key === RoleType.ADMIN) {
+        throw new Error('Cannot delete admin role');
+      }
+      const deleted = await this.model.findByIdAndDelete(id).exec();
+      if (!deleted) {
+        throw new Error(`Role not found with ID: ${id}`);
+      }
+      return deleted;
+    } catch (error) {
+      const errorMessage = error.message;
+      throw new Error(errorMessage);
     }
   }
 }

@@ -9,6 +9,7 @@ import {
   HttpStatus,
   UseGuards,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -30,34 +31,46 @@ export class AddressesController extends BaseController<AddressDocument> {
     super(addressesService);
   }
 
-  @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new address' })
-  @ApiResponse({ status: 201, description: 'Address created successfully' })
-  // @ts-ignore
-  async create(@Req() req: any, @Body() createAddressDto: CreateAddressDto) {
-    console.log('Address Create Headers:', req.headers);
-    console.log('Address Create User:', req.user);
+  // @Post()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth('authentication')
+  // @HttpCode(HttpStatus.CREATED)
+  // @ApiOperation({ summary: 'Create a new address' })
+  // @ApiResponse({ status: 201, description: 'Address created successfully' })
+  // // @ts-ignore
+  // async create(@Req() req: any, @Body() createAddressDto: CreateAddressDto) {
+  //   console.log('Address Create Headers:', req.headers);
+  //   console.log('Address Create User:', req.user);
 
-    if (!req.user) {
-      console.error('User missing in Address Create. Check AuthModule import.');
-    }
+  //   if (!req.user) {
+  //     console.error('User missing in Address Create. Check AuthModule import.');
+  //   }
 
-    const addressData = { ...createAddressDto, user_id: req.user?._id };
-    const data = await this.addressesService.create(addressData);
-    return successResponse(data, 'Address created successfully', 201);
-  }
+  //   const addressData = { ...createAddressDto, user_id: req.user?._id };
+  //   const data = await this.addressesService.create(addressData);
+  //   return successResponse(data, 'Address created successfully', 201);
+  // }
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
-  @ApiOperation({ summary: 'Get all addresses for logged-in user' })
-  async findAll(@Req() req: any) {
-    const data = await this.addressesService.findAllByUser(req.user._id);
-    return successResponse(data, 'Addresses fetched successfully');
-  }
+  // @Get()
+  // // @UseGuards(JwtAuthGuard)
+  // // @ApiBearerAuth('authentication')
+  // @ApiOperation({ summary: 'Get all addresses for logged-in user' })
+  // async findAll(
+  //   // @Req() req: any
+  // ) {
+  //   // customer and admin
+  //   // const allowedRoles = ['customer', 'admin'];
+  //   // if (!allowedRoles.includes(req.user.role?.key)) {
+  //   //   throw new UnauthorizedException('Unauthorized');
+  //   // }
+
+  //   // if (req?.user?.role?.filter((role: any) => role.key === 'customer')) {
+  //   //   throw new UnauthorizedException('Unauthorized');
+  //   // }
+
+  //   const data = await this.addressesService.findAll();
+  //   return successResponse(data, 'Addresses fetched successfully');
+  // }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)

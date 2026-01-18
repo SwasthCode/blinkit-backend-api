@@ -10,7 +10,7 @@ import { UpdateUserDto } from 'src/users/dto';
 
 @Injectable()
 export class BaseService<T extends Document> {
-  constructor(protected readonly model: Model<T>) {}
+  constructor(protected readonly model: Model<T>) { }
 
   async create(createDto: any): Promise<T> {
     const created = new this.model(createDto);
@@ -118,6 +118,15 @@ export class BaseService<T extends Document> {
       isValid: true,
       message: 'Token authenticated successfully',
     };
+  }
+
+  async update(id: string, updateDto: any): Promise<T> {
+    const updated = await this.model.findByIdAndUpdate(id, updateDto, {
+      new: true,
+      runValidators: true,
+    }).exec();
+    if (!updated) throw new NotFoundException(`Item not found with ID: ${id}`);
+    return updated;
   }
 
   async updateProfile(userId: string, updateDto: UpdateUserDto) {

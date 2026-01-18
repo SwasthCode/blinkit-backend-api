@@ -75,4 +75,53 @@ export class OrdersService extends BaseService<OrderDocument> {
       .populate('items.product_id') // Optional: populate if needed, but snapshot data is in items
       .exec();
   }
+
+  async getOrderStats() {
+    const totalOrders = await this.orderModel.countDocuments();
+
+    const monthlyCounts = await this.orderModel.aggregate([
+      {
+        $group: {
+          _id: { $month: '$createdAt' },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          month: '$_id',
+          count: 1,
+        },
+      },
+    ]);
+
+    // Map month numbers to names
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+
+    const formattedMonthlyCounts = monthNames.map((monthName, index) => {
+      const found = monthlyCounts.find((item) => item.month === index + 1);
+      return {
+        month: monthName,
+        count: found ? found.count : 0,
+      };
+    });
+
+    return {
+      grand_total_orders: totalOrders,
+      monthly_counts: formattedMonthlyCounts,
+    };
+  }
 }
