@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Role, RoleDocument } from '../schemas/role.schema';
 import { CreateRoleDto, UpdateRoleDto } from './dto';
 import { BaseService } from '../common/base/base.service';
-import { RoleType } from 'src/common/utils/enum';
+import { RoleType } from '../common/utils/enum';
 
 @Injectable()
 export class RolesService extends BaseService<RoleDocument> {
