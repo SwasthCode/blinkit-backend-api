@@ -115,7 +115,6 @@ export class RolesController extends BaseController<RoleDocument> {
     return successResponse(roles, 'Roles fetched successfully');
   }
 
-
   // delete role
   @Delete(':id')
   @ApiOperation({ summary: 'Delete role by ID' })

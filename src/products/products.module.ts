@@ -12,4 +12,4 @@ import { Product, ProductSchema } from '../schemas/product.schema';
   providers: [ProductsService],
   exports: [ProductsService],
 })
-export class ProductsModule { }
+export class ProductsModule {}

@@ -22,54 +22,54 @@ export class OrdersService extends BaseService<OrderDocument> {
     super(orderModel);
   }
 
-  async placeOrder(
-    userId: string,
-    createOrderDto: CreateOrderDto,
-  ): Promise<OrderDocument> {
-    // 1. Get User's Cart
-    const cart = await this.cartService.getCart(userId);
-    if (!cart || !cart.items || cart.items.length === 0) {
-      throw new BadRequestException('Cart is empty');
-    }
+  // async placeOrder(
+  //   userId: string,
+  //   createOrderDto: CreateOrderDto,
+  // ): Promise<OrderDocument> {
+  //   // 1. Get User's Cart
+  //   const cart = await this.cartService.getCart(userId);
+  //   if (!cart || !cart.items || cart.items.length === 0) {
+  //     throw new BadRequestException('Cart is empty');
+  //   }
 
-    // 2. Calculate Total & Prepare Order Items (Snapshot)
-    let totalAmount = 0;
-    const orderItems: OrderItem[] = [];
+  //   // 2. Calculate Total & Prepare Order Items (Snapshot)
+  //   let totalAmount = 0;
+  //   const orderItems: OrderItem[] = [];
 
-    for (const item of cart.items) {
-      const product = item.product_id as any; // Populated in getCart
-      if (!product) continue;
+  //   for (const item of cart.items) {
+  //     const product = item.product_id as any; // Populated in getCart
+  //     if (!product) continue;
 
-      totalAmount += product.price * item.quantity;
-      orderItems.push({
-        product_id: product._id,
-        name: product.name,
-        image:
-          product.images?.[0]?.url ||
-          'https://placehold.co/600x400?text=No+Image',
-        price: product.price,
-        quantity: item.quantity,
-      });
-    }
+  //     totalAmount += product.price * item.quantity;
+  //     orderItems.push({
+  //       product_id: product._id,
+  //       name: product.name,
+  //       image:
+  //         product.images?.[0]?.url ||
+  //         'https://placehold.co/600x400?text=No+Image',
+  //       price: product.price,
+  //       quantity: item.quantity,
+  //     });
+  //   }
 
-    // 3. Create Order
-    const order = new this.orderModel({
-      user_id: new Types.ObjectId(userId),
-      address_id: new Types.ObjectId(createOrderDto.address_id),
-      items: orderItems,
-      total_amount: totalAmount,
-      payment_method: createOrderDto.payment_method || 'COD',
-      status: 'Pending',
-      payment_status: 'Pending',
-    });
+  //   // 3. Create Order
+  //   const order = new this.orderModel({
+  //     user_id: new Types.ObjectId(userId),
+  //     address_id: new Types.ObjectId(createOrderDto.address_id),
+  //     items: orderItems,
+  //     total_amount: totalAmount,
+  //     payment_method: createOrderDto.payment_method || 'COD',
+  //     status: 'Pending',
+  //     payment_status: 'Pending',
+  //   });
 
-    const savedOrder = await order.save();
+  //   const savedOrder = await order.save();
 
-    // 4. Clear Cart
-    await this.cartService.clearCart(userId);
+  //   // 4. Clear Cart
+  //   await this.cartService.clearCart(userId);
 
-    return savedOrder;
-  }
+  //   return savedOrder;
+  // }
 
   async createDirectOrder(
     userId: string,

@@ -59,7 +59,10 @@ export class SubCategoriesController extends BaseController<SubCategoryDocument>
     @Body() createSubCategoryDto: CreateSubCategoryDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    const data = await this.subCategoriesService.create(createSubCategoryDto, file);
+    const data = await this.subCategoriesService.create(
+      createSubCategoryDto,
+      file,
+    );
     return successResponse(data, 'SubCategory created successfully', 201);
   }
 

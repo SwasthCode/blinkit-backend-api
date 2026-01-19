@@ -5,20 +5,20 @@ export type CategoryDocument = Category & Document;
 
 @Schema({ timestamps: true })
 export class Category {
-    @Prop({ required: true })
-    name: string;
+  @Prop({ required: true })
+  name: string;
 
-    @Prop()
-    description: string;
+  @Prop()
+  description: string;
 
-    @Prop()
-    image: string;
+  @Prop()
+  image: string;
 
-    @Prop({ type: Types.ObjectId, ref: 'MainCategory', required: true })
-    main_category_id: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'MainCategory', required: true })
+  main_category_id: Types.ObjectId;
 
-    @Prop({ default: 'active' })
-    status: string;
+  @Prop({ default: 'active' })
+  status: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

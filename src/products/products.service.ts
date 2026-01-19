@@ -80,10 +80,6 @@ export class ProductsService extends BaseService<ProductDocument> {
   }
 
   async getRecentProducts(limit: number = 5): Promise<ProductDocument[]> {
-    return this.productModel
-      .find()
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .exec();
+    return this.productModel.find().sort({ createdAt: -1 }).limit(limit).exec();
   }
 }

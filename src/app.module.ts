@@ -74,4 +74,4 @@ import { User, UserSchema } from './schemas/user.schema';
   providers: [AppService],
   exports: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

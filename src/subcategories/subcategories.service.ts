@@ -21,9 +21,15 @@ export class SubCategoriesService extends BaseService<SubCategoryDocument> {
   }
 
   // @ts-ignore
-  async create(createSubCategoryDto: any, file?: Express.Multer.File): Promise<SubCategoryDocument> {
+  async create(
+    createSubCategoryDto: any,
+    file?: Express.Multer.File,
+  ): Promise<SubCategoryDocument> {
     if (file) {
-      const imageUrl = await this.firebaseService.uploadFile(file, 'subcategories');
+      const imageUrl = await this.firebaseService.uploadFile(
+        file,
+        'subcategories',
+      );
       createSubCategoryDto.image = imageUrl;
     }
     return super.create(createSubCategoryDto);
@@ -35,7 +41,10 @@ export class SubCategoriesService extends BaseService<SubCategoryDocument> {
     file?: Express.Multer.File,
   ): Promise<SubCategoryDocument> {
     if (file) {
-      const imageUrl = await this.firebaseService.uploadFile(file, 'subcategories');
+      const imageUrl = await this.firebaseService.uploadFile(
+        file,
+        'subcategories',
+      );
       updateSubCategoryDto.image = imageUrl;
     }
     const updated = await this.subCategoryModel

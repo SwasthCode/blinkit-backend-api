@@ -15,8 +15,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
-
+  constructor(private authService: AuthService) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -36,7 +35,6 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-
   @Post('verify-otp')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify OTP' })
@@ -44,8 +42,6 @@ export class AuthController {
   async loginWithOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
     return this.authService.loginWithOtp(loginWithOtpDto);
   }
-
-
 
   @Get('admin')
   @HttpCode(HttpStatus.OK)
@@ -58,12 +54,13 @@ export class AuthController {
   @Get('dashboard')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get dashboard stats' })
-  @ApiResponse({ status: 200, description: 'Dashboard stats fetched successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Dashboard stats fetched successfully',
+  })
   async getDashboardStats() {
     return this.authService.getDashboardStats();
   }
-
-
 
   // @Post('admin/login')
   // @HttpCode(HttpStatus.OK)
@@ -81,10 +78,6 @@ export class AuthController {
   // async adminVerifyOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
   //   return this.authService.adminVerifyOtp(loginWithOtpDto);
   // }
-
-
-
-
 
   // @Get('decrypt-password/:encryptedPassword')
   // @HttpCode(HttpStatus.OK)

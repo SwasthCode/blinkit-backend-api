@@ -44,7 +44,6 @@ export class ReviewsController extends BaseController<ReviewDocument> {
     @Body() createReviewDto: CreateReviewDto,
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
-
     const data = await this.reviewsService.create(createReviewDto, files);
     return successResponse(data, 'Review created successfully', 201);
   }

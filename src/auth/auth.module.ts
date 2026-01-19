@@ -30,4 +30,4 @@ import { ProductsModule } from '../products/products.module';
   providers: [AuthService, JwtStrategy],
   exports: [AuthService, JwtStrategy, PassportModule],
 })
-export class AuthModule { }
+export class AuthModule {}

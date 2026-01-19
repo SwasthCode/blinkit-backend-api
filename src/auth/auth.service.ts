@@ -34,7 +34,6 @@ export class AuthService {
     }
   }
 
-
   async createAdmin(adminData: any) {
     // register admin with psswrod encryption
     const { password } = adminData;
@@ -48,15 +47,8 @@ export class AuthService {
     const user = await this.usersService.create(userData);
     const userObj = user.toObject();
 
-    return successResponse(
-      userObj,
-      'Admin user created successfully',
-      201,
-    );
+    return successResponse(userObj, 'Admin user created successfully', 201);
   }
-
-
-
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByUsername(loginDto.username);
@@ -195,8 +187,14 @@ export class AuthService {
     } else {
       // Check if existing user has admin role
       const userObj = user.toObject();
-      if (!userObj.role || !Array.isArray(userObj.role) || !userObj.role.includes(1)) {
-        throw new UnauthorizedException('Access denied. Admin privileges required.');
+      if (
+        !userObj.role ||
+        !Array.isArray(userObj.role) ||
+        !userObj.role.includes(1)
+      ) {
+        throw new UnauthorizedException(
+          'Access denied. Admin privileges required.',
+        );
       }
     }
 
@@ -222,16 +220,11 @@ export class AuthService {
     );
   }
 
-
   async getAdmins() {
     // Fetch users with role 1
     const admins = await this.usersService.findAdmins();
 
-    return successResponse(
-      admins,
-      'Admin users fetched successfully',
-      200,
-    );
+    return successResponse(admins, 'Admin users fetched successfully', 200);
   }
 
   async getDashboardStats() {

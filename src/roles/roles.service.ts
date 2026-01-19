@@ -212,11 +212,9 @@ export class RolesService extends BaseService<RoleDocument> {
     }
   }
 
-
   // delete role
   async delete(id: string): Promise<RoleDocument> {
     try {
-
       // if role = admin, throw error
       const role = await this.model.findById(id).exec();
       if (!role) {

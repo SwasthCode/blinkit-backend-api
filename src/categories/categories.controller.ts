@@ -89,7 +89,11 @@ export class CategoriesController extends BaseController<CategoryDocument> {
     @Body() updateCategoryDto: UpdateCategoryDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    const data = await this.categoriesService.update(id, updateCategoryDto, file);
+    const data = await this.categoriesService.update(
+      id,
+      updateCategoryDto,
+      file,
+    );
     return successResponse(data, 'Category updated successfully');
   }
 }

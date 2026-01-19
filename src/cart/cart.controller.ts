@@ -22,16 +22,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @ApiTags('Add To Cart')
 @Controller('cart')
 export class CartController {
-  constructor(private readonly cartService: CartService) {}
-
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
-  @ApiOperation({ summary: 'Get user cart' })
-  async getCart(@Req() req: any) {
-    const data = await this.cartService.getCart(req.user._id);
-    return successResponse(data, 'Cart fetched successfully');
-  }
+  constructor(private readonly cartService: CartService) { }
 
   @Post('add')
   @UseGuards(JwtAuthGuard)
@@ -53,6 +44,19 @@ export class CartController {
     );
     return successResponse(data, 'Item removed from cart');
   }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('authentication')
+  @ApiOperation({ summary: 'Get user cart' })
+  async getCart(@Req() req: any) {
+    const data = await this.cartService.getCart(req.user._id);
+    return successResponse(data, 'Cart fetched successfully');
+  }
+
+
+
+
 
   @Delete()
   @UseGuards(JwtAuthGuard)

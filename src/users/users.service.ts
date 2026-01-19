@@ -71,8 +71,6 @@ export class UsersService extends BaseService<UserDocument> {
     }
   }
 
-
-
   async findAll(options: {
     filter?: any;
     select?: string;
@@ -198,7 +196,10 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
   async findAdmins(): Promise<UserDocument[]> {
-    const admins = await this.model.find({ role: { $in: [1] } }).lean().exec();
+    const admins = await this.model
+      .find({ role: { $in: [1] } })
+      .lean()
+      .exec();
     await populateUserRoles(this.userRoleModel, admins);
     return admins as any;
   }
@@ -213,9 +214,11 @@ export class UsersService extends BaseService<UserDocument> {
 
   async findByIdentifier(identifier: string): Promise<UserDocument | null> {
     // Try to find by email first, then by phone
-    const user = await this.model.findOne({
-      $or: [{ email: identifier }, { phone_number: identifier }],
-    }).exec();
+    const user = await this.model
+      .findOne({
+        $or: [{ email: identifier }, { phone_number: identifier }],
+      })
+      .exec();
     return user;
   }
 
