@@ -12,7 +12,7 @@ export class User extends BaseSchema {
   @Prop({ required: false })
   last_name: string;
 
-  @Prop({ required: false, unique: true, sparse: true })
+  @Prop({ required: false, sparse: true })
   username?: string;
 
   @Prop({ required: true, unique: true })

@@ -10,6 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDto, LoginWithOtpDto, CreateAdminDto } from './dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { PasswordUtil } from 'src/common/utils';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -45,22 +46,23 @@ export class AuthController {
     return this.authService.getDashboardStats();
   }
 
-  // @Post('admin/login')
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Admin Login - Send OTP to Phone Number' })
-  // @ApiResponse({ status: 200, description: 'OTP sent successfully' })
-  // async adminLogin(@Body() loginDto: LoginDto) {
-  //   return this.authService.adminLogin(loginDto);
-  // }
+  @Post('admin/login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Admin Login - Send OTP to Phone Number' })
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({ status: 200, description: 'OTP sent successfully' })
+  async adminLogin(@Body() loginDto: LoginDto) {
+    return this.authService.adminLogin(loginDto);
+  }
 
-  // @Post('admin/verify-otp')
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Admin Verify OTP and Login' })
-  // @ApiResponse({ status: 200, description: 'Admin login successful' })
-  // @ApiResponse({ status: 401, description: 'Invalid OTP or not an admin user' })
-  // async adminVerifyOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
-  //   return this.authService.adminVerifyOtp(loginWithOtpDto);
-  // }
+  @Post('admin/verify-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Admin Verify OTP and Login' })
+  @ApiResponse({ status: 200, description: 'Admin login successful' })
+  @ApiResponse({ status: 401, description: 'Invalid OTP or not an admin user' })
+  async adminVerifyOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
+    return this.authService.adminVerifyOtp(loginWithOtpDto);
+  }
 
   // @Get('decrypt-password/:encryptedPassword')
   // @HttpCode(HttpStatus.OK)
