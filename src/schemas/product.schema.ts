@@ -43,3 +43,25 @@ export class Product {
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Product JSON : 
+
+
+// { id: '30', name: 'Organic Neem Cake',
+//    category: 'Organic', 
+//    images: [ 'https://as2.ftcdn.net/v2/jpg/07/21/38/09/1000_F_721380940_dXWyVssH6jrWem0QE5ossHrxCFFoPhNv.webp', ],
+//     variants: [ { id: 'v1', label: '1 kg', price: 85, originalPrice: 100, discount: '15% off' }, { id: 'v2', label: '5 kg', price: 400, originalPrice: 480, discount: '17% off' }, ], description: 'Organic neem cake fertilizer', 
+//     countryOfOrigin: 'India', 
+//     shelfLife: '24 Months', manufacturer: 'Organic Farms India', manufacturerAddress: 'Organic Zone, Bangalore', expiryDate: '10 Oct 2025', inStock: true, },

@@ -13,6 +13,7 @@ import { AddressesModule } from './addresses/addresses.module';
 import { ProductsModule } from './products/products.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { BannersModule } from './banners/banners.module';
+import { MainCategoriesModule } from './main-categories/main-categories.module';
 import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
 import { Order, OrderSchema } from './schemas/order.schema';
@@ -58,6 +59,7 @@ import { User, UserSchema } from './schemas/user.schema';
     AuthModule,
     RolesModule,
     BannersModule,
+    MainCategoriesModule,
     CategoriesModule,
     SubCategoriesModule,
     ProductsModule,
@@ -70,4 +72,4 @@ import { User, UserSchema } from './schemas/user.schema';
   providers: [AppService],
   exports: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

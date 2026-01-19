@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsMongoId } from 'class-validator';
 
 export class CreateCategoryDto {
     @ApiProperty({
@@ -27,6 +27,11 @@ export class CreateCategoryDto {
     @IsOptional()
     @IsString()
     image?: string;
+
+    @ApiProperty({ example: '65a123...', description: 'Main Category ID' })
+    @IsNotEmpty()
+    @IsMongoId()
+    main_category_id: string;
 
     @ApiProperty({ default: 'active', description: 'Status of the category', required: false })
     @IsOptional()

@@ -44,13 +44,14 @@ export class CategoriesController extends BaseController<CategoryDocument> {
       properties: {
         name: { type: 'string' },
         description: { type: 'string' },
+        main_category_id: { type: 'string' },
         // status: { type: 'string', enum: ['active', 'inactive'], default: 'active' },
         image: {
           type: 'string',
           format: 'binary',
         },
       },
-      required: ['name'],
+      required: ['name', 'main_category_id'],
     },
   })
   @ApiResponse({ status: 201, description: 'Category created successfully' })

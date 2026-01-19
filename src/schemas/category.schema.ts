@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type CategoryDocument = Category & Document;
 
@@ -13,6 +13,9 @@ export class Category {
 
     @Prop()
     image: string;
+
+    @Prop({ type: Types.ObjectId, ref: 'MainCategory', required: true })
+    main_category_id: Types.ObjectId;
 
     @Prop({ default: 'active' })
     status: string;
