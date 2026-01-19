@@ -9,12 +9,15 @@ import { BaseService } from '../common/base/base.service';
 import { Order, OrderDocument, OrderItem } from '../schemas/order.schema';
 import { CartService } from '../cart/cart.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateDirectOrderDto } from './dto/create-direct-order.dto';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class OrdersService extends BaseService<OrderDocument> {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     private readonly cartService: CartService,
+    private readonly productsService: ProductsService,
   ) {
     super(orderModel);
   }
@@ -66,6 +69,57 @@ export class OrdersService extends BaseService<OrderDocument> {
     await this.cartService.clearCart(userId);
 
     return savedOrder;
+  }
+
+  async createDirectOrder(
+    userId: string,
+    createDirectOrderDto: CreateDirectOrderDto,
+  ): Promise<OrderDocument> {
+    const orderItems: OrderItem[] = [];
+    let totalAmount = 0;
+
+    for (const item of createDirectOrderDto.items) {
+      const product = await this.productsService.findOne(item.product_id);
+      if (!product) {
+        throw new NotFoundException(
+          `Product with ID ${item.product_id} not found`,
+        );
+      }
+
+      orderItems.push({
+        product_id: product._id as Types.ObjectId,
+        name: product.name,
+        image:
+          product.images?.[0]?.url ||
+          'https://placehold.co/600x400?text=No+Image',
+        price: product.price,
+        quantity: item.quantity,
+      });
+
+      totalAmount += product.price * item.quantity;
+    }
+
+    const order = new this.orderModel({
+      user_id: new Types.ObjectId(userId),
+      address_id: new Types.ObjectId(createDirectOrderDto.address_id),
+      items: orderItems,
+      total_amount: totalAmount,
+      payment_method: createDirectOrderDto.payment_method || 'COD',
+      status: 'Pending',
+      payment_status: 'Pending',
+    });
+
+    return order.save();
+  }
+
+  async updateStatus(id: string, status: string): Promise<OrderDocument> {
+    const order = await this.orderModel.findById(id);
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    order.status = status;
+    return order.save();
   }
 
   async findByUser(userId: string): Promise<OrderDocument[]> {

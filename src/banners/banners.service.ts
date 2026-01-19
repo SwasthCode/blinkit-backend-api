@@ -4,10 +4,13 @@ import { Model } from 'mongoose';
 import { BaseService } from '../common/base/base.service';
 import { Banner, BannerDocument } from '../schemas/banner.schema';
 
+import { FirebaseService } from '../common/firebase/firebase.service';
+
 @Injectable()
 export class BannersService extends BaseService<BannerDocument> {
   constructor(
     @InjectModel(Banner.name) private bannerModel: Model<BannerDocument>,
+    private readonly firebaseService: FirebaseService,
   ) {
     super(bannerModel);
   }
@@ -24,7 +27,8 @@ export class BannersService extends BaseService<BannerDocument> {
     file?: Express.Multer.File,
   ): Promise<BannerDocument> {
     if (file) {
-      createBannerDto['image_url'] = `/uploads/${file.filename}`;
+      const imageUrl = await this.firebaseService.uploadFile(file, 'banners');
+      createBannerDto['image_url'] = imageUrl;
     }
     const createdBanner = new this.bannerModel(createBannerDto);
     return createdBanner.save();

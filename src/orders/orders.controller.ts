@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Body,
   Param,
   UseGuards,
@@ -17,7 +18,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto';
+import { CreateOrderDto, CreateDirectOrderDto, UpdateOrderStatusDto } from './dto';
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { OrderDocument } from '../schemas/order.schema';
@@ -25,7 +26,7 @@ import { OrderDocument } from '../schemas/order.schema';
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -58,5 +59,38 @@ export class OrdersController {
   async findOne(@Param('id') id: string) {
     const data = await this.ordersService.findOne(id);
     return successResponse(data, 'Order details fetched successfully');
+  }
+
+  @Post('direct')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('authentication')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create an order directly (Admin/Buy Now)' })
+  @ApiResponse({ status: 201, description: 'Order created successfully' })
+  async createDirect(
+    @Req() req: any,
+    @Body() createDirectOrderDto: CreateDirectOrderDto,
+  ) {
+    const data = await this.ordersService.createDirectOrder(
+      req.user._id,
+      createDirectOrderDto,
+    );
+    return successResponse(data, 'Order created successfully', 201);
+  }
+
+  @Put(':id/status')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('authentication')
+  @ApiOperation({ summary: 'Update order status' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto,
+  ) {
+    const data = await this.ordersService.updateStatus(
+      id,
+      updateOrderStatusDto.status,
+    );
+    return successResponse(data, 'Order status updated successfully');
   }
 }

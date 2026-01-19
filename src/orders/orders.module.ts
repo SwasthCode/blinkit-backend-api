@@ -5,12 +5,14 @@ import { OrdersController } from './orders.controller';
 import { Order, OrderSchema } from '../schemas/order.schema';
 import { CartModule } from '../cart/cart.module';
 import { AuthModule } from '../auth/auth.module';
+import { ProductsModule } from '../products/products.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
     forwardRef(() => CartModule),
     forwardRef(() => AuthModule),
+    ProductsModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

@@ -10,6 +10,7 @@ import { Transform } from 'class-transformer';
 
 export class CreateBannerDto {
   @ApiProperty({ type: 'string', format: 'binary', required: true })
+  @IsOptional()
   image: any;
 
   @ApiProperty({
