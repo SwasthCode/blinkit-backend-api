@@ -8,11 +8,14 @@ import { BaseService } from '../common/base/base.service';
 import { PasswordUtil } from '../common/utils';
 import { populateUserRoles } from '../common/utils/rolePopulat.util';
 
+import { FirebaseService } from '../common/firebase/firebase.service';
+
 @Injectable()
 export class UsersService extends BaseService<UserDocument> {
   constructor(
     @InjectModel(User.name) userModel: Model<UserDocument>,
     @InjectModel(Role.name) public userRoleModel: Model<RoleDocument>,
+    private readonly firebaseService: FirebaseService,
   ) {
     super(userModel);
   }
@@ -275,6 +278,31 @@ export class UsersService extends BaseService<UserDocument> {
         error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to update password: ${errorMessage}`);
     }
+  }
+
+  // @ts-ignore
+  async updateProfile(
+    userId: string,
+    updateDto: any,
+    file?: Express.Multer.File,
+  ): Promise<UserDocument> {
+    if (file) {
+      const imageUrl = await this.firebaseService.uploadFile(
+        file,
+        'users/profile',
+      );
+      updateDto.profile_image = imageUrl;
+    }
+
+    const user = await this.model.findByIdAndUpdate(
+      userId,
+      { $set: updateDto },
+      { new: true, runValidators: true },
+    );
+
+    if (!user) throw new NotFoundException('User not found');
+
+    return user;
   }
 
   async getProfile(userId: string) {

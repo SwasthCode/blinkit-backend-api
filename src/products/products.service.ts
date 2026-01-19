@@ -6,10 +6,13 @@ import { Product, ProductDocument } from '../schemas/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
+import { FirebaseService } from '../common/firebase/firebase.service';
+
 @Injectable()
 export class ProductsService extends BaseService<ProductDocument> {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    private readonly firebaseService: FirebaseService,
   ) {
     super(productModel);
   }
@@ -19,9 +22,11 @@ export class ProductsService extends BaseService<ProductDocument> {
     files?: Express.Multer.File[],
   ): Promise<ProductDocument> {
     if (files && files.length > 0) {
-      createProductDto.images = files.map((file) => ({
-        url: `/uploads/${file.filename}`,
-      }));
+      const uploadPromises = files.map((file) =>
+        this.firebaseService.uploadFile(file, 'products'),
+      );
+      const imageUrls = await Promise.all(uploadPromises);
+      createProductDto.images = imageUrls.map((url) => ({ url }));
     }
     const createdProduct = new this.productModel(createProductDto);
     return createdProduct.save();
@@ -35,9 +40,11 @@ export class ProductsService extends BaseService<ProductDocument> {
     files?: Express.Multer.File[],
   ): Promise<ProductDocument> {
     if (files && files.length > 0) {
-      updateProductDto.images = files.map((file) => ({
-        url: `/uploads/${file.filename}`,
-      }));
+      const uploadPromises = files.map((file) =>
+        this.firebaseService.uploadFile(file, 'products'),
+      );
+      const imageUrls = await Promise.all(uploadPromises);
+      updateProductDto.images = imageUrls.map((url) => ({ url }));
     }
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, updateProductDto, { new: true })

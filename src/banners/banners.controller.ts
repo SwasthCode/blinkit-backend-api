@@ -7,6 +7,8 @@ import {
   UploadedFile,
   Query,
   UseGuards,
+  Param,
+  Put,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -46,20 +48,20 @@ export class BannersController extends BaseController<BannerDocument> {
     return successResponse(data, 'Banner created successfully', 201);
   }
 
-  // @Put(':id')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth('authentication')
-  // @ApiOperation({ summary: 'Update banner by ID' })
-  // @ApiConsumes('multipart/form-data')
-  // @UseInterceptors(FileInterceptor('image'))
-  // async update(
-  //     @Param('id') id: string,
-  //     @Body() updateBannerDto: UpdateBannerDto,
-  //     @UploadedFile() file?: Express.Multer.File,
-  // ) {
-  //     const data = await this.bannersService.update(id, updateBannerDto, file);
-  //     return successResponse(data, 'Banner updated successfully');
-  // }
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('authentication')
+  @ApiOperation({ summary: 'Update banner by ID' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
+    @Param('id') id: string,
+    @Body() updateBannerDto: any,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const data = await this.bannersService.update(id, updateBannerDto, file);
+    return successResponse(data, 'Banner updated successfully');
+  }
 
   @Get('active')
   @ApiOperation({ summary: 'Get active banners (public)' })

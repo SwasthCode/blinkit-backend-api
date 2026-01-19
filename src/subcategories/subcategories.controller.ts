@@ -59,10 +59,7 @@ export class SubCategoriesController extends BaseController<SubCategoryDocument>
     @Body() createSubCategoryDto: CreateSubCategoryDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    if (file) {
-      createSubCategoryDto.image = `/uploads/${file.filename}`;
-    }
-    const data = await this.subCategoriesService.create(createSubCategoryDto);
+    const data = await this.subCategoriesService.create(createSubCategoryDto, file);
     return successResponse(data, 'SubCategory created successfully', 201);
   }
 
@@ -92,12 +89,10 @@ export class SubCategoriesController extends BaseController<SubCategoryDocument>
     @Body() updateSubCategoryDto: UpdateSubCategoryDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    if (file) {
-      updateSubCategoryDto.image = `/uploads/${file.filename}`;
-    }
     const data = await this.subCategoriesService.update(
       id,
       updateSubCategoryDto,
+      file,
     );
     return successResponse(data, 'SubCategory updated successfully');
   }

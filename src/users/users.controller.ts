@@ -35,6 +35,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @Controller('users')
 export class UsersController extends BaseController<UserDocument> {
   constructor(private readonly usersService: UsersService) {
+    // @ts-ignore
     super(usersService);
   }
 
@@ -82,12 +83,10 @@ export class UsersController extends BaseController<UserDocument> {
     if (!allowedRoles.includes(req.user.role?.key)) {
       throw new UnauthorizedException('Unauthorized');
     }
-    if (file) {
-      updateUserDto.profile_image = `/uploads/${file.filename}`;
-    }
     const data = await this.usersService.updateProfile(
       req.user._id,
       updateUserDto,
+      file,
     );
     return successResponse(data, 'User profile updated successfully');
   }

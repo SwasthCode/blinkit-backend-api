@@ -24,7 +24,6 @@ import { CategoryDocument } from '../schemas/category.schema';
 import { CategoriesService } from './categories.service';
 import { UpdateCategoryDto, CreateCategoryDto } from './dto';
 import { successResponse } from '../common/base/base.response';
-import { uploadToCloudinaryBuffer } from '../common/utils/cloudinary.util';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -60,10 +59,7 @@ export class CategoriesController extends BaseController<CategoryDocument> {
     @Body() createCategoryDto: CreateCategoryDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    if (file) {
-      createCategoryDto.image = `/uploads/${file.filename}`;
-    }
-    const data = await this.categoriesService.create(createCategoryDto);
+    const data = await this.categoriesService.create(createCategoryDto, file);
     return successResponse(data, 'Category created successfully', 201);
   }
 
@@ -93,10 +89,7 @@ export class CategoriesController extends BaseController<CategoryDocument> {
     @Body() updateCategoryDto: UpdateCategoryDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    if (file) {
-      updateCategoryDto.image = `/uploads/${file.filename}`;
-    }
-    const data = await this.categoriesService.update(id, updateCategoryDto);
+    const data = await this.categoriesService.update(id, updateCategoryDto, file);
     return successResponse(data, 'Category updated successfully');
   }
 }

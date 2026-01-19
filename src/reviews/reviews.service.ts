@@ -6,10 +6,13 @@ import { Review, ReviewDocument } from '../schemas/review.schema';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 
+import { FirebaseService } from '../common/firebase/firebase.service';
+
 @Injectable()
 export class ReviewsService extends BaseService<ReviewDocument> {
   constructor(
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
+    private readonly firebaseService: FirebaseService,
   ) {
     super(reviewModel);
   }
@@ -19,9 +22,11 @@ export class ReviewsService extends BaseService<ReviewDocument> {
     files?: Express.Multer.File[],
   ): Promise<ReviewDocument> {
     if (files && files.length > 0) {
-      createReviewDto.images = files.map((file) => ({
-        url: `/uploads/${file.filename}`,
-      }));
+      const uploadPromises = files.map((file) =>
+        this.firebaseService.uploadFile(file, 'reviews'),
+      );
+      const imageUrls = await Promise.all(uploadPromises);
+      createReviewDto.images = imageUrls.map((url) => ({ url }));
     } else {
       if (!Array.isArray(createReviewDto.images)) {
         delete createReviewDto.images;
@@ -39,9 +44,11 @@ export class ReviewsService extends BaseService<ReviewDocument> {
     files?: Express.Multer.File[],
   ): Promise<ReviewDocument> {
     if (files && files.length > 0) {
-      updateReviewDto.images = files.map((file) => ({
-        url: `/uploads/${file.filename}`,
-      }));
+      const uploadPromises = files.map((file) =>
+        this.firebaseService.uploadFile(file, 'reviews'),
+      );
+      const imageUrls = await Promise.all(uploadPromises);
+      updateReviewDto.images = imageUrls.map((url) => ({ url }));
     }
     const updatedReview = await this.reviewModel
       .findByIdAndUpdate(id, updateReviewDto, { new: true })

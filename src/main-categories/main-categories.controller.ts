@@ -57,10 +57,7 @@ export class MainCategoriesController extends BaseController<MainCategoryDocumen
         @Body() createMainCategoryDto: CreateMainCategoryDto,
         @UploadedFile() file?: Express.Multer.File,
     ) {
-        if (file) {
-            createMainCategoryDto.image = `/uploads/${file.filename}`;
-        }
-        const data = await this.mainCategoriesService.create(createMainCategoryDto);
+        const data = await this.mainCategoriesService.create(createMainCategoryDto, file);
         return successResponse(data, 'MainCategory created successfully', 201);
     }
 
@@ -90,10 +87,7 @@ export class MainCategoriesController extends BaseController<MainCategoryDocumen
         @Body() updateMainCategoryDto: UpdateMainCategoryDto,
         @UploadedFile() file?: Express.Multer.File,
     ) {
-        if (file) {
-            updateMainCategoryDto.image = `/uploads/${file.filename}`;
-        }
-        const data = await this.mainCategoriesService.update(id, updateMainCategoryDto);
+        const data = await this.mainCategoriesService.update(id, updateMainCategoryDto, file);
         return successResponse(data, 'MainCategory updated successfully');
     }
 }
