@@ -33,7 +33,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 200, description: 'OTP sent successfully' })
   async adminLogin(@Body() loginDto: LoginDto) {
-    return this.authService.adminLogin(loginDto);
+    return this.authService.login(loginDto);
   }
 
   @Post('/verify-otp')
