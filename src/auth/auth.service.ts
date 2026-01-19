@@ -105,122 +105,122 @@ export class AuthService {
     );
   }
 
-  // async loginWithOtp({ username, otp }: LoginWithOtpDto) {
-  //   if (otp !== '1234') {
-  //     throw new UnauthorizedException('Invalid OTP');
-  //   }
+  async loginWithOtp({ phone_number, otp }: LoginWithOtpDto) {
+    if (otp !== '1234') {
+      throw new UnauthorizedException('Invalid OTP');
+    }
 
-  //   let user = await this.usersService.findByUsername(username);
+    let user = await this.usersService.findByPhone(phone_number);
 
-  //   if (!user) {
-  //     try {
-  //       user = await this.usersService.create({
-  //         phone_number,
-  //         role: [1, 2],
-  //       } as any);
-  //     } catch (error) {
-  //       // Handle race condition: if user was created by another request in the meantime
-  //       if (
-  //         (error as Error).message.includes(
-  //           'User with this phone number already exists',
-  //         )
-  //       ) {
-  //         user = await this.usersService.findByPhone(phone_number);
-  //         if (!user) {
-  //           throw error; // If still not found, rethrow the original error
-  //         }
-  //       } else {
-  //         throw error;
-  //       }
-  //     }
-  //   }
+    if (!user) {
+      try {
+        user = await this.usersService.create({
+          phone_number,
+          role: [1, 2],
+        } as any);
+      } catch (error) {
+        // Handle race condition: if user was created by another request in the meantime
+        if (
+          (error as Error).message.includes(
+            'User with this phone number already exists',
+          )
+        ) {
+          user = await this.usersService.findByPhone(phone_number);
+          if (!user) {
+            throw error; // If still not found, rethrow the original error
+          }
+        } else {
+          throw error;
+        }
+      }
+    }
 
-  //   const userObj = user.toObject();
+    const userObj = user.toObject();
 
-  //   const accessToken = this.jwtService.sign(
-  //     {
-  //       id: user._id,
-  //       phone_number: user.phone_number,
-  //       role: userObj.role,
-  //       status: userObj.status,
-  //     },
-  //     { expiresIn: '7d' },
-  //   );
+    const accessToken = this.jwtService.sign(
+      {
+        id: user._id,
+        phone_number: user.phone_number,
+        role: userObj.role,
+        status: userObj.status,
+      },
+      { expiresIn: '7d' },
+    );
 
-  //   return successResponse(
-  //     {
-  //       ...userObj,
-  //       access_token: accessToken,
-  //     },
-  //     'Login successful',
-  //     200,
-  //   );
-  // }
+    return successResponse(
+      {
+        ...userObj,
+        access_token: accessToken,
+      },
+      'Login successful',
+      200,
+    );
+  }
 
-  // async adminLogin(loginDto: LoginDto) {
-  //   // Same as regular login, just send OTP
-  //   // Admin users will be identified during OTP verification
-  //   return successResponse({}, 'OTP sent successfully', 200);
-  // }
+  async adminLogin(loginDto: LoginDto) {
+    // Same as regular login, just send OTP
+    // Admin users will be identified during OTP verification
+    return successResponse({}, 'OTP sent successfully', 200);
+  }
 
-  // async adminVerifyOtp({ phone_number, otp }: LoginWithOtpDto) {
-  //   if (otp !== '1234') {
-  //     throw new UnauthorizedException('Invalid OTP');
-  //   }
+  async adminVerifyOtp({ phone_number, otp }: LoginWithOtpDto) {
+    if (otp !== '1234') {
+      throw new UnauthorizedException('Invalid OTP');
+    }
 
-  //   let user = await this.usersService.findByPhone(phone_number);
+    let user = await this.usersService.findByPhone(phone_number);
 
-  //   if (!user) {
-  //     // Create new admin user with role = 1
-  //     try {
-  //       user = await this.usersService.create({
-  //         phone_number,
-  //         role: [1], // Admin role
-  //       } as any);
-  //     } catch (error) {
-  //       // Handle race condition
-  //       if (
-  //         (error as Error).message.includes(
-  //           'User with this phone number already exists',
-  //         )
-  //       ) {
-  //         user = await this.usersService.findByPhone(phone_number);
-  //         if (!user) {
-  //           throw error;
-  //         }
-  //       } else {
-  //         throw error;
-  //       }
-  //     }
-  //   } else {
-  //     // Check if existing user has admin role
-  //     const userObj = user.toObject();
-  //     if (!userObj.role || !Array.isArray(userObj.role) || !userObj.role.includes(1)) {
-  //       throw new UnauthorizedException('Access denied. Admin privileges required.');
-  //     }
-  //   }
+    if (!user) {
+      // Create new admin user with role = 1
+      try {
+        user = await this.usersService.create({
+          phone_number,
+          role: [1], // Admin role
+        } as any);
+      } catch (error) {
+        // Handle race condition
+        if (
+          (error as Error).message.includes(
+            'User with this phone number already exists',
+          )
+        ) {
+          user = await this.usersService.findByPhone(phone_number);
+          if (!user) {
+            throw error;
+          }
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      // Check if existing user has admin role
+      const userObj = user.toObject();
+      if (!userObj.role || !Array.isArray(userObj.role) || !userObj.role.includes(1)) {
+        throw new UnauthorizedException('Access denied. Admin privileges required.');
+      }
+    }
 
-  //   const userObj = user.toObject();
+    const userObj = user.toObject();
 
-  //   const accessToken = this.jwtService.sign(
-  //     {
-  //       id: user._id,
-  //       phone_number: user.phone_number,
-  //       role: userObj.role,
-  //       status: userObj.status,
-  //     },
-  //     { expiresIn: '7d' },
-  //   );
+    const accessToken = this.jwtService.sign(
+      {
+        id: user._id,
+        phone_number: user.phone_number,
+        role: userObj.role,
+        status: userObj.status,
+      },
+      { expiresIn: '7d' },
+    );
 
-  //   return successResponse(
-  //     {
-  //       ...userObj,
-  //       access_token: accessToken,
-  //     },
-  //     'Admin login successful',
-  //     200,
-  //   );
-  // }
+    return successResponse(
+      {
+        ...userObj,
+        access_token: accessToken,
+      },
+      'Admin login successful',
+      200,
+    );
+  }
 
 
   async getAdmins() {

@@ -36,6 +36,17 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+
+  @Post('verify-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify OTP' })
+  @ApiResponse({ status: 200, description: 'Otp sent successfully' })
+  async loginWithOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
+    return this.authService.loginWithOtp(loginWithOtpDto);
+  }
+
+
+
   @Get('admin')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all admin users' })
@@ -52,13 +63,7 @@ export class AuthController {
     return this.authService.getDashboardStats();
   }
 
-  // @Post('verify-otp')
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Verify OTP' })
-  // @ApiResponse({ status: 200, description: 'Otp sent successfully' })
-  // async loginWithOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
-  //   return this.authService.loginWithOtp(loginWithOtpDto);
-  // }
+
 
   // @Post('admin/login')
   // @HttpCode(HttpStatus.OK)
