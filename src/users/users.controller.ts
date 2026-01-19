@@ -26,6 +26,7 @@ import {
 
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto';
+import { LoginDto, LoginWithOtpDto } from '../auth/dto';
 import { BaseController } from '../common/base/base.controller';
 import { UserDocument } from '../schemas/user.schema';
 import { successResponse } from '../common/base/base.response';
@@ -48,6 +49,33 @@ export class UsersController extends BaseController<UserDocument> {
   async create(@Body() createUserDto: CreateUserDto) {
     const data = await this.usersService.create(createUserDto);
     return successResponse(data, 'User created successfully', 201);
+  }
+
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login with Phone Number' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        phone_number: { type: 'string', example: '9876543210' },
+      },
+      required: ['phone_number'],
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Otp sent successfully' })
+  async loginWithPhone(@Body('phone_number') phone_number: string) {
+    return this.usersService.loginWithPhone(phone_number);
+  }
+
+  @Post('verify-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify OTP' })
+  @ApiBody({ type: LoginWithOtpDto })
+  @ApiResponse({ status: 200, description: 'Login successful' })
+  async verifyOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
+    return this.usersService.verifyOtp(loginWithOtpDto);
   }
 
   @Get('profile')
@@ -160,4 +188,5 @@ export class UsersController extends BaseController<UserDocument> {
   async findOne(@Param('id') id: string) {
     return super.findOne(id);
   }
+
 }

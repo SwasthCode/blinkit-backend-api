@@ -1,9 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
 import { Role, RoleDocument } from '../schemas/role.schema';
 import { CreateUserDto } from './dto';
+import { LoginDto, LoginWithOtpDto } from '../auth/dto';
+import { JwtService } from '@nestjs/jwt';
+import { successResponse } from '../common/base/base.response';
 import { BaseService } from '../common/base/base.service';
 import { PasswordUtil } from '../common/utils';
 import { populateUserRoles } from '../common/utils/rolePopulat.util';
@@ -16,6 +19,7 @@ export class UsersService extends BaseService<UserDocument> {
     @InjectModel(User.name) userModel: Model<UserDocument>,
     @InjectModel(Role.name) public userRoleModel: Model<RoleDocument>,
     private readonly firebaseService: FirebaseService,
+    private readonly jwtService: JwtService,
   ) {
     super(userModel);
   }
@@ -70,7 +74,72 @@ export class UsersService extends BaseService<UserDocument> {
       throw new Error(`Failed to create user: ${errorMessage}`);
     }
   }
+  async login(loginDto: LoginDto) {
+    // Current requirement: "Login with Phone Number" often means sending OTP first
+    // In this codebase, login(LoginDto) was for username/password in AuthService.
+    // However, the user said "Login with phone_no" and "Verify with otp".
+    // I will implement them as per the user's request details.
 
+    // If it's just a username/password login:
+    const user = await this.model.findOne({ username: loginDto.username });
+    if (!user || user.password !== PasswordUtil.encryptPassword(loginDto.password)) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return successResponse(user, 'Login successful');
+  }
+
+  async loginWithPhone(phone_number: string) {
+    // Logic for sending OTP would go here. For now, returning success as per auth.service.ts
+    return successResponse({}, 'OTP sent successfully', 200);
+  }
+
+  async verifyOtp({ phone_number, otp }: LoginWithOtpDto) {
+    if (otp !== '1234') {
+      throw new UnauthorizedException('Invalid OTP');
+    }
+
+    let user = await this.findByPhone(phone_number);
+
+    if (!user) {
+      try {
+        user = await this.create({
+          phone_number,
+          role: [2], // customer role
+        } as any);
+      } catch (error) {
+        if ((error as any).message.includes('User with this phone number already exists')) {
+          user = await this.findByPhone(phone_number);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    if (!user) {
+      throw new Error('Failed to identify user');
+    }
+
+    const userObj = user.toObject();
+
+    const accessToken = this.jwtService.sign(
+      {
+        id: user._id,
+        phone_number: user.phone_number,
+        role: userObj.role,
+        status: userObj.status,
+      },
+      { expiresIn: '7d' },
+    );
+
+    return successResponse(
+      {
+        ...userObj,
+        access_token: accessToken,
+      },
+      'Login successful',
+      200,
+    );
+  }
   async findAll(options: {
     filter?: any;
     select?: string;
@@ -190,6 +259,8 @@ export class UsersService extends BaseService<UserDocument> {
 
     return paginatedUsers as any;
   }
+
+
 
   async findByPhone(phone_number: string): Promise<UserDocument | null> {
     return this.model.findOne({ phone_number }).exec();

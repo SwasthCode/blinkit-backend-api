@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 
 import * as jwt from 'jsonwebtoken';
-import { UpdateUserDto } from 'src/users/dto';
+import { UpdateUserDto } from '../../users/dto';
 
 @Injectable()
 export class BaseService<T extends Document> {
-  constructor(protected readonly model: Model<T>) {}
+  constructor(protected readonly model: Model<T>) { }
 
   async create(createDto: any): Promise<T> {
     const created = new this.model(createDto);

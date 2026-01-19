@@ -9,13 +9,12 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, LoginWithOtpDto, CreateAdminDto } from './dto';
-import { PasswordUtil } from '../common/utils';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -25,22 +24,6 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
   async createAdmin(@Body() createAdminDto: CreateAdminDto) {
     return this.authService.createAdmin(createAdminDto);
-  }
-
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Login with Phone Number' })
-  @ApiResponse({ status: 200, description: 'Otp sent successfully' })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
-  }
-
-  @Post('verify-otp')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Verify OTP' })
-  @ApiResponse({ status: 200, description: 'Otp sent successfully' })
-  async loginWithOtp(@Body() loginWithOtpDto: LoginWithOtpDto) {
-    return this.authService.loginWithOtp(loginWithOtpDto);
   }
 
   @Get('admin')

@@ -4,8 +4,8 @@ import { UsersService } from '../users/users.service';
 import { LoginDto, LoginWithOtpDto } from './dto';
 import { successResponse } from '../common/base/base.response';
 import * as admin from 'firebase-admin';
-import { PasswordUtil } from 'src/common/utils';
-import { populateUserRoles } from 'src/common/utils/rolePopulat.util';
+import { PasswordUtil } from '../common/utils';
+import { populateUserRoles } from '../common/utils/rolePopulat.util';
 
 import { OrdersService } from '../orders/orders.service';
 import { ProductsService } from '../products/products.service';
