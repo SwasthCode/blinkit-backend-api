@@ -6,6 +6,7 @@ import {
   MainCategory,
   MainCategoryDocument,
 } from '../schemas/main-category.schema';
+import { Category, CategoryDocument } from '../schemas/category.schema';
 import { UpdateMainCategoryDto } from './dto';
 
 import { FirebaseService } from '../common/firebase/firebase.service';
@@ -15,6 +16,8 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
   constructor(
     @InjectModel(MainCategory.name)
     private mainCategoryModel: Model<MainCategoryDocument>,
+    @InjectModel(Category.name)
+    private categoryModel: Model<CategoryDocument>,
     private readonly firebaseService: FirebaseService,
   ) {
     super(mainCategoryModel);
@@ -25,6 +28,8 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
     createMainCategoryDto: any,
     file?: Express.Multer.File,
   ): Promise<MainCategoryDocument> {
+    console.log('MainCategoriesService.create - DTO:', createMainCategoryDto);
+    console.log('MainCategoriesService.create - File received:', file ? file.originalname : 'No file');
     if (file) {
       const imageUrl = await this.firebaseService.uploadFile(
         file,
@@ -70,37 +75,42 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
     if (skip) q = q.skip(Number(skip));
     if (limit) q = q.limit(Number(limit));
 
-    // Explicit deep population
-    return q
-      .populate({
-        path: 'categories',
-        model: 'Category',
-        populate: {
-          path: 'subcategories',
-          model: 'SubCategory',
-        },
+    const mainCategories = await q.exec();
+
+    // Manually fetch categories for each main category
+    const mainCategoryIds = mainCategories.map((mc) => mc.id);
+    const allCategories = await this.categoryModel
+      .find({
+        main_category_id: mainCategoryIds,
       })
       .exec();
+    // Map categories to their respective main categories
+    const result = mainCategories.map((mc: any) => {
+      const mcObj = mc.toObject();
+      mcObj.categories = allCategories.filter(
+        (c) => c.main_category_id.toString() === mc._id.toString(),
+      );
+      return mcObj;
+    });
+
+    return result as any;
   }
 
   async findOne(id: string): Promise<MainCategoryDocument> {
-    const mainCategory = await this.mainCategoryModel
-      .findById(id)
-      .populate({
-        path: 'categories',
-        model: 'Category',
-        populate: {
-          path: 'subcategories',
-          model: 'SubCategory',
-        },
-      })
-      .exec();
+    const mainCategory = await this.mainCategoryModel.findById(id).exec();
 
     if (!mainCategory) {
       throw new NotFoundException(`MainCategory with ID ${id} not found`);
     }
 
-    return mainCategory;
+    const categories = await this.categoryModel
+      .find({ main_category_id: id })
+      .exec();
+
+    const result = mainCategory.toObject();
+    result.categories = categories;
+
+    return result as any;
   }
 
   async update(
@@ -108,6 +118,9 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
     updateMainCategoryDto: UpdateMainCategoryDto,
     file?: Express.Multer.File,
   ): Promise<MainCategoryDocument> {
+    console.log('MainCategoriesService.update - ID:', id);
+    console.log('MainCategoriesService.update - DTO:', updateMainCategoryDto);
+    console.log('MainCategoriesService.update - File received:', file ? file.originalname : 'No file');
     if (file) {
       const imageUrl = await this.firebaseService.uploadFile(
         file,
@@ -118,18 +131,19 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
 
     const updatedMainCategory = await this.mainCategoryModel
       .findByIdAndUpdate(id, updateMainCategoryDto, { new: true })
-      .populate({
-        path: 'categories',
-        populate: {
-          path: 'subcategories',
-        },
-      })
       .exec();
 
     if (!updatedMainCategory) {
       throw new NotFoundException(`MainCategory with ID ${id} not found`);
     }
 
-    return updatedMainCategory;
+    const categories = await this.categoryModel
+      .find({ main_category_id: id })
+      .exec();
+
+    const result = updatedMainCategory.toObject();
+    result.categories = categories;
+
+    return result as any;
   }
 }
