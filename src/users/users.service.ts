@@ -101,18 +101,7 @@ export class UsersService extends BaseService<UserDocument> {
     let user = await this.findByPhone(phone_number);
 
     if (!user) {
-      try {
-        user = await this.create({
-          phone_number,
-          role: [2], // customer role
-        } as any);
-      } catch (error) {
-        if ((error as any).message.includes('User with this phone number already exists')) {
-          user = await this.findByPhone(phone_number);
-        } else {
-          throw error;
-        }
-      }
+      throw new NotFoundException('User with this phone number not found');
     }
 
     if (!user) {

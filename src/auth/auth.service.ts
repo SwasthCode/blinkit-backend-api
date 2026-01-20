@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { LoginDto, LoginWithOtpDto } from './dto';
@@ -105,26 +105,7 @@ export class AuthService {
     let user = await this.usersService.findByPhone(phone_number);
 
     if (!user) {
-      try {
-        user = await this.usersService.create({
-          phone_number,
-          role: [1, 2],
-        } as any);
-      } catch (error) {
-        // Handle race condition: if user was created by another request in the meantime
-        if (
-          (error as Error).message.includes(
-            'User with this phone number already exists',
-          )
-        ) {
-          user = await this.usersService.findByPhone(phone_number);
-          if (!user) {
-            throw error; // If still not found, rethrow the original error
-          }
-        } else {
-          throw error;
-        }
-      }
+      throw new NotFoundException('User with this phone number not found');
     }
 
     const userObj = user.toObject();
@@ -163,27 +144,7 @@ export class AuthService {
     let user = await this.usersService.findByPhone(phone_number);
 
     if (!user) {
-      // Create new admin user with role = 1
-      try {
-        user = await this.usersService.create({
-          phone_number,
-          role: [1], // Admin role
-        } as any);
-      } catch (error) {
-        // Handle race condition
-        if (
-          (error as Error).message.includes(
-            'User with this phone number already exists',
-          )
-        ) {
-          user = await this.usersService.findByPhone(phone_number);
-          if (!user) {
-            throw error;
-          }
-        } else {
-          throw error;
-        }
-      }
+      throw new NotFoundException('User with this phone number not found');
     } else {
       // Check if existing user has admin role
       const userObj = user.toObject();
