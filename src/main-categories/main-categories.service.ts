@@ -35,6 +35,74 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
     return super.create(createMainCategoryDto);
   }
 
+  async findAll(options: {
+    filter?: string;
+    select?: string;
+    sort?: string;
+    limit?: number;
+    skip?: number;
+  }): Promise<MainCategoryDocument[]> {
+    const { filter, select, sort, limit, skip } = options;
+
+    let query = {};
+    if (filter) {
+      try {
+        query = JSON.parse(filter);
+      } catch (e) {
+        console.warn('Invalid JSON filter in MainCategoriesService:', filter);
+      }
+    }
+
+    let q = this.mainCategoryModel.find(query);
+
+    if (select) {
+      q = q.select(select.split(',').join(' '));
+    }
+
+    if (sort) {
+      try {
+        q = q.sort(JSON.parse(sort));
+      } catch (e) {
+        q = q.sort(sort);
+      }
+    }
+
+    if (skip) q = q.skip(Number(skip));
+    if (limit) q = q.limit(Number(limit));
+
+    // Explicit deep population
+    return q
+      .populate({
+        path: 'categories',
+        model: 'Category',
+        populate: {
+          path: 'subcategories',
+          model: 'SubCategory',
+        },
+      })
+      .exec();
+  }
+
+  async findOne(id: string): Promise<MainCategoryDocument> {
+    const mainCategory = await this.mainCategoryModel
+      .findById(id)
+      .populate({
+        path: 'categories',
+        model: 'Category',
+        populate: {
+          path: 'subcategories',
+          model: 'SubCategory',
+        },
+      })
+      .exec();
+
+    if (!mainCategory) {
+      throw new NotFoundException(`MainCategory with ID ${id} not found`);
+    }
+
+    return mainCategory;
+  }
+
   async update(
     id: string,
     updateMainCategoryDto: UpdateMainCategoryDto,
@@ -50,6 +118,12 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
 
     const updatedMainCategory = await this.mainCategoryModel
       .findByIdAndUpdate(id, updateMainCategoryDto, { new: true })
+      .populate({
+        path: 'categories',
+        populate: {
+          path: 'subcategories',
+        },
+      })
       .exec();
 
     if (!updatedMainCategory) {

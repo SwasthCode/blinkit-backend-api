@@ -3,7 +3,11 @@ import { Document } from 'mongoose';
 
 export type MainCategoryDocument = MainCategory & Document;
 
-@Schema({ timestamps: true })
+@Schema({
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+})
 export class MainCategory {
   @Prop({ required: true })
   name: string;
@@ -16,6 +20,14 @@ export class MainCategory {
 
   @Prop({ default: 'active' })
   status: string;
+
+  categories?: any[];
 }
 
 export const MainCategorySchema = SchemaFactory.createForClass(MainCategory);
+
+MainCategorySchema.virtual('categories', {
+  ref: 'Category',
+  localField: '_id',
+  foreignField: 'main_category_id',
+});

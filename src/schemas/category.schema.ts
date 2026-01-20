@@ -3,7 +3,11 @@ import { Document, Types } from 'mongoose';
 
 export type CategoryDocument = Category & Document;
 
-@Schema({ timestamps: true })
+@Schema({
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+})
 export class Category {
   @Prop({ required: true })
   name: string;
@@ -22,3 +26,9 @@ export class Category {
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
+
+CategorySchema.virtual('subcategories', {
+  ref: 'SubCategory',
+  localField: '_id',
+  foreignField: 'category_id',
+});
