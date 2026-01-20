@@ -14,8 +14,11 @@ export class Review {
   @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
   product_id: Types.ObjectId;
 
-  // @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  // user_id: Types.ObjectId;
+  @Prop({ type: String, required: false })
+  user_id: string;
+
+  @Prop({ type: Object, required: false })
+  userInfo: any;
 
   @Prop({ required: true, min: 1, max: 5 })
   rating: number;
@@ -25,6 +28,9 @@ export class Review {
 
   @Prop({ type: [ReviewImage], default: [] })
   images: ReviewImage[];
+
+  @Prop({ default: 'Published' })
+  status: string;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

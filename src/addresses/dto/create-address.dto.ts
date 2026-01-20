@@ -62,4 +62,13 @@ export class CreateAddressDto {
   @IsOptional()
   @IsBoolean()
   isDefault?: boolean;
+
+  @ApiProperty({ example: '696fab3ab3132b1a53be39b3', required: false })
+  @IsOptional()
+  @IsString()
+  user_id?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  userInfo?: any;
 }

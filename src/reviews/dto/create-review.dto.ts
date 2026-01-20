@@ -42,4 +42,8 @@ export class CreateReviewDto {
   @ApiProperty({ example: 'active', required: false })
   @IsOptional()
   status?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  userInfo?: any;
 }

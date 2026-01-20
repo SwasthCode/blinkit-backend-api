@@ -10,6 +10,7 @@ import {
   UseGuards,
   Req,
   UnauthorizedException,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -54,21 +55,9 @@ export class AddressesController extends BaseController<AddressDocument> {
   @Get()
   // @UseGuards(JwtAuthGuard)
   // @ApiBearerAuth('authentication')
-  @ApiOperation({ summary: 'Get all addresses for logged-in user' })
-  async findAll(
-    @Req() req: any
-  ) {
-    // customer and admin
-    // const allowedRoles = ['customer', 'admin'];
-    // if (!allowedRoles.includes(req.user.role?.key)) {
-    //   throw new UnauthorizedException('Unauthorized');
-    // }
-
-    // if (req?.user?.role?.filter((role: any) => role.key === 'customer')) {
-    //   throw new UnauthorizedException('Unauthorized');
-    // }
-
-    const data = await this.addressesService.findAllByUser(req.user._id);
+  @ApiOperation({ summary: 'Get all addresses' })
+  async findAll(@Query() options: any) {
+    const data = await this.addressesService.findAll(options);
     return successResponse(data, 'Addresses fetched successfully');
   }
 

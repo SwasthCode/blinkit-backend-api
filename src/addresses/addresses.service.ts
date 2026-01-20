@@ -3,27 +3,39 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BaseService } from '../common/base/base.service';
 import { Address, AddressDocument } from '../schemas/address.schema';
+import { User, UserDocument } from '../schemas/user.schema';
 import { CreateAddressDto } from './dto';
 
 @Injectable()
 export class AddressesService extends BaseService<AddressDocument> {
   constructor(
     @InjectModel(Address.name) private addressModel: Model<AddressDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {
     super(addressModel);
   }
 
   async create(
-    createAddressDto: CreateAddressDto & { user_id: string },
+    createAddressDto: any,
   ): Promise<AddressDocument> {
-    if (createAddressDto.isDefault) {
+    const userId = createAddressDto.userInfo?._id || createAddressDto.user_id;
+
+    if (createAddressDto.isDefault && userId) {
       await this.addressModel.updateMany(
-        { user_id: createAddressDto.user_id },
+        { user_id: userId },
         { $set: { isDefault: false } },
       );
     }
     const createdAddress = new this.addressModel(createAddressDto);
-    return createdAddress.save();
+    const savedAddress = await createdAddress.save();
+
+    if (userId) {
+      await this.userModel.findByIdAndUpdate(userId, {
+        $push: { addresses: savedAddress.toObject() },
+      });
+    }
+
+    return savedAddress;
   }
 
   async findAllByUser(userId: string): Promise<AddressDocument[]> {

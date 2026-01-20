@@ -31,6 +31,9 @@ export class User extends BaseSchema {
     // enum: ['admin', 'user', 'moderator'],
   })
   role: number[];
+
+  @Prop({ type: [{ type: Object }] })
+  addresses: any[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
