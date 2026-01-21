@@ -107,8 +107,8 @@ export class OrdersService extends BaseService<OrderDocument> {
       items: orderItems,
       total_amount: totalAmount,
       payment_method: createDirectOrderDto.payment_method || 'COD',
-      status: 'Pending',
-      payment_status: 'Pending',
+      status: 'pending',
+      payment_status: 'pending',
     });
 
     return order.save();

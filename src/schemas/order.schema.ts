@@ -38,22 +38,22 @@ export class Order {
   @Prop({
     required: true,
     enum: [
-      'Pending',
-      'Ready',
-      'Hold',
-      'Shipped',
-      'Delivered',
-      'Cancelled',
-      'Returned',
+      'pending',
+      'ready',
+      'hold',
+      'ship',
+      'delivered',
+      'cancelled',
+      'returned',
     ],
-    default: 'Pending',
+    default: 'pending',
   })
   status: string;
 
   @Prop({
     required: true,
-    enum: ['Pending', 'Paid', 'Failed'],
-    default: 'Pending',
+    enum: ['pending', 'paid', 'failed'],
+    default: 'pending',
   })
   payment_status: string;
 

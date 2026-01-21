@@ -5,25 +5,25 @@ export class UpdateOrderStatusDto {
   @ApiProperty({
     description: 'Status of the order',
     enum: [
-      'Pending',
-      'Ready',
-      'Hold',
-      'Shipped',
-      'Delivered',
-      'Cancelled',
-      'Returned',
+      'pending',
+      'ready',
+      'hold',
+      'ship',
+      'delivered',
+      'cancelled',
+      'returned',
     ],
-    example: 'Ready',
+    example: 'ready',
   })
   @IsNotEmpty()
   @IsEnum([
-    'Pending',
-    'Ready',
-    'Hold',
-    'Shipped',
-    'Delivered',
-    'Cancelled',
-    'Returned',
+    'pending',
+    'ready',
+    'hold',
+    'ship',
+    'delivered',
+    'cancelled',
+    'returned',
   ])
   status: string;
 }
