@@ -130,17 +130,20 @@ export class OrdersService extends BaseService<OrderDocument> {
       .populate('user_id', '-addresses -password')
       .populate('address_id')
       .populate('items.product_id')
+      .lean()
       .exec();
 
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
-    if (order.user_id) {
-      await populateUserRoles(this.roleModel, [order.user_id]);
+    const transformed = this.transformOrder(order);
+
+    if (transformed.user) {
+      await populateUserRoles(this.roleModel, [transformed.user]);
     }
 
-    return this.transformOrder(order);
+    return transformed;
   }
 
   private transformOrder(order: any) {
@@ -201,16 +204,19 @@ export class OrdersService extends BaseService<OrderDocument> {
       .populate('user_id', '-addresses -password')
       .populate('address_id')
       .populate('items.product_id')
+      .lean()
       .exec();
 
-    // Populate user roles
-    const users = orders.map((o) => o.user_id).filter(Boolean);
+    // Transform logic
+    const transformedOrders = orders.map((order) => this.transformOrder(order));
+
+    // Populate user roles on the transformed objects
+    const users = transformedOrders.map((o) => o.user).filter(Boolean);
     if (users.length > 0) {
       await populateUserRoles(this.roleModel, users);
     }
 
-    // Transform logic
-    return orders.map((order) => this.transformOrder(order));
+    return transformedOrders;
   }
 
   async getOrderStats() {
