@@ -4,10 +4,26 @@ import { IsEnum, IsNotEmpty } from 'class-validator';
 export class UpdateOrderStatusDto {
   @ApiProperty({
     description: 'Status of the order',
-    enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'],
-    example: 'Confirmed',
+    enum: [
+      'Pending',
+      'Ready',
+      'Hold',
+      'Shipped',
+      'Delivered',
+      'Cancelled',
+      'Returned',
+    ],
+    example: 'Ready',
   })
   @IsNotEmpty()
-  @IsEnum(['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'])
+  @IsEnum([
+    'Pending',
+    'Ready',
+    'Hold',
+    'Shipped',
+    'Delivered',
+    'Cancelled',
+    'Returned',
+  ])
   status: string;
 }
