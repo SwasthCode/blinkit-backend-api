@@ -90,8 +90,7 @@ export class OrdersService extends BaseService<OrderDocument> {
         product_id: product._id as Types.ObjectId,
         name: product.name,
         image:
-          product.images?.[0]?.url ||
-          'https://placehold.co/600x400?text=No+Image',
+          product.images?.[0]?.url,
         price: product.price,
         quantity: item.quantity,
       });
@@ -125,7 +124,7 @@ export class OrdersService extends BaseService<OrderDocument> {
   async findOne(id: string): Promise<any> {
     const order = await this.orderModel
       .findById(id)
-      .populate('user_id')
+      .populate('user_id', '-addresses -password')
       .populate('address_id')
       .populate('items.product_id')
       .exec();
@@ -161,7 +160,7 @@ export class OrdersService extends BaseService<OrderDocument> {
     const orders = await this.orderModel
       .find({ user_id: new Types.ObjectId(userId) })
       .sort({ createdAt: -1 })
-      .populate('user_id')
+      .populate('user_id', '-addresses -password')
       .populate('address_id')
       .populate('items.product_id')
       .exec();
