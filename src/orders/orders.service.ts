@@ -125,6 +125,7 @@ export class OrdersService extends BaseService<OrderDocument> {
   async findOne(id: string): Promise<any> {
     const order = await this.orderModel
       .findById(id)
+      .populate('user_id')
       .populate('address_id')
       .populate('items.product_id')
       .exec();
@@ -160,6 +161,7 @@ export class OrdersService extends BaseService<OrderDocument> {
     const orders = await this.orderModel
       .find({ user_id: new Types.ObjectId(userId) })
       .sort({ createdAt: -1 })
+      .populate('user_id')
       .populate('address_id')
       .populate('items.product_id')
       .exec();
