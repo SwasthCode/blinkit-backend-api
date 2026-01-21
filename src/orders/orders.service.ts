@@ -7,15 +7,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { BaseService } from '../common/base/base.service';
 import { Order, OrderDocument, OrderItem } from '../schemas/order.schema';
+import { Role, RoleDocument } from '../schemas/role.schema';
 import { CartService } from '../cart/cart.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateDirectOrderDto } from './dto/create-direct-order.dto';
 import { ProductsService } from '../products/products.service';
+import { populateUserRoles } from '../common/utils/rolePopulat.util';
 
 @Injectable()
 export class OrdersService extends BaseService<OrderDocument> {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
+    @InjectModel(Role.name) private roleModel: Model<RoleDocument>,
     private readonly cartService: CartService,
     private readonly productsService: ProductsService,
   ) {
@@ -133,6 +136,10 @@ export class OrdersService extends BaseService<OrderDocument> {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
+    if (order.user_id) {
+      await populateUserRoles(this.roleModel, [order.user_id]);
+    }
+
     return this.transformOrder(order);
   }
 
@@ -195,6 +202,12 @@ export class OrdersService extends BaseService<OrderDocument> {
       .populate('address_id')
       .populate('items.product_id')
       .exec();
+
+    // Populate user roles
+    const users = orders.map((o) => o.user_id).filter(Boolean);
+    if (users.length > 0) {
+      await populateUserRoles(this.roleModel, users);
+    }
 
     // Transform logic
     return orders.map((order) => this.transformOrder(order));
