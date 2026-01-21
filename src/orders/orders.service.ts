@@ -137,11 +137,24 @@ export class OrdersService extends BaseService<OrderDocument> {
   }
 
   private transformOrder(order: any) {
-    const orderObj = order instanceof Model ? order.toObject() : (typeof order.toObject === 'function' ? order.toObject() : order);
-    const items = orderObj.items.map((item: any) => {
+    const orderObj =
+      order instanceof Model
+        ? order.toObject()
+        : typeof order.toObject === 'function'
+          ? order.toObject()
+          : order;
+
+    const { user_id, address_id, ...rest } = orderObj;
+
+    const items = rest.items.map((item: any) => {
       const product = item.product_id;
       if (product && typeof product === 'object') {
-        const productObj = product instanceof Model ? product.toObject() : (typeof product.toObject === 'function' ? product.toObject() : product);
+        const productObj =
+          product instanceof Model
+            ? product.toObject()
+            : typeof product.toObject === 'function'
+              ? product.toObject()
+              : product;
         return {
           ...productObj,
           quantity: item.quantity,
@@ -151,7 +164,9 @@ export class OrdersService extends BaseService<OrderDocument> {
     });
 
     return {
-      ...orderObj,
+      ...rest,
+      user: user_id,
+      address: address_id,
       items,
     };
   }
