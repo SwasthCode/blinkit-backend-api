@@ -39,7 +39,7 @@ export class ProductsController extends BaseController<ProductDocument> {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new product' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('image', 10))
+  @UseInterceptors(FilesInterceptor('images', 10))
   @ApiResponse({ status: 201, description: 'Product created successfully' })
   async create(
     @Body() createProductDto: CreateProductDto,
@@ -52,7 +52,7 @@ export class ProductsController extends BaseController<ProductDocument> {
   @Put(':id')
   @ApiOperation({ summary: 'Update product by ID' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('image', 10))
+  @UseInterceptors(FilesInterceptor('images', 10))
   async update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
