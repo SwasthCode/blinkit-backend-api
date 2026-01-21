@@ -41,6 +41,7 @@ export class Order {
       'pending',
       'ready',
       'hold',
+      'ship',
       'shipped',
       'delivered',
       'cancelled',
