@@ -9,6 +9,24 @@ export class ProductImage {
   url: string;
 }
 
+@Schema({ _id: true })
+export class ProductVariant {
+  @Prop({ required: true })
+  id: string;
+
+  @Prop({ required: true })
+  label: string;
+
+  @Prop({ required: true })
+  price: number;
+
+  @Prop({ required: true })
+  originalPrice: number;
+
+  @Prop({ required: true })
+  discount: string;
+}
+
 @Schema({ timestamps: true })
 export class Product {
   @Prop({ required: true })
@@ -29,6 +47,9 @@ export class Product {
   @Prop({ type: [ProductImage], default: [] })
   images: ProductImage[];
 
+  @Prop({ type: [ProductVariant], default: [] })
+  variants: ProductVariant[];
+
   @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
   category_id: Types.ObjectId;
 
@@ -40,6 +61,21 @@ export class Product {
 
   @Prop({ default: true })
   isAvailable: boolean;
+
+  @Prop()
+  countryOfOrigin: string;
+
+  @Prop()
+  shelfLife: string;
+
+  @Prop()
+  manufacturer: string;
+
+  @Prop()
+  manufacturerAddress: string;
+
+  @Prop()
+  expiryDate: string;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

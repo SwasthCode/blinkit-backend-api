@@ -66,4 +66,46 @@ export class CreateProductDto {
   @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   isAvailable?: boolean;
+
+  @ApiProperty({
+    example:
+      '[{ "id": "v1", "label": "1 kg", "price": 85, "originalPrice": 100, "discount": "15% off" }]',
+  })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        return value;
+      }
+    }
+    return value;
+  })
+  variants?: any[];
+
+  @ApiProperty({ example: 'India' })
+  @IsOptional()
+  @IsString()
+  countryOfOrigin?: string;
+
+  @ApiProperty({ example: '24 Months' })
+  @IsOptional()
+  @IsString()
+  shelfLife?: string;
+
+  @ApiProperty({ example: 'Organic Farms India' })
+  @IsOptional()
+  @IsString()
+  manufacturer?: string;
+
+  @ApiProperty({ example: 'Organic Zone, Bangalore' })
+  @IsOptional()
+  @IsString()
+  manufacturerAddress?: string;
+
+  @ApiProperty({ example: '10 Oct 2025' })
+  @IsOptional()
+  @IsString()
+  expiryDate?: string;
 }
