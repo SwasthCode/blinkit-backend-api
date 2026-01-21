@@ -122,12 +122,50 @@ export class OrdersService extends BaseService<OrderDocument> {
     return order.save();
   }
 
-  async findByUser(userId: string): Promise<OrderDocument[]> {
-    return this.orderModel
+  async findOne(id: string): Promise<any> {
+    const order = await this.orderModel
+      .findById(id)
+      .populate('address_id')
+      .populate('items.product_id')
+      .exec();
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    return this.transformOrder(order);
+  }
+
+  private transformOrder(order: any) {
+    const orderObj = order instanceof Model ? order.toObject() : (typeof order.toObject === 'function' ? order.toObject() : order);
+    const items = orderObj.items.map((item: any) => {
+      const product = item.product_id;
+      if (product && typeof product === 'object') {
+        const productObj = product instanceof Model ? product.toObject() : (typeof product.toObject === 'function' ? product.toObject() : product);
+        return {
+          ...productObj,
+          quantity: item.quantity,
+        };
+      }
+      return item;
+    });
+
+    return {
+      ...orderObj,
+      items,
+    };
+  }
+
+  async findByUser(userId: string): Promise<any[]> {
+    const orders = await this.orderModel
       .find({ user_id: new Types.ObjectId(userId) })
       .sort({ createdAt: -1 })
-      .populate('items.product_id') // Optional: populate if needed, but snapshot data is in items
+      .populate('address_id')
+      .populate('items.product_id')
       .exec();
+
+    // Transform logic
+    return orders.map((order) => this.transformOrder(order));
   }
 
   async getOrderStats() {

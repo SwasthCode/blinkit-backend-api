@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
   Req,
+  Query,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -30,21 +31,9 @@ import { OrderDocument } from '../schemas/order.schema';
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService) { }
 
-  // @Post()
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth('authentication')
-  // @HttpCode(HttpStatus.CREATED)
-  // @ApiOperation({ summary: 'Place an order from cart' })
-  // @ApiResponse({ status: 201, description: 'Order placed successfully' })
-  // async create(@Req() req: any, @Body() createOrderDto: CreateOrderDto) {
-  //   const data = await this.ordersService.placeOrder(
-  //     req.user._id,
-  //     createOrderDto,
-  //   );
-  //   return successResponse(data, 'Order placed successfully', 201);
-  // }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('authentication')
