@@ -77,7 +77,7 @@ export class OrdersService extends BaseService<OrderDocument> {
   async createDirectOrder(
     userId: string,
     createDirectOrderDto: CreateDirectOrderDto,
-  ): Promise<OrderDocument> {
+  ): Promise<any> {
     const orderItems: OrderItem[] = [];
     let totalAmount = 0;
 
@@ -111,17 +111,19 @@ export class OrdersService extends BaseService<OrderDocument> {
       payment_status: 'pending',
     });
 
-    return order.save();
+    const savedOrder = await order.save();
+    return this.findOne((savedOrder as any)._id.toString());
   }
 
-  async updateStatus(id: string, status: string): Promise<OrderDocument> {
+  async updateStatus(id: string, status: string): Promise<any> {
     const order = await this.orderModel.findById(id);
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
     order.status = status.toLowerCase();
-    return order.save();
+    await order.save();
+    return this.findOne(id);
   }
 
   async findOne(id: string): Promise<any> {
