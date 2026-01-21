@@ -120,7 +120,7 @@ export class OrdersService extends BaseService<OrderDocument> {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
-    order.status = status;
+    order.status = status.toLowerCase();
     return order.save();
   }
 

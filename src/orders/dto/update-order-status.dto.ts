@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UpdateOrderStatusDto {
   @ApiProperty({
@@ -25,5 +26,6 @@ export class UpdateOrderStatusDto {
     'cancelled',
     'returned',
   ])
+  @Transform(({ value }) => typeof value === 'string' ? value.toLowerCase() : value)
   status: string;
 }
