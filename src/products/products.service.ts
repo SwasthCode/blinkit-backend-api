@@ -38,7 +38,7 @@ export class ProductsService extends BaseService<ProductDocument> {
     sort?: string;
     limit?: number;
     skip?: number;
-  }): Promise<ProductDocument[]> {
+  }): Promise<any[]> {
     const { filter, select, sort, limit, skip } = options;
 
     let query = {};
@@ -80,24 +80,57 @@ export class ProductsService extends BaseService<ProductDocument> {
       q = q.limit(Number(limit));
     }
 
-    return q.exec();
+    const products = await q.exec();
+    return products.map((product) => this.transformProduct(product));
   }
 
-  async findOne(id: string): Promise<ProductDocument> {
+  async findOne(id: string): Promise<any> {
     const doc = await this.productModel
       .findById(id)
       .populate('category_id', 'name')
       .populate('subcategory_id', 'name')
       .exec();
     if (!doc) throw new NotFoundException(`Product not found with ID: ${id}`);
-    return doc;
+    return this.transformProduct(doc);
+  }
+
+  private transformProduct(product: any) {
+    const productObj =
+      product instanceof Model
+        ? product.toObject({ virtuals: false })
+        : typeof product.toObject === 'function'
+          ? product.toObject({ virtuals: false })
+          : product;
+
+    const { category_id, subcategory_id, ...rest } = productObj;
+
+    // Ensure populated objects don't have virtual 'id' if they were passed as raw objects
+    const category = category_id;
+    const subcategory = subcategory_id;
+
+    if (category && typeof category === 'object' && 'id' in category) {
+      delete (category as any).id;
+    }
+    if (
+      subcategory &&
+      typeof subcategory === 'object' &&
+      'id' in subcategory
+    ) {
+      delete (subcategory as any).id;
+    }
+
+    return {
+      ...rest,
+      category,
+      subcategory,
+    };
   }
 
   async update(
     id: string,
     updateProductDto: UpdateProductDto,
     files?: Express.Multer.File[],
-  ): Promise<ProductDocument> {
+  ): Promise<any> {
     if (files && files.length > 0) {
       const uploadPromises = files.map((file) =>
         this.firebaseService.uploadFile(file, 'products'),
@@ -107,11 +140,13 @@ export class ProductsService extends BaseService<ProductDocument> {
     }
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, updateProductDto, { new: true })
+      .populate('category_id', 'name')
+      .populate('subcategory_id', 'name')
       .exec();
     if (!updatedProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    return updatedProduct;
+    return this.transformProduct(updatedProduct);
   }
 
   async remove(id: string): Promise<any> {
@@ -122,23 +157,32 @@ export class ProductsService extends BaseService<ProductDocument> {
     return deletedProduct;
   }
 
-  async findByCategory(categoryId: string): Promise<ProductDocument[]> {
-    return this.productModel
+  async findByCategory(categoryId: string): Promise<any[]> {
+    const products = await this.productModel
       .find({ category_id: categoryId })
       .populate('category_id', 'name')
       .populate('subcategory_id', 'name')
       .exec();
+    return products.map((product) => this.transformProduct(product));
   }
 
-  async findBySubCategory(subCategoryId: string): Promise<ProductDocument[]> {
-    return this.productModel
+  async findBySubCategory(subCategoryId: string): Promise<any[]> {
+    const products = await this.productModel
       .find({ subcategory_id: subCategoryId })
       .populate('category_id', 'name')
       .populate('subcategory_id', 'name')
       .exec();
+    return products.map((product) => this.transformProduct(product));
   }
 
-  async getRecentProducts(limit: number = 5): Promise<ProductDocument[]> {
-    return this.productModel.find().sort({ createdAt: -1 }).limit(limit).exec();
+  async getRecentProducts(limit: number = 5): Promise<any[]> {
+    const products = await this.productModel
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('category_id', 'name')
+      .populate('subcategory_id', 'name')
+      .exec();
+    return products.map((product) => this.transformProduct(product));
   }
 }

@@ -139,22 +139,38 @@ export class OrdersService extends BaseService<OrderDocument> {
   private transformOrder(order: any) {
     const orderObj =
       order instanceof Model
-        ? order.toObject()
+        ? order.toObject({ virtuals: false })
         : typeof order.toObject === 'function'
-          ? order.toObject()
+          ? order.toObject({ virtuals: false })
           : order;
 
     const { user_id, address_id, ...rest } = orderObj;
+
+    // Remove 'id' if still present in populated objects
+    const user = user_id;
+    const address = address_id;
+
+    if (user && typeof user === 'object' && 'id' in user) {
+      delete (user as any).id;
+    }
+    if (address && typeof address === 'object' && 'id' in address) {
+      delete (address as any).id;
+    }
 
     const items = rest.items.map((item: any) => {
       const product = item.product_id;
       if (product && typeof product === 'object') {
         const productObj =
           product instanceof Model
-            ? product.toObject()
+            ? product.toObject({ virtuals: false })
             : typeof product.toObject === 'function'
-              ? product.toObject()
+              ? product.toObject({ virtuals: false })
               : product;
+
+        if ('id' in productObj) {
+          delete (productObj as any).id;
+        }
+
         return {
           ...productObj,
           quantity: item.quantity,
@@ -165,8 +181,8 @@ export class OrdersService extends BaseService<OrderDocument> {
 
     return {
       ...rest,
-      user: user_id,
-      address: address_id,
+      user,
+      address,
       items,
     };
   }
