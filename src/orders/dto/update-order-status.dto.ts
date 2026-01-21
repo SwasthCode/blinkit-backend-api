@@ -10,6 +10,7 @@ export class UpdateOrderStatusDto {
       'ready',
       'hold',
       'ship',
+      'shipped',
       'delivered',
       'cancelled',
       'returned',
@@ -17,15 +18,16 @@ export class UpdateOrderStatusDto {
     example: 'ready',
   })
   @IsNotEmpty()
+  @Transform(({ value }) => typeof value === 'string' ? value.toLowerCase() : value)
   @IsEnum([
     'pending',
     'ready',
     'hold',
     'ship',
+    'shipped',
     'delivered',
     'cancelled',
     'returned',
   ])
-  @Transform(({ value }) => typeof value === 'string' ? value.toLowerCase() : value)
   status: string;
 }
