@@ -131,13 +131,41 @@ export class ProductsService extends BaseService<ProductDocument> {
     updateProductDto: UpdateProductDto,
     files?: Express.Multer.File[],
   ): Promise<any> {
+    const existingProduct = await this.productModel.findById(id);
+    if (!existingProduct) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    let currentImages = existingProduct.images || [];
+
+    if (updateProductDto.removedImageIds && updateProductDto.removedImageIds.length > 0) {
+      const removedIds = updateProductDto.removedImageIds;
+      currentImages = currentImages.filter(
+        (img: any) => !removedIds.includes(img._id.toString()),
+      );
+      delete updateProductDto.removedImageIds;
+    }
+
+    // Handle singular removedImageId if present
+    if (updateProductDto.removedImageId) {
+      currentImages = currentImages.filter(
+        (img: any) => img._id.toString() !== updateProductDto.removedImageId,
+      );
+      delete updateProductDto.removedImageId;
+    }
+
     if (files && files.length > 0) {
       const uploadPromises = files.map((file) =>
         this.firebaseService.uploadFile(file, 'products'),
       );
       const imageUrls = await Promise.all(uploadPromises);
-      updateProductDto.images = imageUrls.map((url) => ({ url }));
+      const newImages = imageUrls.map((url) => ({ url }));
+      currentImages = [...currentImages, ...newImages];
     }
+
+    // Always update images to ensure consistency with our explicit add/remove logic
+    updateProductDto.images = currentImages;
+
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, updateProductDto, { new: true })
       .populate('category_id', 'name')

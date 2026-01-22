@@ -25,6 +25,18 @@ export class ProductVariant {
 
   @Prop({ required: true })
   discount: string;
+
+  @Prop()
+  shelfLife: string;
+
+  @Prop()
+  expiryDate: string;
+
+  @Prop()
+  manufacturer: string;
+
+  @Prop()
+  manufacturerAddress: string;
 }
 
 @Schema({ timestamps: true })

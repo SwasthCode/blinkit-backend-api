@@ -69,7 +69,7 @@ export class CreateProductDto {
 
   @ApiProperty({
     example:
-      '[{ "id": "v1", "label": "1 kg", "price": 85, "originalPrice": 100, "discount": "15% off" }]',
+      '[{ "id": "v1", "label": "1 kg", "price": 85, "originalPrice": 100, "discount": "15% off", "shelfLife": "24 Months", "expiryDate": "10 Oct 2025", "manufacturer": "Organic Farms", "manufacturerAddress": "Bangalore" }]',
   })
   @IsOptional()
   @Transform(({ value }) => {
