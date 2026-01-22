@@ -361,39 +361,27 @@ export class UsersService extends BaseService<UserDocument> {
       userId,
       { $set: updateDto },
       { new: true, runValidators: true },
-    );
+    ).lean().exec();
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    // Populate roles before returning
+    await populateUserRoles(this.userRoleModel, [user]);
+
+    return user as any;
   }
 
   async getProfile(userId: string) {
-    const user: any = await this.model.findById(userId).lean();
+    const user: any = await this.model.findById(userId).lean().exec();
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    // describe role
-    // if user.role=[1,2,3]
-    // then user.role=1
-    if (user.role && user.role.length > 1) {
-      // get each role info
-      const newRole: any[] = [];
-      const roles = await this.userRoleModel.find({
-        role_type: { $in: user.role },
-      });
-      for (const role of roles) {
-        newRole.push(role);
-      }
-      user.role = newRole;
-    } else {
-      const role = await this.userRoleModel.findOne({ role_type: user.role });
-      user.role = [role];
-    }
+    // Use unified populateUserRoles utility
+    await populateUserRoles(this.userRoleModel, [user]);
 
     return user;
   }
