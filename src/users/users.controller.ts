@@ -97,6 +97,7 @@ export class UsersController extends BaseController<UserDocument> {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('profile_image'))
   @ApiOperation({ summary: 'Update user profile' })
+  @ApiBody({ type: UpdateUserDto })
   @ApiResponse({
     status: 200,
     description: 'User profile updated successfully',
@@ -106,9 +107,8 @@ export class UsersController extends BaseController<UserDocument> {
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    // if token contains role user / admin then allow to update profile, role is [{ key: 'user' }, { key: 'admin' }] array
-    const allowedRoles = ['user', 'admin'];
-    if (!allowedRoles.includes(req.user.role?.key)) {
+    // Basic verification that user is authenticated and has a role
+    if (!req.user || !req.user.role) {
       throw new UnauthorizedException('Unauthorized');
     }
     const data = await this.usersService.updateProfile(

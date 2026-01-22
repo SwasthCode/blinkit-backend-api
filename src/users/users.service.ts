@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
 import { Role, RoleDocument } from '../schemas/role.schema';
 import { CreateUserDto } from './dto';
@@ -363,7 +363,9 @@ export class UsersService extends BaseService<UserDocument> {
       { new: true, runValidators: true },
     );
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
     return user;
   }
@@ -397,12 +399,7 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
   async getUserStats() {
-    // Assuming role 1 is Admin. We might want to filter only customers (e.g. role != 1) or count all.
-    // User requested "customer[user] details", usually implying end-users.
-    // Let's count where role is NOT filtering for now to be safe, or just filter standard users.
-    // Given the role structure is [Number], let's assume we want all users for now or filter if needed.
-    // If we want only customers, we might need to know the customer role ID.
-    // For now, I'll aggregate ALL users to be generic, or maybe filter role { $ne: [1] } if [1] is admin.
+
 
     const totalUsers = await this.model.countDocuments();
 

@@ -34,6 +34,9 @@ export class User extends BaseSchema {
 
   @Prop({ type: [{ type: Object }] })
   addresses: any[];
+
+  @Prop({ required: false })
+  profile_image?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

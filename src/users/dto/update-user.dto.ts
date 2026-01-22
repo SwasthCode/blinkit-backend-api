@@ -74,10 +74,12 @@ export class UpdateUserDto {
   // status?: string;
 
   @ApiProperty({
-    description: 'The profile image URL of the user',
-    example: 'https://example.com/profile.jpg',
+    description: 'The profile image file (FormData)',
+    type: 'string',
+    format: 'binary',
     required: false,
   })
   @IsOptional()
-  profile_image?: string;
+  @IsString()
+  profile_image?: any;
 }
