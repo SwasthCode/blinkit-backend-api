@@ -11,6 +11,7 @@ import { Role, RoleDocument } from '../schemas/role.schema';
 import { CartService } from '../cart/cart.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateDirectOrderDto } from './dto/create-direct-order.dto';
+
 import { ProductsService } from '../products/products.service';
 import { populateUserRoles } from '../common/utils/rolePopulat.util';
 
@@ -115,13 +116,31 @@ export class OrdersService extends BaseService<OrderDocument> {
     return this.findOne((savedOrder as any)._id.toString());
   }
 
-  async updateStatus(id: string, status: string): Promise<any> {
+  async updateOrder(id: string, updateOrderDto: UpdateOrderStatusDto): Promise<any> {
     const order = await this.orderModel.findById(id);
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
-    order.status = status.toLowerCase();
+    if (updateOrderDto.items) {
+      order.items = updateOrderDto.items.map((item: any) => ({
+        product_id: new Types.ObjectId(item.product_id),
+        name: item.name,
+        image: item.image,
+        price: item.price,
+        quantity: item.quantity,
+        brand_name: item.brand_name,
+      }));
+    }
+
+    if (updateOrderDto.total_amount !== undefined) {
+      order.total_amount = updateOrderDto.total_amount;
+    }
+
+    if (updateOrderDto.status) {
+      order.status = updateOrderDto.status.toLowerCase();
+    }
+
     await order.save();
     return this.findOne(id);
   }

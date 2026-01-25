@@ -1,8 +1,52 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested, IsEnum } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
+
+export class UpdateOrderItemDto {
+  @ApiProperty({ example: '65a...', description: 'Product ID' })
+  @IsNotEmpty()
+  @IsString()
+  product_id: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  image: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  price: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  quantity: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  brand_name?: string;
+}
 
 export class UpdateOrderStatusDto {
+  @ApiProperty({ type: [UpdateOrderItemDto], required: false })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateOrderItemDto)
+  items?: UpdateOrderItemDto[];
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  total_amount?: number;
+
   @ApiProperty({
     description: 'Status of the order',
     enum: [
@@ -16,8 +60,9 @@ export class UpdateOrderStatusDto {
       'returned',
     ],
     example: 'ready',
+    required: false,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @Transform(({ value }) => typeof value === 'string' ? value.toLowerCase() : value)
   @IsEnum([
     'pending',
@@ -29,5 +74,5 @@ export class UpdateOrderStatusDto {
     'cancelled',
     'returned',
   ])
-  status: string;
+  status?: string;
 }

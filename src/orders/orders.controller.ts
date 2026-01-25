@@ -20,19 +20,16 @@ import {
 } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import {
-  CreateOrderDto,
   CreateDirectOrderDto,
   UpdateOrderStatusDto,
 } from './dto';
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { OrderDocument } from '../schemas/order.schema';
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) { }
-
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -70,19 +67,16 @@ export class OrdersController {
     return successResponse(data, 'Order details fetched successfully');
   }
 
-  @Put(':id/status')
+  @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('authentication')
-  @ApiOperation({ summary: 'Update order status' })
+  @ApiOperation({ summary: 'Update order (status, items, or total_amount)' })
   @ApiParam({ name: 'id', description: 'Order ID' })
-  async updateStatus(
+  async update(
     @Param('id') id: string,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto,
   ) {
-    const data = await this.ordersService.updateStatus(
-      id,
-      updateOrderStatusDto.status,
-    );
-    return successResponse(data, 'Order status updated successfully');
+    const data = await this.ordersService.updateOrder(id, updateOrderStatusDto);
+    return successResponse(data, 'Order updated successfully');
   }
 }
