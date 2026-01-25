@@ -17,6 +17,7 @@ import { MainCategoriesModule } from './main-categories/main-categories.module';
 import { CartModule } from './cart/cart.module';
 import { FirebaseModule } from './common/firebase/firebase.module';
 import { OrdersModule } from './orders/orders.module';
+import { BrandsModule } from './brands/brands.module';
 import { Order, OrderSchema } from './schemas/order.schema';
 import { Cart, CartSchema } from './schemas/cart.schema';
 import { Address, AddressSchema } from './schemas/address.schema';
@@ -69,6 +70,7 @@ import { User, UserSchema } from './schemas/user.schema';
     OrdersModule,
     ReviewsModule,
     FirebaseModule,
+    BrandsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
