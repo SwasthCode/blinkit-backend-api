@@ -93,7 +93,7 @@ export class OrdersService extends BaseService<OrderDocument> {
         product_id: product._id as Types.ObjectId,
         name: product.name,
         image:
-          product.images?.[0]?.url,
+          product.images?.[0]?.url || 'https://placehold.co/100',
         price: product.price,
         quantity: item.quantity,
       });
