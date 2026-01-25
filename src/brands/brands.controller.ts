@@ -38,7 +38,7 @@ export class BrandsController extends BaseController<BrandDocument> {
   @ApiResponse({ status: 201, description: 'Brand created successfully' })
   async create(
     @Body() createBrandDto: CreateBrandDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     const data = await this.brandsService.create(createBrandDto, file);
     return successResponse(data, 'Brand created successfully', 201);

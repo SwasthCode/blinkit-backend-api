@@ -6,7 +6,6 @@ import { Brand, BrandDocument } from '../schemas/brand.schema';
 import { CreateBrandDto } from './dto/create-brand.dto';
 
 import { FirebaseService } from '../common/firebase/firebase.service';
-import { CreateBrandDto } from './dto/create-brand.dto';
 
 @Injectable()
 export class BrandsService extends BaseService<BrandDocument> {
