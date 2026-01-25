@@ -11,6 +11,7 @@ import { Role, RoleDocument } from '../schemas/role.schema';
 import { CartService } from '../cart/cart.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateDirectOrderDto } from './dto/create-direct-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 import { ProductsService } from '../products/products.service';
 import { populateUserRoles } from '../common/utils/rolePopulat.util';
