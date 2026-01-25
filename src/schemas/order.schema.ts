@@ -19,6 +19,9 @@ export class OrderItem {
 
   @Prop({ required: true })
   quantity: number;
+
+  @Prop()
+  brand_name?: string;
 }
 
 @Schema({ timestamps: true })
