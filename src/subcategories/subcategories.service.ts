@@ -32,14 +32,53 @@ export class SubCategoriesService extends BaseService<SubCategoryDocument> {
       );
       createSubCategoryDto.image = imageUrl;
     }
-    return super.create(createSubCategoryDto);
+    const created = await super.create(createSubCategoryDto);
+    const populated = await this.subCategoryModel
+      .findById(created._id)
+      .populate('category_id', 'name')
+      .populate('brand_id')
+      .exec();
+    return this.transformSubCategory(populated);
+  }
+
+  async findAll(options: any): Promise<any[]> {
+    const { filter, select, sort, limit, skip } = options;
+    let query = {};
+    if (filter) {
+      try {
+        query = JSON.parse(filter);
+      } catch (e) {}
+    }
+
+    const q = this.subCategoryModel
+      .find(query)
+      .populate('category_id', 'name')
+      .populate('brand_id');
+
+    if (sort) q.sort(sort);
+    if (skip) q.skip(Number(skip));
+    if (limit) q.limit(Number(limit));
+    if (select) q.select(select);
+
+    const data = await q.exec();
+    return data.map((item) => this.transformSubCategory(item));
+  }
+
+  async findOne(id: string): Promise<any> {
+    const data = await this.subCategoryModel
+      .findById(id)
+      .populate('category_id', 'name')
+      .populate('brand_id')
+      .exec();
+    if (!data) throw new NotFoundException(`SubCategory not found`);
+    return this.transformSubCategory(data);
   }
 
   async update(
     id: string,
     updateSubCategoryDto: UpdateSubCategoryDto,
     file?: Express.Multer.File,
-  ): Promise<SubCategoryDocument> {
+  ): Promise<any> {
     if (file) {
       const imageUrl = await this.firebaseService.uploadFile(
         file,
@@ -49,12 +88,36 @@ export class SubCategoriesService extends BaseService<SubCategoryDocument> {
     }
     const updated = await this.subCategoryModel
       .findByIdAndUpdate(id, updateSubCategoryDto, { new: true })
+      .populate('category_id', 'name')
+      .populate('brand_id')
       .exec();
 
     if (!updated) {
       throw new NotFoundException(`SubCategory with ID ${id} not found`);
     }
 
-    return updated;
+    return this.transformSubCategory(updated);
+  }
+
+  private transformSubCategory(item: any) {
+    const obj =
+      item instanceof Model ? item.toObject({ virtuals: false }) : item;
+    const { category_id, brand_id, ...rest } = obj;
+
+    const category = category_id;
+    const brand = brand_id;
+
+    if (category && typeof category === 'object' && 'id' in category) {
+      delete (category as any).id;
+    }
+    if (brand && typeof brand === 'object' && 'id' in brand) {
+      delete (brand as any).id;
+    }
+
+    return {
+      ...rest,
+      category,
+      brand,
+    };
   }
 }

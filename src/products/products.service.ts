@@ -29,7 +29,14 @@ export class ProductsService extends BaseService<ProductDocument> {
       createProductDto.images = imageUrls.map((url) => ({ url }));
     }
     const createdProduct = new this.productModel(createProductDto);
-    return createdProduct.save();
+    const saved = await createdProduct.save();
+    const populated = await this.productModel
+      .findById(saved._id)
+      .populate('category_id', 'name')
+      .populate('subcategory_id', 'name')
+      .populate('brand_id')
+      .exec();
+    return this.transformProduct(populated);
   }
 
   async findAll(options: {
@@ -62,7 +69,8 @@ export class ProductsService extends BaseService<ProductDocument> {
     let q = this.productModel
       .find(query)
       .populate('category_id', 'name')
-      .populate('subcategory_id', 'name');
+      .populate('subcategory_id', 'name')
+      .populate('brand_id');
 
     if (select) {
       q = q.select(select.split(',').join(' '));
@@ -89,6 +97,7 @@ export class ProductsService extends BaseService<ProductDocument> {
       .findById(id)
       .populate('category_id', 'name')
       .populate('subcategory_id', 'name')
+      .populate('brand_id')
       .exec();
     if (!doc) throw new NotFoundException(`Product not found with ID: ${id}`);
     return this.transformProduct(doc);
@@ -102,11 +111,12 @@ export class ProductsService extends BaseService<ProductDocument> {
           ? product.toObject({ virtuals: false })
           : product;
 
-    const { category_id, subcategory_id, ...rest } = productObj;
+    const { category_id, subcategory_id, brand_id, ...rest } = productObj;
 
     // Ensure populated objects don't have virtual 'id' if they were passed as raw objects
     const category = category_id;
     const subcategory = subcategory_id;
+    const brand = brand_id;
 
     if (category && typeof category === 'object' && 'id' in category) {
       delete (category as any).id;
@@ -118,11 +128,15 @@ export class ProductsService extends BaseService<ProductDocument> {
     ) {
       delete (subcategory as any).id;
     }
+    if (brand && typeof brand === 'object' && 'id' in brand) {
+      delete (brand as any).id;
+    }
 
     return {
       ...rest,
       category,
       subcategory,
+      brand,
     };
   }
 
@@ -170,6 +184,7 @@ export class ProductsService extends BaseService<ProductDocument> {
       .findByIdAndUpdate(id, updateProductDto, { new: true })
       .populate('category_id', 'name')
       .populate('subcategory_id', 'name')
+      .populate('brand_id')
       .exec();
     if (!updatedProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -190,6 +205,7 @@ export class ProductsService extends BaseService<ProductDocument> {
       .find({ category_id: categoryId })
       .populate('category_id', 'name')
       .populate('subcategory_id', 'name')
+      .populate('brand_id')
       .exec();
     return products.map((product) => this.transformProduct(product));
   }
@@ -199,6 +215,7 @@ export class ProductsService extends BaseService<ProductDocument> {
       .find({ subcategory_id: subCategoryId })
       .populate('category_id', 'name')
       .populate('subcategory_id', 'name')
+      .populate('brand_id')
       .exec();
     return products.map((product) => this.transformProduct(product));
   }
@@ -210,6 +227,7 @@ export class ProductsService extends BaseService<ProductDocument> {
       .limit(limit)
       .populate('category_id', 'name')
       .populate('subcategory_id', 'name')
+      .populate('brand_id')
       .exec();
     return products.map((product) => this.transformProduct(product));
   }

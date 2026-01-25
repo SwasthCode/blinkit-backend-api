@@ -23,6 +23,9 @@ export class Category {
 
   @Prop({ default: 'active' })
   status: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Brand' })
+  brand_id: Types.ObjectId;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

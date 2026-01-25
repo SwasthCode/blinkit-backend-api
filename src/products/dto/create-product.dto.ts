@@ -108,4 +108,9 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   expiryDate?: string;
+
+  @ApiProperty({ example: 'Brand ID' })
+  @IsOptional()
+  @IsMongoId()
+  brand_id?: string;
 }

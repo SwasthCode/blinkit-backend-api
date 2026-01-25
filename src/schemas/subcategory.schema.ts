@@ -19,6 +19,9 @@ export class SubCategory {
 
   @Prop({ default: 'active' })
   status: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Brand' })
+  brand_id: Types.ObjectId;
 }
 
 export const SubCategorySchema = SchemaFactory.createForClass(SubCategory);

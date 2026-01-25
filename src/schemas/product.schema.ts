@@ -88,6 +88,8 @@ export class Product {
 
   @Prop()
   expiryDate: string;
+  @Prop({ type: Types.ObjectId, ref: 'Brand' })
+  brand_id: Types.ObjectId;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
