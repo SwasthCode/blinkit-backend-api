@@ -76,10 +76,34 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
     return invoice;
   }
 
-  async findAll(options: any = {}): Promise<InvoiceDocument[]> {
-      // Basic override if needed or rely on base, but we might want to populate user
-      const { filter, sort, limit, skip } = options;
-      // ... reuse base logic or custom query
-      return super.findAll(options);
+  async findAll(options: any = {}): Promise<any[]> {
+    const { filter, select, sort, limit, skip } = options;
+    let query = {};
+    if (filter) {
+      try {
+        query = JSON.parse(filter);
+      } catch (e) {}
+    }
+
+    const q = this.invoiceModel
+      .find(query)
+      .populate('user_id', 'first_name last_name email phone_number');
+
+    if (sort) q.sort(sort);
+    if (skip) q.skip(Number(skip));
+    if (limit) q.limit(Number(limit));
+    if (select) q.select(select);
+
+    return q.exec();
+  }
+
+  async findOne(id: string): Promise<InvoiceDocument> {
+    const invoice = await this.invoiceModel
+      .findById(id)
+      .populate('user_id', 'first_name last_name email phone_number')
+      .exec();
+    
+    if (!invoice) throw new NotFoundException(`Invoice with ID ${id} not found`);
+    return invoice;
   }
 }
