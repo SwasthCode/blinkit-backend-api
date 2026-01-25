@@ -13,10 +13,10 @@ export class UpdateOrderItemDto {
   @IsString()
   name: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  image: string;
+  // @ApiProperty()
+  // @IsOptional()
+  // @IsString()
+  // image: string;
 
   @ApiProperty()
   @IsOptional()
