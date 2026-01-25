@@ -4,12 +4,12 @@ import { Type, Transform } from 'class-transformer';
 
 export class UpdateOrderItemDto {
   @ApiProperty({ example: '65a...', description: 'Product ID' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   product_id: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   name: string;
 
@@ -19,12 +19,12 @@ export class UpdateOrderItemDto {
   image: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   price: number;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   quantity: number;
 
