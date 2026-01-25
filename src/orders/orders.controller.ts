@@ -54,10 +54,10 @@ export class OrdersController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('authentication')
-  @ApiOperation({ summary: 'Get order history' })
-  async findAll(@Req() req: any) {
-    const data = await this.ordersService.findByUser(req.user._id);
-    return successResponse(data, 'Order history fetched successfully');
+  @ApiOperation({ summary: 'Get all orders with filters' })
+  async findAll(@Req() req: any, @Query() query: any) {
+    const data = await this.ordersService.findAllWithFilters(query);
+    return successResponse(data, 'Orders fetched successfully');
   }
 
   @Get(':id')

@@ -199,6 +199,52 @@ export class OrdersService extends BaseService<OrderDocument> {
     };
   }
 
+  async findAllWithFilters(options: {
+    filter?: string;
+    sort?: string;
+    limit?: number;
+    skip?: number;
+  }): Promise<any[]> {
+    const { filter, sort, limit, skip } = options;
+    let query = {};
+    if (filter) {
+      try {
+        query = JSON.parse(filter);
+      } catch (e) {
+        console.warn('Invalid JSON filter:', filter);
+      }
+    }
+
+    let sortOptions: any = { createdAt: -1 };
+    if (sort) {
+      try {
+        sortOptions = JSON.parse(sort);
+      } catch (e) {
+        sortOptions = sort;
+      }
+    }
+
+    const orders = await this.orderModel
+      .find(query)
+      .sort(sortOptions)
+      .limit(limit ? Number(limit) : 0)
+      .skip(skip ? Number(skip) : 0)
+      .populate('user_id', '-addresses -password')
+      .populate('address_id')
+      .populate('items.product_id')
+      .lean()
+      .exec();
+
+    const transformedOrders = orders.map((order) => this.transformOrder(order));
+
+    const users = transformedOrders.map((o) => o.user).filter(Boolean);
+    if (users.length > 0) {
+      await populateUserRoles(this.roleModel, users as any);
+    }
+
+    return transformedOrders;
+  }
+
   async findByUser(userId: string): Promise<any[]> {
     const orders = await this.orderModel
       .find({ user_id: new Types.ObjectId(userId) })
