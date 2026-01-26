@@ -48,6 +48,22 @@ export class Order {
   customer_name?: string;
 
   @Prop({
+    type: [
+      {
+        status: { type: String, required: true },
+        changedAt: { type: Date, default: Date.now },
+        comment: { type: String },
+      },
+    ],
+    default: [],
+  })
+  status_history: {
+    status: string;
+    changedAt: Date;
+    comment?: string;
+  }[];
+
+  @Prop({
     required: true,
     enum: [
       'pending',

@@ -111,6 +111,13 @@ export class OrdersService extends BaseService<OrderDocument> {
       payment_method: createDirectOrderDto.payment_method || 'COD',
       status: 'pending',
       payment_status: 'pending',
+      status_history: [
+        {
+          status: 'pending',
+          changedAt: new Date(),
+          comment: 'Order placed',
+        },
+      ],
     });
 
     const savedOrder = await order.save();
@@ -156,7 +163,15 @@ export class OrdersService extends BaseService<OrderDocument> {
     }
 
     if (updateOrderDto.status) {
-      order.status = updateOrderDto.status.toLowerCase();
+      const newStatus = updateOrderDto.status.toLowerCase();
+      if (order.status !== newStatus) {
+        order.status = newStatus;
+        order.status_history.push({
+          status: newStatus,
+          changedAt: new Date(),
+          comment: `Status updated to ${newStatus}`,
+        });
+      }
     }
 
     if (updateOrderDto.shipping_address) {
