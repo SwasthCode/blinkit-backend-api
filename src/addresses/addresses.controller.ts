@@ -38,10 +38,27 @@ export class AddressesController extends BaseController<AddressDocument> {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new address' })
   @ApiResponse({ status: 201, description: 'Address created successfully' })
+  // @ts-ignore
   async create(@Req() req: any, @Body() createAddressDto: CreateAddressDto) {
+    console.log('Address Create Headers:', req.headers);
+    console.log('Address Create User:', req.user);
+
+    if (!req.user) {
+      console.error('User missing in Address Create. Check AuthModule import.');
+    }
+
     const addressData = { ...createAddressDto, user_id: req.user?._id };
     const data = await this.addressesService.create(addressData);
     return successResponse(data, 'Address created successfully', 201);
+  }
+
+  @Get()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth('authentication')
+  @ApiOperation({ summary: 'Get all addresses' })
+  async findAll(@Query() options: any) {
+    const data = await this.addressesService.findAll(options);
+    return successResponse(data, 'Addresses fetched successfully');
   }
 
   @Delete(':id')

@@ -31,8 +31,4 @@ export class CreatePackerDto {
   @IsString()
   @IsOptional()
   user_id?: string;
-
-  @ApiProperty({ example: true, required: false })
-  @IsOptional()
-  is_available?: boolean;
 }

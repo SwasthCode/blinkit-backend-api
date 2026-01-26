@@ -19,15 +19,10 @@ import { AddToCartDto, RemoveFromCartDto } from './dto';
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-import { BaseController } from '../common/base/base.controller';
-import { CartDocument } from '../schemas/cart.schema';
-
 @ApiTags('Add To Cart')
 @Controller('cart')
-export class CartController extends BaseController<CartDocument> {
-  constructor(private readonly cartService: CartService) {
-    super(cartService);
-  }
+export class CartController {
+  constructor(private readonly cartService: CartService) { }
 
   @Post('add')
   @UseGuards(JwtAuthGuard)
@@ -50,7 +45,7 @@ export class CartController extends BaseController<CartDocument> {
     return successResponse(data, 'Item removed from cart');
   }
 
-  @Get('my-cart')
+  @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('authentication')
   @ApiOperation({ summary: 'Get user cart' })
@@ -58,6 +53,10 @@ export class CartController extends BaseController<CartDocument> {
     const data = await this.cartService.getCart(req.user._id);
     return successResponse(data, 'Cart fetched successfully');
   }
+
+
+
+
 
   @Delete()
   @UseGuards(JwtAuthGuard)

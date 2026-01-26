@@ -76,13 +76,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
     return invoice;
   }
 
-  async findAll(options: {
-    filter?: string;
-    select?: string;
-    sort?: string;
-    limit?: number;
-    skip?: number;
-  }): Promise<InvoiceDocument[]> {
+  async findAll(options: any = {}): Promise<any[]> {
     const { filter, select, sort, limit, skip } = options;
     let query = {};
     if (filter) {

@@ -264,14 +264,13 @@ export class OrdersService extends BaseService<OrderDocument> {
     };
   }
 
-  async findAll(options: {
+  async findAllWithFilters(options: {
     filter?: string;
-    select?: string;
     sort?: string;
     limit?: number;
     skip?: number;
   }): Promise<any[]> {
-    const { filter, select, sort, limit, skip } = options;
+    const { filter, sort, limit, skip } = options;
     let query = {};
     if (filter) {
       try {

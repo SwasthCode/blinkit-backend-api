@@ -44,25 +44,13 @@ export class InvoicesController extends BaseController<InvoiceDocument> {
     return successResponse(data, 'Invoice created successfully', 201);
   }
 
-  @Post('generate')
+  @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('authentication')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Generate an invoice for an order' })
-  @ApiResponse({ status: 201, description: 'Invoice generated successfully' })
-  async generate(@Body() createInvoiceDto: CreateInvoiceDto) {
-    const data = await this.invoicesService.create(createInvoiceDto);
-    return successResponse(data, 'Invoice generated successfully', 201);
-  }
-
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
-  @ApiOperation({ summary: 'Get invoice details' })
-  @ApiParam({ name: 'id', description: 'Invoice ID' })
-  async findOne(@Param('id') id: string) {
-    const data = await this.invoicesService.findOne(id);
-    return successResponse(data, 'Invoice details fetched successfully');
+  @ApiOperation({ summary: 'Get all invoices' })
+  async findAll(@Query() query: any) {
+    const data = await this.invoicesService.findAll(query);
+    return successResponse(data, 'Invoices fetched successfully');
   }
 
   @Get('order/:orderId')
@@ -73,5 +61,16 @@ export class InvoicesController extends BaseController<InvoiceDocument> {
   async findByOrder(@Param('orderId') orderId: string) {
     const data = await this.invoicesService.findByOrder(orderId);
     return successResponse(data, 'Invoice fetched successfully');
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('authentication')
+  @ApiOperation({ summary: 'Get invoice details' })
+  @ApiParam({ name: 'id', description: 'Invoice ID' })
+  async findOne(@Param('id') id: string) {
+      // Use base or service method
+    const data = await this.invoicesService.findOne(id);
+    return successResponse(data, 'Invoice details fetched successfully');
   }
 }
