@@ -132,7 +132,8 @@ export class OrdersService extends BaseService<OrderDocument> {
           updateOrderDto.total_amount !== undefined || 
           updateOrderDto.shipping_address || 
           updateOrderDto.shipping_phone || 
-          updateOrderDto.customer_name;
+          updateOrderDto.customer_name ||
+          updateOrderDto.address_id;
        
        if (isContentUpdate) {
            throw new BadRequestException(`Cannot update order details when status is ${order.status}`);
@@ -166,6 +167,9 @@ export class OrdersService extends BaseService<OrderDocument> {
     }
     if (updateOrderDto.customer_name) {
       order.customer_name = updateOrderDto.customer_name;
+    }
+    if (updateOrderDto.address_id) {
+      order.address_id = new Types.ObjectId(updateOrderDto.address_id);
     }
 
     await order.save();

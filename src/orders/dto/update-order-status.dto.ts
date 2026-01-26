@@ -90,4 +90,9 @@ export class UpdateOrderStatusDto {
   @IsOptional()
   @IsString()
   customer_name?: string;
+
+  @ApiProperty({ example: '65a...', description: 'Address ID', required: false })
+  @IsOptional()
+  @IsString()
+  address_id?: string;
 }
