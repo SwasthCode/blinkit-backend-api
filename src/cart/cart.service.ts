@@ -5,9 +5,19 @@ import { Cart, CartDocument } from '../schemas/cart.schema';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { RemoveFromCartDto } from './dto/remove-from-cart.dto';
 
+import { BaseService } from '../common/base/base.service';
+
 @Injectable()
-export class CartService {
-  constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
+export class CartService extends BaseService<CartDocument> {
+  constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {
+    super(cartModel);
+  }
+
+  async findOne(id: string): Promise<CartDocument> {
+    const doc = await this.cartModel.findById(id).populate('items.product_id').exec();
+    if (!doc) throw new Error(`Item not found with ID: ${id}`);
+    return doc;
+  }
 
   async getCart(userId: string): Promise<CartDocument> {
     let cart = await this.cartModel

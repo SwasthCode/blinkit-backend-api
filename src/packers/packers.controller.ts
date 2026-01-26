@@ -13,4 +13,14 @@ export class PackersController extends BaseController<PackerDocument> {
   constructor(private readonly packersService: PackersService) {
     super(packersService);
   }
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('authentication')
+  @ApiOperation({ summary: 'Create a new packer' })
+  @ApiResponse({ status: 201, description: 'Packer created successfully' })
+  async create(@Body() createPackerDto: CreatePackerDto) {
+    const data = await this.packersService.create(createPackerDto);
+    return successResponse(data, 'Packer created successfully', 201);
+  }
 }

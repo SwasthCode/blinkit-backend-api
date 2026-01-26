@@ -21,6 +21,9 @@ export class Packer extends BaseSchema {
   @Prop({ required: false })
   address?: string;
 
+  @Prop({ default: true })
+  is_available: boolean;
+
   @Prop({ type: Types.ObjectId, ref: 'User', required: false })
   user_id?: Types.ObjectId; // Link to user account if needed
 }

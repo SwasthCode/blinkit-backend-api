@@ -26,10 +26,15 @@ import {
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+import { BaseController } from '../common/base/base.controller';
+import { OrderDocument } from '../schemas/order.schema';
+
 @ApiTags('Orders')
 @Controller('orders')
-export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) { }
+export class OrdersController extends BaseController<OrderDocument> {
+  constructor(private readonly ordersService: OrdersService) {
+    super(ordersService);
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -46,15 +51,6 @@ export class OrdersController {
       createDirectOrderDto,
     );
     return successResponse(data, 'Order created successfully', 201);
-  }
-
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
-  @ApiOperation({ summary: 'Get all orders with filters' })
-  async findAll(@Req() req: any, @Query() query: any) {
-    const data = await this.ordersService.findAllWithFilters(query);
-    return successResponse(data, 'Orders fetched successfully');
   }
 
   @Get(':id')
