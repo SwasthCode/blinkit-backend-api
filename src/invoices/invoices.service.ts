@@ -60,7 +60,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
 
     const createdInvoice = new this.invoiceModel(invoiceData);
     const savedInvoice = await createdInvoice.save();
-    return this.findOne(savedInvoice._id.toString());
+    return this.findOne((savedInvoice as any)._id.toString());
   }
 
   async findByOrder(orderId: string): Promise<InvoiceDocument> {

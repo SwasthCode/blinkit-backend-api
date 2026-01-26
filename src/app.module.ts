@@ -19,6 +19,7 @@ import { FirebaseModule } from './common/firebase/firebase.module';
 import { OrdersModule } from './orders/orders.module';
 import { BrandsModule } from './brands/brands.module';
 import { InvoicesModule } from './invoices/invoices.module';
+import { PackersModule } from './packers/packers.module';
 import { Order, OrderSchema } from './schemas/order.schema';
 import { Cart, CartSchema } from './schemas/cart.schema';
 import { Address, AddressSchema } from './schemas/address.schema';
@@ -29,6 +30,7 @@ import { Category, CategorySchema } from './schemas/category.schema';
 import { SubCategory, SubCategorySchema } from './schemas/subcategory.schema';
 import { Role, RoleSchema } from './schemas/role.schema';
 import { User, UserSchema } from './schemas/user.schema';
+import { Packer, PackerSchema } from './schemas/packer.schema';
 
 @Module({
   imports: [
@@ -57,6 +59,7 @@ import { User, UserSchema } from './schemas/user.schema';
       { name: SubCategory.name, schema: SubCategorySchema },
       { name: Role.name, schema: RoleSchema },
       { name: User.name, schema: UserSchema },
+      { name: Packer.name, schema: PackerSchema },
     ]),
     UsersModule,
     AuthModule,
@@ -73,6 +76,7 @@ import { User, UserSchema } from './schemas/user.schema';
     FirebaseModule,
     BrandsModule,
     InvoicesModule,
+    PackersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
