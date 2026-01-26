@@ -233,4 +233,19 @@ export class RolesService extends BaseService<RoleDocument> {
       throw new Error(errorMessage);
     }
   }
+
+  /**
+   * Seed the Packer role if it doesn't exist
+   */
+  async seedPackerRole() {
+    try {
+      const packerRole = await this.model.findOne({ key: 'packer' }).exec();
+      if (!packerRole) {
+        console.log('Seeding Packer role...');
+        await this.create({ name: 'Packer' });
+      }
+    } catch (error) {
+      console.error('Failed to seed Packer role:', error.message);
+    }
+  }
 }
