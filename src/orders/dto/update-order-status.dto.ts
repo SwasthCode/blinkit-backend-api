@@ -4,27 +4,27 @@ import { Type, Transform } from 'class-transformer';
 
 export class UpdateOrderItemDto {
   @ApiProperty({ example: '65a...', description: 'Product ID' })
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   product_id: string;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   name: string;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   image: string;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   price: number;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   quantity: number;
 
@@ -75,4 +75,19 @@ export class UpdateOrderStatusDto {
     'returned',
   ])
   status?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  shipping_address?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  shipping_phone?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  customer_name?: string;
 }

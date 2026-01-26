@@ -123,6 +123,22 @@ export class OrdersService extends BaseService<OrderDocument> {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
+    const restrictedStatuses = ['shipped', 'delivered', 'returned', 'cancelled'];
+    const isRestricted = restrictedStatuses.includes(order.status.toLowerCase());
+
+    if (isRestricted) {
+       const isContentUpdate = 
+          updateOrderDto.items || 
+          updateOrderDto.total_amount !== undefined || 
+          updateOrderDto.shipping_address || 
+          updateOrderDto.shipping_phone || 
+          updateOrderDto.customer_name;
+       
+       if (isContentUpdate) {
+           throw new BadRequestException(`Cannot update order details when status is ${order.status}`);
+       }
+    }
+
     if (updateOrderDto.items) {
       order.items = updateOrderDto.items.map((item: any) => ({
         product_id: new Types.ObjectId(item.product_id),
@@ -140,6 +156,16 @@ export class OrdersService extends BaseService<OrderDocument> {
 
     if (updateOrderDto.status) {
       order.status = updateOrderDto.status.toLowerCase();
+    }
+
+    if (updateOrderDto.shipping_address) {
+      order.shipping_address = updateOrderDto.shipping_address;
+    }
+    if (updateOrderDto.shipping_phone) {
+      order.shipping_phone = updateOrderDto.shipping_phone;
+    }
+    if (updateOrderDto.customer_name) {
+      order.customer_name = updateOrderDto.customer_name;
     }
 
     await order.save();

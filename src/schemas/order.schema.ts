@@ -38,6 +38,15 @@ export class Order {
   @Prop({ required: true })
   total_amount: number;
 
+  @Prop()
+  shipping_address?: string;
+
+  @Prop()
+  shipping_phone?: string;
+
+  @Prop()
+  customer_name?: string;
+
   @Prop({
     required: true,
     enum: [
