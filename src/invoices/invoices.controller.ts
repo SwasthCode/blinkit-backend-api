@@ -44,6 +44,17 @@ export class InvoicesController extends BaseController<InvoiceDocument> {
     return successResponse(data, 'Invoice created successfully', 201);
   }
 
+  @Post('generate')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('authentication')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Generate an invoice for an order' })
+  @ApiResponse({ status: 201, description: 'Invoice generated successfully' })
+  async generate(@Body() createInvoiceDto: CreateInvoiceDto) {
+    const data = await this.invoicesService.create(createInvoiceDto);
+    return successResponse(data, 'Invoice generated successfully', 201);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('authentication')
