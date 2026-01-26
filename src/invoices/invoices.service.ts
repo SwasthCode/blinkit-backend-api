@@ -59,18 +59,18 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
     };
 
     const createdInvoice = new this.invoiceModel(invoiceData);
-    return createdInvoice.save();
+    const savedInvoice = await createdInvoice.save();
+    return this.findOne((savedInvoice as any)._id.toString());
   }
 
   async findByOrder(orderId: string): Promise<InvoiceDocument> {
     const invoice = await this.invoiceModel
       .findOne({ order_id: new Types.ObjectId(orderId) })
       .populate('user_id', 'first_name last_name email phone_number')
+      .populate('order_id', 'status')
       .exec();
 
     if (!invoice) {
-        // Option: Auto-generate if not found? 
-        // For now, request via POST to create explicitly.
       throw new NotFoundException(`Invoice not found for order ${orderId}`);
     }
     return invoice;
@@ -87,7 +87,8 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
 
     const q = this.invoiceModel
       .find(query)
-      .populate('user_id', 'first_name last_name email phone_number');
+      .populate('user_id', 'first_name last_name email phone_number')
+      .populate('order_id', 'status');
 
     if (sort) q.sort(sort);
     if (skip) q.skip(Number(skip));
@@ -101,6 +102,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
     const invoice = await this.invoiceModel
       .findById(id)
       .populate('user_id', 'first_name last_name email phone_number')
+      .populate('order_id', 'status')
       .exec();
     
     if (!invoice) throw new NotFoundException(`Invoice with ID ${id} not found`);
