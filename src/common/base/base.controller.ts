@@ -84,6 +84,38 @@ export class BaseController<T extends Document> {
     });
     return successResponse(data, 'Data fetched successfully');
   }
+  
+  @Get('select')
+  @ApiOperation({
+    summary:
+      'Get minimal data for dropdowns or search (defaults to ID and Name)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Minimal list of entities',
+  })
+  @ApiQuery({
+    name: 'filter',
+    required: false,
+    type: String,
+    description: 'JSON string filter',
+  })
+  @ApiQuery({
+    name: 'select',
+    required: false,
+    type: String,
+    description: 'Custom fields to select, defaults to "name"',
+  })
+  async findSelect(
+    @Query('filter') filter?: string,
+    @Query('select') select: string = 'name',
+  ) {
+    const data = await this.baseService.findAll({
+      filter,
+      select: `_id,${select}`,
+    });
+    return successResponse(data, 'Select data fetched successfully');
+  }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get entity by ID' })
