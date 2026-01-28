@@ -33,8 +33,6 @@ export class AddressesController extends BaseController<AddressDocument> {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new address' })
   @ApiResponse({ status: 201, description: 'Address created successfully' })
@@ -47,7 +45,10 @@ export class AddressesController extends BaseController<AddressDocument> {
       console.error('User missing in Address Create. Check AuthModule import.');
     }
 
-    const addressData = { ...createAddressDto, user_id: req.user?._id };
+    const addressData = { ...createAddressDto };
+    if (req.user?._id) {
+      addressData.user_id = req.user._id;
+    }
     const data = await this.addressesService.create(addressData);
     return successResponse(data, 'Address created successfully', 201);
   }
