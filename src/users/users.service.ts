@@ -22,6 +22,7 @@ export class UsersService extends BaseService<UserDocument> {
     private readonly jwtService: JwtService,
   ) {
     super(userModel);
+    this.searchFields = ['first_name', 'last_name', 'email', 'phone_number', 'status', 'username'];
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {

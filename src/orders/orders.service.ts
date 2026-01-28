@@ -23,6 +23,7 @@ export class OrdersService extends BaseService<OrderDocument> {
     private readonly productsService: ProductsService,
   ) {
     super(orderModel);
+    this.searchFields = ['status', 'payment_status', 'shipping_address', 'shipping_phone', 'customer_name'];
   }
 
   async createDirectOrder(

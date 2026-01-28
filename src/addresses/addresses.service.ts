@@ -13,6 +13,7 @@ export class AddressesService extends BaseService<AddressDocument> {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {
     super(addressModel);
+    this.searchFields = ['name', 'shipping_phone', 'pincode', 'locality', 'address', 'city', 'state', 'landmark', 'alternate_phone'];
   }
 
   async create(

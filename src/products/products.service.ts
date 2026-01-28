@@ -15,6 +15,7 @@ export class ProductsService extends BaseService<ProductDocument> {
     private readonly firebaseService: FirebaseService,
   ) {
     super(productModel);
+    this.searchFields = ['name', 'description', 'manufacturer', 'manufacturerAddress', 'countryOfOrigin', 'shelfLife'];
   }
 
   async create(

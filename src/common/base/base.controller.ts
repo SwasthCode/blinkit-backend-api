@@ -16,7 +16,7 @@ import { BaseService } from './base.service';
 import { successResponse } from './base.response';
 
 export class BaseController<T extends Document> {
-  constructor(protected readonly baseService: BaseService<T>) {}
+  constructor(protected readonly baseService: BaseService<T>) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -31,7 +31,7 @@ export class BaseController<T extends Document> {
   @Get()
   @ApiOperation({
     summary:
-      'Get all entities with advanced filtering, sorting, and pagination',
+      'Get all entities with advanced filtering, sorting, pagination, and search',
   })
   @ApiResponse({
     status: 200,
@@ -42,6 +42,12 @@ export class BaseController<T extends Document> {
     required: false,
     type: String,
     description: 'JSON string filter, e.g. {"status":"active"}',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search term for global search across configured fields',
   })
   @ApiQuery({
     name: 'select',
@@ -70,6 +76,7 @@ export class BaseController<T extends Document> {
   })
   async findAll(
     @Query('filter') filter?: string,
+    @Query('search') search?: string,
     @Query('select') select?: string,
     @Query('sort') sort?: string,
     @Query('limit') limit?: number,
@@ -77,45 +84,19 @@ export class BaseController<T extends Document> {
   ) {
     const data = await this.baseService.findAll({
       filter,
+      search,
       select,
       sort,
       limit,
       skip,
     });
+    if (!data || data.length === 0) {
+      return successResponse(data, 'No Data Found');
+    }
     return successResponse(data, 'Data fetched successfully');
   }
-  
-  @Get('select')
-  @ApiOperation({
-    summary:
-      'Get minimal data for dropdowns or search (defaults to ID and Name)',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Minimal list of entities',
-  })
-  @ApiQuery({
-    name: 'filter',
-    required: false,
-    type: String,
-    description: 'JSON string filter',
-  })
-  @ApiQuery({
-    name: 'select',
-    required: false,
-    type: String,
-    description: 'Custom fields to select, defaults to "name"',
-  })
-  async findSelect(
-    @Query('filter') filter?: string,
-    @Query('select') select: string = 'name',
-  ) {
-    const data = await this.baseService.findAll({
-      filter,
-      select: `_id,${select}`,
-    });
-    return successResponse(data, 'Select data fetched successfully');
-  }
+
+
 
   @Get(':id')
   @ApiOperation({ summary: 'Get entity by ID' })

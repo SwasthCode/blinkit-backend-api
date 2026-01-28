@@ -20,6 +20,7 @@ export class CategoriesService extends BaseService<CategoryDocument> {
     private readonly firebaseService: FirebaseService,
   ) {
     super(categoryModel);
+    this.searchFields = ['name', 'description', 'status'];
   }
 
   async create(
@@ -58,7 +59,7 @@ export class CategoriesService extends BaseService<CategoryDocument> {
     if (filter) {
       try {
         query = JSON.parse(filter);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const q = this.categoryModel

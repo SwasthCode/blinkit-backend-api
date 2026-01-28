@@ -15,6 +15,7 @@ export class ReviewsService extends BaseService<ReviewDocument> {
     private readonly firebaseService: FirebaseService,
   ) {
     super(reviewModel);
+    this.searchFields = ['comment', 'status'];
   }
 
   async create(

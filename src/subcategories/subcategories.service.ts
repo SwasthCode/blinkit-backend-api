@@ -18,6 +18,7 @@ export class SubCategoriesService extends BaseService<SubCategoryDocument> {
     private readonly firebaseService: FirebaseService,
   ) {
     super(subCategoryModel);
+    this.searchFields = ['name', 'description', 'status'];
   }
 
   // @ts-ignore
@@ -47,7 +48,7 @@ export class SubCategoriesService extends BaseService<SubCategoryDocument> {
     if (filter) {
       try {
         query = JSON.parse(filter);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const q = this.subCategoryModel

@@ -10,6 +10,8 @@ import { UpdateUserDto } from '../../users/dto';
 
 @Injectable()
 export class BaseService<T extends Document> {
+  protected searchFields: string[] = [];
+
   constructor(protected readonly model: Model<T>) { }
 
   async create(createDto: any): Promise<T> {
@@ -19,24 +21,37 @@ export class BaseService<T extends Document> {
 
   async findAll(options: {
     filter?: string;
+    search?: string;
     select?: string;
     sort?: string;
     limit?: number;
     skip?: number;
   }): Promise<T[]> {
-    const { filter, select, sort, limit, skip } = options;
+    const { filter, search, select, sort, limit, skip } = options;
 
     // Parse filter
-    let query = {};
+    let query: any = {};
     if (filter) {
       try {
         query = JSON.parse(filter);
-        // Basic sanitization or transformation could go here if needed
-        // For regex search support in JSON, we might need a custom parser or convention
-        // For now, assuming standard MongoDB query object structure
       } catch (e) {
-        // Fallback for simple key-value if not JSON, or just ignore (or throw)
         console.warn('Invalid JSON filter:', filter);
+      }
+    }
+
+    // Apply Search
+    if (search && this.searchFields.length > 0) {
+      const searchRegex = { $regex: search, $options: 'i' };
+      const searchQuery = {
+        $or: this.searchFields.map((field) => ({
+          [field]: searchRegex,
+        })),
+      };
+
+      if (Object.keys(query).length > 0) {
+        query = { $and: [query, searchQuery] };
+      } else {
+        query = searchQuery;
       }
     }
 
@@ -46,7 +61,6 @@ export class BaseService<T extends Document> {
       try {
         sortOptions = JSON.parse(sort);
       } catch (e) {
-        // Handle "field" or "-field" string format
         sortOptions = sort;
       }
     }

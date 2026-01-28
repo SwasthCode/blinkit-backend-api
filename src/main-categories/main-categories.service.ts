@@ -21,6 +21,7 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
     private readonly firebaseService: FirebaseService,
   ) {
     super(mainCategoryModel);
+    this.searchFields = ['name', 'description', 'status'];
   }
 
   // @ts-ignore

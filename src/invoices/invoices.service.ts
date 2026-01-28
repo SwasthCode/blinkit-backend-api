@@ -18,6 +18,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
   ) {
     super(invoiceModel);
+    this.searchFields = ['invoice_number', 'status'];
   }
 
   async create(createInvoiceDto: CreateInvoiceDto): Promise<InvoiceDocument> {
@@ -82,7 +83,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
     if (filter) {
       try {
         query = JSON.parse(filter);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const q = this.invoiceModel
@@ -104,7 +105,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
       .populate('user_id', 'first_name last_name email phone_number')
       .populate('order_id', 'status')
       .exec();
-    
+
     if (!invoice) throw new NotFoundException(`Invoice with ID ${id} not found`);
     return invoice;
   }

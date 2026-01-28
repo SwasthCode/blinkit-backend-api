@@ -14,6 +14,7 @@ export class BrandsService extends BaseService<BrandDocument> {
     private readonly firebaseService: FirebaseService,
   ) {
     super(brandModel);
+    this.searchFields = ['name', 'status'];
   }
 
   async create(
