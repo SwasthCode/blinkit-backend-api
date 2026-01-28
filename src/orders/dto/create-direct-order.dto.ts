@@ -33,6 +33,11 @@ export class CreateDirectOrderDto {
   @IsString()
   packer_id?: string;
 
+  @ApiProperty({ example: 'Picker ID', required: false })
+  @IsOptional()
+  @IsString()
+  picker_id?: string;
+
   @ApiProperty({ example: 'COD', required: false })
   @IsOptional()
   @IsString()

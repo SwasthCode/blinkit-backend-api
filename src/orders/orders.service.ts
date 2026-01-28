@@ -107,6 +107,7 @@ export class OrdersService extends BaseService<OrderDocument> {
       user_id: new Types.ObjectId(userId),
       address_id: new Types.ObjectId(createDirectOrderDto.address_id),
       packer_id: createDirectOrderDto.packer_id ? new Types.ObjectId(createDirectOrderDto.packer_id) : undefined,
+      picker_id: createDirectOrderDto.picker_id ? new Types.ObjectId(createDirectOrderDto.picker_id) : undefined,
       items: orderItems,
       total_amount: totalAmount,
       payment_method: createDirectOrderDto.payment_method || 'COD',
@@ -190,6 +191,18 @@ export class OrdersService extends BaseService<OrderDocument> {
     if (updateOrderDto.packer_id) {
       order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
     }
+    if (updateOrderDto.picker_id) {
+      order.picker_id = new Types.ObjectId(updateOrderDto.picker_id);
+    }
+    if (updateOrderDto.picker_accepted !== undefined) {
+      order.picker_accepted = updateOrderDto.picker_accepted;
+    }
+    if (updateOrderDto.picker_remark !== undefined) {
+      order.picker_remark = updateOrderDto.picker_remark;
+    }
+    if (updateOrderDto.packer_remark !== undefined) {
+      order.packer_remark = updateOrderDto.packer_remark;
+    }
 
     await order.save();
     return this.findOne(id);
@@ -200,6 +213,7 @@ export class OrdersService extends BaseService<OrderDocument> {
       .findById(id)
       .populate('user_id', '-addresses -password')
       .populate('packer_id', 'first_name last_name')
+      .populate('picker_id', 'first_name last_name')
       .populate('address_id')
       .populate('items.product_id')
       .lean()
@@ -301,6 +315,7 @@ export class OrdersService extends BaseService<OrderDocument> {
       .skip(skip ? Number(skip) : 0)
       .populate('user_id', '-addresses -password')
       .populate('packer_id', 'first_name last_name')
+      .populate('picker_id', 'first_name last_name')
       .populate('address_id')
       .populate('items.product_id')
       .lean()
@@ -385,5 +400,35 @@ export class OrdersService extends BaseService<OrderDocument> {
       grand_total_orders: totalOrders,
       monthly_counts: formattedMonthlyCounts,
     };
+  }
+
+  async getMyPicks(userId: string): Promise<any[]> {
+    const orders = await this.orderModel
+      .find({ picker_id: new Types.ObjectId(userId) })
+      .sort({ createdAt: -1 })
+      .populate('user_id', '-addresses -password')
+      .populate('packer_id', 'first_name last_name')
+      .populate('picker_id', 'first_name last_name')
+      .populate('address_id')
+      .populate('items.product_id')
+      .lean()
+      .exec();
+
+    return orders.map((order) => this.transformOrder(order));
+  }
+
+  async getMyPacks(userId: string): Promise<any[]> {
+    const orders = await this.orderModel
+      .find({ packer_id: new Types.ObjectId(userId) })
+      .sort({ createdAt: -1 })
+      .populate('user_id', '-addresses -password')
+      .populate('packer_id', 'first_name last_name')
+      .populate('picker_id', 'first_name last_name')
+      .populate('address_id')
+      .populate('items.product_id')
+      .lean()
+      .exec();
+
+    return orders.map((order) => this.transformOrder(order));
   }
 }

@@ -56,9 +56,29 @@ export class OrdersController {
 
   @Get()
   @ApiOperation({ summary: 'Get all orders with filters' })
-  async findAll(@Req() req: any, @Query() query: any) {
+  async findAll(@Query() query: any) {
     const data = await this.ordersService.findAllWithFilters(query);
     return successResponse(data, 'Orders fetched successfully');
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('my-picks')
+  @ApiOperation({ summary: 'Get assigned orders for picker' })
+  async getMyPicks(@Req() req: any) {
+    const userId = req.user._id;
+    const data = await this.ordersService.getMyPicks(userId.toString());
+    return successResponse(data, 'My pick assignments fetched successfully');
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('my-packs')
+  @ApiOperation({ summary: 'Get assigned orders for packer' })
+  async getMyPacks(@Req() req: any) {
+    const userId = req.user._id;
+    const data = await this.ordersService.getMyPacks(userId.toString());
+    return successResponse(data, 'My pack assignments fetched successfully');
   }
 
   @Get(':id')

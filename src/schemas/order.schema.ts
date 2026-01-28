@@ -34,6 +34,14 @@ export class Order {
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: false })
   packer_id?: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+  picker_id?: Types.ObjectId;
+  @Prop({ default: false })
+  picker_accepted?: boolean;
+  @Prop()
+  picker_remark?: string;
+  @Prop()
+  packer_remark?: string;
 
   @Prop({ type: [OrderItem], required: true })
   items: OrderItem[];

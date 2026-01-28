@@ -100,4 +100,23 @@ export class UpdateOrderStatusDto {
   @IsOptional()
   @IsString()
   packer_id?: string;
+
+  @ApiProperty({ example: '65a...', description: 'Picker ID', required: false })
+  @IsOptional()
+  @IsString()
+  picker_id?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  picker_accepted?: boolean;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  picker_remark?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  packer_remark?: string;
 }
