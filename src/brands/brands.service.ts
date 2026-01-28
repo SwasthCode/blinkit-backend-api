@@ -36,6 +36,8 @@ export class BrandsService extends BaseService<BrandDocument> {
       .exec();
   }
 
+
+
   async findByMainCategory(mainCategoryId: string): Promise<BrandDocument[]> {
     return this.brandModel
       .find({ main_category_id: mainCategoryId })

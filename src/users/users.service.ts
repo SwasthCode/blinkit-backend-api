@@ -138,126 +138,34 @@ export class UsersService extends BaseService<UserDocument> {
   }): Promise<UserDocument[]> {
     const { filter, select, sort, limit, skip } = options;
 
-    // 1. Fetch ALL users (initial database retrieval)
-    // optimization: if filter doesn't contain role fields, we could apply it here,
-    // but for simplicity and full support of mixed queries, we fetch all.
-    const allUsers = await this.model.find({}).lean().exec();
+    let query = filter || {};
 
-    // 2. Populate Roles (Manual Population)
-    await populateUserRoles(this.userRoleModel, allUsers);
+    const sortOptions = sort || {};
 
-    // 3. In-Memory Filtering
-    let filteredUsers = allUsers;
-    if (filter) {
-      try {
-        const parsedFilter =
-          typeof filter === 'string' ? JSON.parse(filter) : filter;
-        filteredUsers = allUsers.filter((user) => {
-          return Object.keys(parsedFilter).every((key) => {
-            const filterVal = parsedFilter[key];
-            // Support nested keys like 'role.name'
-            const userVal = key
-              .split('.')
-              .reduce(
-                (obj, k) => (obj && obj[k] !== undefined ? obj[k] : undefined),
-                user,
-              );
+    let q = this.model.find(query);
 
-            // Special handling for role_id filtering against populated roles
-            if (key === 'role_id') {
-              const roles = Array.isArray(user.role) ? user.role : [user.role];
-              // user.role is now populated with objects (by populateUserRoles)
-              // or original values if not found.
-              return roles.some((r: any) => {
-                const rId = r && typeof r === 'object' && r._id ? r._id.toString() : String(r);
-                return rId === String(filterVal);
-              });
-            }
-
-            // Simple equality check (expand for more complex mongo operators if needed)
-            // Handling array lookups for roles? Simplistic approach:
-            if (Array.isArray(userVal) && !Array.isArray(filterVal)) {
-              // if user has multiple roles and we filter by one value, check if it includes
-              // This is tricky for object arrays.
-              // For now, simple strict equality or includes
-              return userVal.includes(filterVal);
-            }
-            if (
-              Array.isArray(userVal) &&
-              Array.isArray(filterVal) &&
-              key.includes('role')
-            ) {
-              // If filtering on nested role array properties (e.g. role.name), userVal would actually be an array of names
-              // This reduce logic above usually handles objects, for arrays it gets weird.
-              // Let's settle for simple generic equality for now.
-              return userVal == filterVal;
-            }
-
-            return userVal == filterVal;
-          });
-        });
-      } catch (e) {
-        console.warn('In-memory filter parse failed', e);
-      }
-    }
-
-    // 4. In-Memory Sorting
-    if (sort) {
-      try {
-        const sortObj = typeof sort === 'string' ? JSON.parse(sort) : sort;
-        // sortObj: { field: 1 or -1 }
-        const sortKeys = Object.keys(sortObj);
-        if (sortKeys.length > 0) {
-          const key = sortKeys[0]; // simplistic single field sort
-          const dir = parseInt(sortObj[key]) || 1;
-
-          filteredUsers.sort((a: any, b: any) => {
-            const valA = key.split('.').reduce((o, k) => (o ? o[k] : null), a);
-            const valB = key.split('.').reduce((o, k) => (o ? o[k] : null), b);
-
-            if (valA < valB) return -1 * dir;
-            if (valA > valB) return 1 * dir;
-            return 0;
-          });
-        }
-      } catch {
-        // ignore sort errors
-      }
-    }
-
-    // 5. In-Memory Pagination
-    const skipVal = typeof skip === 'string' ? parseInt(skip, 10) : skip || 0;
-    const limitVal =
-      typeof limit === 'string' ? parseInt(limit, 10) : limit || 0;
-
-    let paginatedUsers = filteredUsers;
-    if (skipVal > 0) {
-      paginatedUsers = paginatedUsers.slice(skipVal);
-    }
-    if (limitVal > 0) {
-      paginatedUsers = paginatedUsers.slice(0, limitVal);
-    }
-
-    // 6. In-Memory Selection
     if (select) {
-      const fields = select.split(/[,\s]+/).filter((f) => f.trim());
-      if (fields.length > 0) {
-        return paginatedUsers.map((user: any) => {
-          const selectedUser: any = {};
-          // Always include _id unless explicitly excluded (not implementing exclusion logic for now)
-          selectedUser._id = user._id;
-          fields.forEach((field) => {
-            // Supports simplistic top-level fields only for now
-            if (user[field] !== undefined) {
-              selectedUser[field] = user[field];
-            }
-          });
-          return selectedUser;
-        });
-      }
+      q = q.select(select.split(/[,\s]+/).join(' '));
     }
 
-    return paginatedUsers as any;
+    if (Object.keys(sortOptions).length > 0) {
+      q = q.sort(sortOptions as any);
+    }
+
+    if (skip) {
+      q = q.skip(Number(skip));
+    }
+
+    if (limit) {
+      q = q.limit(Number(limit));
+    }
+
+    const users = await q.lean().exec();
+
+    // Populate Roles (Manual Population)
+    await populateUserRoles(this.userRoleModel, users);
+
+    return users as any;
   }
 
 

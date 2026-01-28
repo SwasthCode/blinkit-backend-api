@@ -36,7 +36,7 @@ export class ReviewsService extends BaseService<ReviewDocument> {
     return createdReview.save();
   }
 
-  // ... findAll method unchanged ...
+
 
   async update(
     id: string,
