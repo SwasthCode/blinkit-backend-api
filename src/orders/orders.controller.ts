@@ -32,8 +32,6 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) { }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create an order' })
   @ApiResponse({ status: 201, description: 'Order created successfully' })
@@ -56,8 +54,6 @@ export class OrdersController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
   @ApiOperation({ summary: 'Get order details' })
   @ApiParam({ name: 'id', description: 'Order ID' })
   async findOne(@Param('id') id: string) {
