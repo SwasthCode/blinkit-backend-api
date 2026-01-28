@@ -9,10 +9,8 @@ import { BaseService } from '../common/base/base.service';
 import { Order, OrderDocument, OrderItem } from '../schemas/order.schema';
 import { Role, RoleDocument } from '../schemas/role.schema';
 import { CartService } from '../cart/cart.service';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateDirectOrderDto } from './dto/create-direct-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-
 import { ProductsService } from '../products/products.service';
 import { populateUserRoles } from '../common/utils/rolePopulat.util';
 
@@ -26,55 +24,6 @@ export class OrdersService extends BaseService<OrderDocument> {
   ) {
     super(orderModel);
   }
-
-  // async placeOrder(
-  //   userId: string,
-  //   createOrderDto: CreateOrderDto,
-  // ): Promise<OrderDocument> {
-  //   // 1. Get User's Cart
-  //   const cart = await this.cartService.getCart(userId);
-  //   if (!cart || !cart.items || cart.items.length === 0) {
-  //     throw new BadRequestException('Cart is empty');
-  //   }
-
-  //   // 2. Calculate Total & Prepare Order Items (Snapshot)
-  //   let totalAmount = 0;
-  //   const orderItems: OrderItem[] = [];
-
-  //   for (const item of cart.items) {
-  //     const product = item.product_id as any; // Populated in getCart
-  //     if (!product) continue;
-
-  //     totalAmount += product.price * item.quantity;
-  //     orderItems.push({
-  //       product_id: product._id,
-  //       name: product.name,
-  //       image:
-  //         product.images?.[0]?.url ||
-  //         'https://placehold.co/600x400?text=No+Image',
-  //       price: product.price,
-  //       quantity: item.quantity,
-  //     });
-  //   }
-
-  //   // 3. Create Order
-  //   const order = new this.orderModel({
-  //     user_id: new Types.ObjectId(userId),
-  //     address_id: new Types.ObjectId(createOrderDto.address_id),
-  //     items: orderItems,
-  //     total_amount: totalAmount,
-  //     payment_method: createOrderDto.payment_method || 'COD',
-  //     status: 'Pending',
-  //     payment_status: 'Pending',
-  //   });
-
-  //   const savedOrder = await order.save();
-
-  //   // 4. Clear Cart
-  //   await this.cartService.clearCart(userId);
-
-  //   return savedOrder;
-  // }
 
   async createDirectOrder(
     userId: string,
@@ -94,8 +43,7 @@ export class OrdersService extends BaseService<OrderDocument> {
       orderItems.push({
         product_id: product._id as Types.ObjectId,
         name: product.name,
-        image:
-          product.images?.[0]?.url || 'https://placehold.co/100',
+        image: product.images?.[0]?.url || 'https://placehold.co/100',
         price: product.price,
         quantity: item.quantity,
       });
@@ -126,16 +74,25 @@ export class OrdersService extends BaseService<OrderDocument> {
     return this.findOne((savedOrder as any)._id.toString());
   }
 
-  async updateOrder(id: string, updateOrderDto: UpdateOrderStatusDto): Promise<any> {
+  async updateOrder(id: string, updateOrderDto: UpdateOrderStatusDto, user?: any): Promise<any> {
     const order = await this.orderModel.findById(id);
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
+    // Role-based field restrictions
+    const userRoleKeys = user?.role?.map((r: any) =>
+      typeof r === 'object' ? r.key?.toLowerCase() : r?.toString().toLowerCase()
+    ) || [];
+
+    const isAdmin = userRoleKeys.includes('admin') || userRoleKeys.includes('1');
+    const isPicker = userRoleKeys.includes('picker');
+    const isPacker = userRoleKeys.includes('packer');
+
     const restrictedStatuses = ['shipped', 'delivered', 'returned', 'cancelled'];
     const isRestricted = restrictedStatuses.includes(order.status.toLowerCase());
 
-    if (isRestricted) {
+    if (isRestricted && isAdmin) {
       const isContentUpdate =
         updateOrderDto.items ||
         updateOrderDto.total_amount !== undefined ||
@@ -149,59 +106,51 @@ export class OrdersService extends BaseService<OrderDocument> {
       }
     }
 
-    if (updateOrderDto.items) {
-      order.items = updateOrderDto.items.map((item: any) => ({
-        product_id: new Types.ObjectId(item.product_id),
-        name: item.name,
-        image: item.image,
-        price: item.price,
-        quantity: item.quantity,
-        brand_name: item.brand_name,
-      }));
-    }
-
-    if (updateOrderDto.total_amount !== undefined) {
-      order.total_amount = updateOrderDto.total_amount;
-    }
-
-    if (updateOrderDto.status) {
-      const newStatus = updateOrderDto.status.toLowerCase();
-      if (order.status !== newStatus) {
-        order.status = newStatus;
-        order.status_history.push({
-          status: newStatus,
-          changedAt: new Date(),
-          comment: `Status updated to ${newStatus}`,
-        });
+    // Apply updates based on roles
+    if (isAdmin) {
+      if (updateOrderDto.items) {
+        order.items = updateOrderDto.items.map((item: any) => ({
+          product_id: new Types.ObjectId(item.product_id),
+          name: item.name,
+          image: item.image,
+          price: item.price,
+          quantity: item.quantity,
+          brand_name: item.brand_name,
+        }));
       }
+
+      if (updateOrderDto.total_amount !== undefined) {
+        order.total_amount = updateOrderDto.total_amount;
+      }
+
+      if (updateOrderDto.shipping_address) order.shipping_address = updateOrderDto.shipping_address;
+      if (updateOrderDto.shipping_phone) order.shipping_phone = updateOrderDto.shipping_phone;
+      if (updateOrderDto.customer_name) order.customer_name = updateOrderDto.customer_name;
+      if (updateOrderDto.address_id) order.address_id = new Types.ObjectId(updateOrderDto.address_id);
+      if (updateOrderDto.packer_id) order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
+      if (updateOrderDto.picker_id) order.picker_id = new Types.ObjectId(updateOrderDto.picker_id);
+      if (updateOrderDto.status) order.status = updateOrderDto.status.toLowerCase();
     }
 
-    if (updateOrderDto.shipping_address) {
-      order.shipping_address = updateOrderDto.shipping_address;
+    if (isPicker) {
+      if (updateOrderDto.picker_accepted !== undefined) order.picker_accepted = updateOrderDto.picker_accepted;
+      if (updateOrderDto.picker_remark !== undefined) order.picker_remark = updateOrderDto.picker_remark;
+      if (updateOrderDto.packer_id) order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
+      if (updateOrderDto.status) order.status = updateOrderDto.status.toLowerCase();
     }
-    if (updateOrderDto.shipping_phone) {
-      order.shipping_phone = updateOrderDto.shipping_phone;
+
+    if (isPacker) {
+      if (updateOrderDto.packer_remark !== undefined) order.packer_remark = updateOrderDto.packer_remark;
+      if (updateOrderDto.status) order.status = updateOrderDto.status.toLowerCase();
     }
-    if (updateOrderDto.customer_name) {
-      order.customer_name = updateOrderDto.customer_name;
-    }
-    if (updateOrderDto.address_id) {
-      order.address_id = new Types.ObjectId(updateOrderDto.address_id);
-    }
-    if (updateOrderDto.packer_id) {
-      order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
-    }
-    if (updateOrderDto.picker_id) {
-      order.picker_id = new Types.ObjectId(updateOrderDto.picker_id);
-    }
-    if (updateOrderDto.picker_accepted !== undefined) {
-      order.picker_accepted = updateOrderDto.picker_accepted;
-    }
-    if (updateOrderDto.picker_remark !== undefined) {
-      order.picker_remark = updateOrderDto.picker_remark;
-    }
-    if (updateOrderDto.packer_remark !== undefined) {
-      order.packer_remark = updateOrderDto.packer_remark;
+
+    // Handle status history if status changed
+    if (updateOrderDto.status && order.isModified('status')) {
+      order.status_history.push({
+        status: order.status,
+        changedAt: new Date(),
+        comment: `Status updated to ${order.status} by ${userRoleKeys.join('/')}`,
+      });
     }
 
     await order.save();
@@ -242,7 +191,6 @@ export class OrdersService extends BaseService<OrderDocument> {
 
     const { user_id, address_id, ...rest } = orderObj;
 
-    // Remove 'id' if still present in populated objects
     const user = user_id;
     const address = address_id;
 
@@ -341,10 +289,8 @@ export class OrdersService extends BaseService<OrderDocument> {
       .lean()
       .exec();
 
-    // Transform logic
     const transformedOrders = orders.map((order) => this.transformOrder(order));
 
-    // Populate user roles on the transformed objects
     const users = transformedOrders.map((o) => o.user).filter(Boolean);
     if (users.length > 0) {
       await populateUserRoles(this.roleModel, users);
@@ -372,7 +318,6 @@ export class OrdersService extends BaseService<OrderDocument> {
       },
     ]);
 
-    // Map month numbers to names
     const monthNames = [
       'January',
       'February',

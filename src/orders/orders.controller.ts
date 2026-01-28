@@ -89,14 +89,17 @@ export class OrdersController {
     return successResponse(data, 'Order details fetched successfully');
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Put(':id')
   @ApiOperation({ summary: 'Update order (status, items, or total_amount)' })
   @ApiParam({ name: 'id', description: 'Order ID' })
   async update(
+    @Req() req: any,
     @Param('id') id: string,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto,
   ) {
-    const data = await this.ordersService.updateOrder(id, updateOrderStatusDto);
+    const data = await this.ordersService.updateOrder(id, updateOrderStatusDto, req.user);
     return successResponse(data, 'Order updated successfully');
   }
 }
