@@ -66,8 +66,6 @@ export class OrdersController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
   @ApiOperation({ summary: 'Update order (status, items, or total_amount)' })
   @ApiParam({ name: 'id', description: 'Order ID' })
   async update(
