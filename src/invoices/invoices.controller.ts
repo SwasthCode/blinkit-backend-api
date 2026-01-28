@@ -45,8 +45,6 @@ export class InvoicesController extends BaseController<InvoiceDocument> {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
   @ApiOperation({ summary: 'Get all invoices' })
   async findAll(@Query() query: any) {
     const data = await this.invoicesService.findAll(query);
@@ -69,7 +67,7 @@ export class InvoicesController extends BaseController<InvoiceDocument> {
   @ApiOperation({ summary: 'Get invoice details' })
   @ApiParam({ name: 'id', description: 'Invoice ID' })
   async findOne(@Param('id') id: string) {
-      // Use base or service method
+    // Use base or service method
     const data = await this.invoicesService.findOne(id);
     return successResponse(data, 'Invoice details fetched successfully');
   }
