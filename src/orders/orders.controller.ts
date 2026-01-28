@@ -49,8 +49,6 @@ export class OrdersController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
   @ApiOperation({ summary: 'Get all orders with filters' })
   async findAll(@Req() req: any, @Query() query: any) {
     const data = await this.ordersService.findAllWithFilters(query);
