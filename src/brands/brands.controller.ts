@@ -60,11 +60,14 @@ export class BrandsController extends BaseController<BrandDocument> {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update brand by ID' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('image'))
   async update(
     @Param('id') id: string,
     @Body() updateBrandDto: UpdateBrandDto,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    const data = await this.brandsService.update(id, updateBrandDto);
+    const data = await this.brandsService.update(id, updateBrandDto, file);
     return successResponse(data, 'Brand updated successfully');
   }
 }

@@ -42,4 +42,16 @@ export class BrandsService extends BaseService<BrandDocument> {
       .populate('main_category_id', 'name')
       .exec();
   }
+
+  async update(
+    id: string,
+    updateBrandDto: any,
+    file?: Express.Multer.File,
+  ): Promise<BrandDocument> {
+    if (file) {
+      const imageUrl = await this.firebaseService.uploadFile(file, 'brands');
+      updateBrandDto.image = imageUrl;
+    }
+    return super.update(id, updateBrandDto);
+  }
 }
