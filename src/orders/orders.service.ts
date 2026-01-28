@@ -187,6 +187,9 @@ export class OrdersService extends BaseService<OrderDocument> {
     if (updateOrderDto.address_id) {
       order.address_id = new Types.ObjectId(updateOrderDto.address_id);
     }
+    if (updateOrderDto.packer_id) {
+      order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
+    }
 
     await order.save();
     return this.findOne(id);

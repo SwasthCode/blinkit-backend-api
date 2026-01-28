@@ -95,4 +95,9 @@ export class UpdateOrderStatusDto {
   @IsOptional()
   @IsString()
   address_id?: string;
+
+  @ApiProperty({ example: '65a...', description: 'Packer ID', required: false })
+  @IsOptional()
+  @IsString()
+  packer_id?: string;
 }

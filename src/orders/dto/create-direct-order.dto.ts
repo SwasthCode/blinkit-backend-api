@@ -20,6 +20,10 @@ class DirectOrderItemDto {
 }
 
 export class CreateDirectOrderDto {
+  @ApiProperty({ example: 'User ID', required: false })
+  @IsOptional()
+  user_id?: string;
+
   @ApiProperty({ example: 'Address ID' })
   @IsNotEmpty()
   address_id: string;

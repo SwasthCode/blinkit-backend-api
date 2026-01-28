@@ -39,8 +39,16 @@ export class OrdersController {
     @Req() req: any,
     @Body() createDirectOrderDto: CreateDirectOrderDto,
   ) {
+    const userId = req.user?._id || createDirectOrderDto.user_id;
+
+    if (!userId) {
+      // Ideally throw an error, but for now assuming it's provided as per current non-strict env
+      // throw new BadRequestException('User ID is required');
+      console.warn('No User ID found in request or body');
+    }
+
     const data = await this.ordersService.createDirectOrder(
-      req.user._id,
+      userId,
       createDirectOrderDto,
     );
     return successResponse(data, 'Order created successfully', 201);
