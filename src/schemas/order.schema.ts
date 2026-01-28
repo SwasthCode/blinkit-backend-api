@@ -32,6 +32,9 @@ export class Order {
   @Prop({ type: Types.ObjectId, ref: 'Address', required: true })
   address_id: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+  packer_id?: Types.ObjectId;
+
   @Prop({ type: [OrderItem], required: true })
   items: OrderItem[];
 

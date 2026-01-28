@@ -106,6 +106,7 @@ export class OrdersService extends BaseService<OrderDocument> {
     const order = new this.orderModel({
       user_id: new Types.ObjectId(userId),
       address_id: new Types.ObjectId(createDirectOrderDto.address_id),
+      packer_id: createDirectOrderDto.packer_id ? new Types.ObjectId(createDirectOrderDto.packer_id) : undefined,
       items: orderItems,
       total_amount: totalAmount,
       payment_method: createDirectOrderDto.payment_method || 'COD',
@@ -134,17 +135,17 @@ export class OrdersService extends BaseService<OrderDocument> {
     const isRestricted = restrictedStatuses.includes(order.status.toLowerCase());
 
     if (isRestricted) {
-       const isContentUpdate = 
-          updateOrderDto.items || 
-          updateOrderDto.total_amount !== undefined || 
-          updateOrderDto.shipping_address || 
-          updateOrderDto.shipping_phone || 
-          updateOrderDto.customer_name ||
-          updateOrderDto.address_id;
-       
-       if (isContentUpdate) {
-           throw new BadRequestException(`Cannot update order details when status is ${order.status}`);
-       }
+      const isContentUpdate =
+        updateOrderDto.items ||
+        updateOrderDto.total_amount !== undefined ||
+        updateOrderDto.shipping_address ||
+        updateOrderDto.shipping_phone ||
+        updateOrderDto.customer_name ||
+        updateOrderDto.address_id;
+
+      if (isContentUpdate) {
+        throw new BadRequestException(`Cannot update order details when status is ${order.status}`);
+      }
     }
 
     if (updateOrderDto.items) {
@@ -195,6 +196,7 @@ export class OrdersService extends BaseService<OrderDocument> {
     const order = await this.orderModel
       .findById(id)
       .populate('user_id', '-addresses -password')
+      .populate('packer_id', 'first_name last_name')
       .populate('address_id')
       .populate('items.product_id')
       .lean()
@@ -295,6 +297,7 @@ export class OrdersService extends BaseService<OrderDocument> {
       .limit(limit ? Number(limit) : 0)
       .skip(skip ? Number(skip) : 0)
       .populate('user_id', '-addresses -password')
+      .populate('packer_id', 'first_name last_name')
       .populate('address_id')
       .populate('items.product_id')
       .lean()

@@ -163,6 +163,17 @@ export class UsersService extends BaseService<UserDocument> {
                 user,
               );
 
+            // Special handling for role_id filtering against populated roles
+            if (key === 'role_id') {
+              const roles = Array.isArray(user.role) ? user.role : [user.role];
+              // user.role is now populated with objects (by populateUserRoles)
+              // or original values if not found.
+              return roles.some((r: any) => {
+                const rId = r && typeof r === 'object' && r._id ? r._id.toString() : String(r);
+                return rId === String(filterVal);
+              });
+            }
+
             // Simple equality check (expand for more complex mongo operators if needed)
             // Handling array lookups for roles? Simplistic approach:
             if (Array.isArray(userVal) && !Array.isArray(filterVal)) {
