@@ -131,17 +131,56 @@ export class UsersService extends BaseService<UserDocument> {
     );
   }
   async findAll(options: {
-    filter?: any;
+    filter?: string;
+    search?: string;
     select?: string;
-    sort?: unknown;
+    sort?: string;
     limit?: number | string;
     skip?: number | string;
   }): Promise<UserDocument[]> {
-    const { filter, select, sort, limit, skip } = options;
+    const { filter, search, select, sort, limit, skip } = options;
 
-    let query = filter || {};
+    let query: any = {};
+    if (filter) {
+      try {
+        query = JSON.parse(filter);
 
-    const sortOptions = sort || {};
+        // Transformation: Handle role.role_id filter
+        // Since roles are stored as number[] (role_ids) in the User collection,
+        // we convert {"role.role_id": value} to {"role": value}
+        if (query['role.role_id'] !== undefined) {
+          query.role = query['role.role_id'];
+          delete query['role.role_id'];
+        }
+      } catch (e) {
+        console.warn('Invalid JSON filter in UsersService:', filter);
+      }
+    }
+
+    // Apply Search
+    if (search && this.searchFields.length > 0) {
+      const searchRegex = { $regex: search, $options: 'i' };
+      const searchQuery = {
+        $or: this.searchFields.map((field) => ({
+          [field]: searchRegex,
+        })),
+      };
+
+      if (Object.keys(query).length > 0) {
+        query = { $and: [query, searchQuery] };
+      } else {
+        query = searchQuery;
+      }
+    }
+
+    let sortOptions: any = {};
+    if (sort) {
+      try {
+        sortOptions = JSON.parse(sort);
+      } catch (e) {
+        sortOptions = sort;
+      }
+    }
 
     let q = this.model.find(query);
 
@@ -149,8 +188,8 @@ export class UsersService extends BaseService<UserDocument> {
       q = q.select(select.split(/[,\s]+/).join(' '));
     }
 
-    if (Object.keys(sortOptions).length > 0) {
-      q = q.sort(sortOptions as any);
+    if (Object.keys(sortOptions).length > 0 || typeof sortOptions === 'string') {
+      q = q.sort(sortOptions);
     }
 
     if (skip) {

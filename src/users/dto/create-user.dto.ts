@@ -74,12 +74,12 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'The status of the user',
     example: 'active',
-    enum: ['active', 'inactive', 'suspended'],
+    enum: ['active', 'inactive', 'pending'],
     default: 'active',
   })
   @IsOptional()
-  @IsEnum(['active', 'inactive', 'suspended'], {
-    message: 'Status must be one of: active, inactive, suspended',
+  @IsEnum(['active', 'inactive', 'pending'], {
+    message: 'Status must be one of: active, inactive, pending',
   })
   status?: string;
 }

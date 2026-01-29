@@ -91,7 +91,16 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
       .populate('user_id', 'first_name last_name email phone_number')
       .populate('order_id', 'status');
 
-    if (sort) q.sort(sort);
+    let sortOptions: any = {};
+    if (sort) {
+      try {
+        sortOptions = JSON.parse(sort);
+      } catch (e) {
+        sortOptions = sort;
+      }
+    }
+
+    if (sortOptions) q.sort(sortOptions);
     if (skip) q.skip(Number(skip));
     if (limit) q.limit(Number(limit));
     if (select) q.select(select);

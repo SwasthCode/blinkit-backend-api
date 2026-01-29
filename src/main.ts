@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
+import * as os from 'os';
 
 let cachedApp: express.Express;
 
@@ -59,6 +60,18 @@ async function createApp(): Promise<express.Express> {
   return expressApp;
 }
 
+function getLocalIp(): string {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]!) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return 'localhost';
+}
+
 // For Vercel serverless functions
 export default async function handler(
   req: express.Request,
@@ -74,9 +87,16 @@ if (require.main === module) {
     console.log('🚀 Starting application...');
     const app = await createApp();
     const port = process.env.PORT ?? 8000;
+    const localIp = getLocalIp();
     app.listen(port, () => {
       console.log(`Application is running on: http://localhost:${port}`);
+      if (localIp !== 'localhost') {
+        console.log(`Application is running on: http://${localIp}:${port}`);
+      }
       console.log(`Swagger documentation: http://localhost:${port}/api`);
+      if (localIp !== 'localhost') {
+        console.log(`Swagger documentation: http://${localIp}:${port}/api`);
+      }
     });
   }
   void bootstrap();
