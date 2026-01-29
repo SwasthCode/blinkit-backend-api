@@ -26,6 +26,9 @@ export class OrderItem {
 
 @Schema({ timestamps: true })
 export class Order {
+  @Prop({ unique: true, required: true })
+  order_id: string;
+
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   user_id: Types.ObjectId;
 

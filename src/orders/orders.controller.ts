@@ -26,10 +26,15 @@ import {
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+import { BaseController } from '../common/base/base.controller';
+import { OrderDocument } from '../schemas/order.schema';
+
 @ApiTags('Orders')
 @Controller('orders')
-export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) { }
+export class OrdersController extends BaseController<OrderDocument> {
+  constructor(private readonly ordersService: OrdersService) {
+    super(ordersService);
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -95,11 +100,11 @@ export class OrdersController {
   @ApiOperation({ summary: 'Update order (status, items, or total_amount)' })
   @ApiParam({ name: 'id', description: 'Order ID' })
   async update(
-    @Req() req: any,
     @Param('id') id: string,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto,
+    @Req() req?: any,
   ) {
-    const data = await this.ordersService.updateOrder(id, updateOrderStatusDto, req.user);
+    const data = await this.ordersService.updateOrder(id, updateOrderStatusDto, req?.user);
     return successResponse(data, 'Order updated successfully');
   }
 }

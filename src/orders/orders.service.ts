@@ -12,6 +12,7 @@ import { CartService } from '../cart/cart.service';
 import { CreateDirectOrderDto } from './dto/create-direct-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { ProductsService } from '../products/products.service';
+import { generateOrderId } from '../common/utils/helper';
 import { populateUserRoles } from '../common/utils/rolePopulat.util';
 
 @Injectable()
@@ -23,7 +24,7 @@ export class OrdersService extends BaseService<OrderDocument> {
     private readonly productsService: ProductsService,
   ) {
     super(orderModel);
-    this.searchFields = ['status', 'payment_status', 'shipping_address', 'shipping_phone', 'customer_name'];
+    this.searchFields = ['status', 'payment_status', 'shipping_address', 'shipping_phone', 'customer_name', 'order_id'];
   }
 
   async createDirectOrder(
@@ -52,7 +53,10 @@ export class OrdersService extends BaseService<OrderDocument> {
       totalAmount += product.price * item.quantity;
     }
 
+    const orderId = generateOrderId();
+
     const order = new this.orderModel({
+      order_id: orderId,
       user_id: new Types.ObjectId(userId),
       address_id: new Types.ObjectId(createDirectOrderDto.address_id),
       packer_id: createDirectOrderDto.packer_id ? new Types.ObjectId(createDirectOrderDto.packer_id) : undefined,
