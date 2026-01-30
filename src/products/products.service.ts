@@ -101,15 +101,25 @@ export class ProductsService extends BaseService<ProductDocument> {
   }
 
   async findOne(id: string): Promise<any> {
-    if (!isValidObjectId(id)) {
-      throw new NotFoundException(`Invalid Product ID format: ${id}`);
+    let doc;
+    if (isValidObjectId(id)) {
+      doc = await this.productModel
+        .findById(id)
+        .populate('category_id', 'name')
+        .populate('subcategory_id', 'name')
+        .populate('brand_id')
+        .exec();
     }
-    const doc = await this.productModel
-      .findById(id)
-      .populate('category_id', 'name')
-      .populate('subcategory_id', 'name')
-      .populate('brand_id')
-      .exec();
+
+    if (!doc) {
+      doc = await this.productModel
+        .findOne({ product_id: id })
+        .populate('category_id', 'name')
+        .populate('subcategory_id', 'name')
+        .populate('brand_id')
+        .exec();
+    }
+
     if (!doc) throw new NotFoundException(`Product not found with ID: ${id}`);
     return this.transformProduct(doc);
   }
@@ -258,5 +268,12 @@ export class ProductsService extends BaseService<ProductDocument> {
       }
       throw new BadRequestException(`Insufficient stock for product: ${product.name}`);
     }
+  }
+
+  async increaseStock(productId: string, quantity: number): Promise<void> {
+    await this.productModel.updateOne(
+      { _id: productId },
+      { $inc: { stock: quantity } }
+    ).exec();
   }
 }

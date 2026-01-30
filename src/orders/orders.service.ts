@@ -190,14 +190,50 @@ export class OrdersService extends BaseService<OrderDocument> {
     // Apply updates based on roles
     if (isAdmin) {
       if (updateOrderDto.items) {
-        order.items = updateOrderDto.items.map((item: any) => ({
-          product_id: new (Types.ObjectId as any)(item.product_id),
-          name: item.name,
-          image: item.image,
-          price: item.price,
-          quantity: item.quantity,
-          brand_name: item.brand_name,
-        }));
+        // --- Stock Management Logic START ---
+        const oldItemsMap = new Map<string, number>();
+        order.items.forEach(item => {
+          const pid = item.product_id.toString();
+          oldItemsMap.set(pid, (oldItemsMap.get(pid) || 0) + item.quantity);
+        });
+
+        const newItemsList: OrderItem[] = [];
+        const newItemsMap = new Map<string, number>();
+
+        for (const itemDto of updateOrderDto.items) {
+          const product = await this.productsService.findOne(itemDto.product_id);
+          if (product) {
+            const pid = product._id.toString();
+            newItemsMap.set(pid, (newItemsMap.get(pid) || 0) + itemDto.quantity);
+            newItemsList.push({
+              product_id: product._id as Types.ObjectId,
+              name: itemDto.name || product.name,
+              image: itemDto.image || (product.images?.[0]?.url || 'https://placehold.co/100'),
+              price: itemDto.price || product.price,
+              quantity: itemDto.quantity,
+              brand_name: itemDto.brand_name || (product.brand?.name || null),
+            });
+          }
+        }
+
+        // Calculate differences and apply stock changes
+        const allProductIds = new Set([...oldItemsMap.keys(), ...newItemsMap.keys()]);
+        for (const pid of allProductIds) {
+          const oldQty = oldItemsMap.get(pid) || 0;
+          const newQty = newItemsMap.get(pid) || 0;
+          const netChange = newQty - oldQty;
+
+          if (netChange > 0) {
+            // Need more stock
+            await this.productsService.decreaseStock(pid, netChange);
+          } else if (netChange < 0) {
+            // Restore stock
+            await this.productsService.increaseStock(pid, Math.abs(netChange));
+          }
+        }
+
+        order.items = newItemsList;
+        // --- Stock Management Logic END ---
       }
 
       if (updateOrderDto.total_amount !== undefined) {
@@ -211,6 +247,55 @@ export class OrdersService extends BaseService<OrderDocument> {
       if (updateOrderDto.packer_id) order.packer_id = new (Types.ObjectId as any)(updateOrderDto.packer_id);
       if (updateOrderDto.picker_id) order.picker_id = new (Types.ObjectId as any)(updateOrderDto.picker_id);
       if (updateOrderDto.status) order.status = updateOrderDto.status.toLowerCase();
+
+      // Advanced Updates
+      if (updateOrderDto.picker_obj) {
+        const pickerId = updateOrderDto.picker_obj.id;
+        try {
+          const picker = await this.usersService.findOne(pickerId);
+          if (picker) {
+            order.picker_obj = {
+              user_id: picker._id as Types.ObjectId,
+              name: (`${picker.first_name || ''} ${picker.last_name || ''}`.trim() || picker.username) as string,
+              phone: (picker.phone_number || '') as string,
+              status: order.picker_obj?.status || 'assigned',
+              updated_at: new Date(),
+              remark_msg: (updateOrderDto.picker_obj.remark || order.picker_obj?.remark_msg || undefined) as string | undefined,
+              status_history: (order.picker_obj?.status_history || []) as any[]
+            };
+          }
+        } catch (e) {
+          console.warn('Failed to fetch picker details in update:', e.message);
+        }
+      }
+
+      if (updateOrderDto.packer_obj) {
+        const packerId = updateOrderDto.packer_obj.id;
+        try {
+          const packer = await this.usersService.findOne(packerId);
+          if (packer) {
+            order.packer_obj = {
+              user_id: packer._id as Types.ObjectId,
+              name: (`${packer.first_name || ''} ${packer.last_name || ''}`.trim() || packer.username) as string,
+              phone: (packer.phone_number || '') as string,
+              status: order.packer_obj?.status || 'assigned',
+              updated_at: new Date(),
+              remark_msg: (updateOrderDto.packer_obj.remark || order.packer_obj?.remark_msg || undefined) as string | undefined,
+              status_history: (order.packer_obj?.status_history || []) as any[]
+            };
+          }
+        } catch (e) {
+          console.warn('Failed to fetch packer details in update:', e.message);
+        }
+      }
+
+      if (updateOrderDto.payment_details) {
+        order.payment_details = {
+          ...(order.payment_details || {}),
+          ...updateOrderDto.payment_details
+        };
+        order.markModified('payment_details');
+      }
     }
 
     if (isPicker) {

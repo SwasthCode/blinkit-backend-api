@@ -9,19 +9,19 @@ export class UpdateOrderItemDto {
   product_id: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  image: string;
+  image?: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  price: number;
+  price?: number;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -119,4 +119,22 @@ export class UpdateOrderStatusDto {
   @IsOptional()
   @IsString()
   packer_remark?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  picker_obj?: {
+    id: string;
+    remark?: string;
+  };
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  packer_obj?: {
+    id: string;
+    remark?: string;
+  };
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  payment_details?: any;
 }
