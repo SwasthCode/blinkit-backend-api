@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, isValidObjectId } from 'mongoose';
 import { BaseService } from '../common/base/base.service';
@@ -243,5 +243,20 @@ export class ProductsService extends BaseService<ProductDocument> {
       .populate('brand_id')
       .exec();
     return products.map((product) => this.transformProduct(product));
+  }
+
+  async decreaseStock(productId: string, quantity: number): Promise<void> {
+    const result = await this.productModel.updateOne(
+      { _id: productId, stock: { $gte: quantity } },
+      { $inc: { stock: -quantity } }
+    ).exec();
+
+    if (result.modifiedCount === 0) {
+      const product = await this.productModel.findById(productId);
+      if (!product) {
+        throw new NotFoundException(`Product with ID ${productId} not found`);
+      }
+      throw new BadRequestException(`Insufficient stock for product: ${product.name}`);
+    }
   }
 }

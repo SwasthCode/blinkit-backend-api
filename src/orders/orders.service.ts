@@ -53,6 +53,9 @@ export class OrdersService extends BaseService<OrderDocument> {
       });
 
       totalAmount += product.price * item.quantity;
+
+      // Decrease stock
+      await this.productsService.decreaseStock(item.product_id, item.quantity);
     }
 
     const orderId = generateOrderId();
