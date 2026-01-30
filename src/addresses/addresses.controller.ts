@@ -63,8 +63,6 @@ export class AddressesController extends BaseController<AddressDocument> {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
   @ApiOperation({ summary: 'Delete address by ID' })
   async remove(@Param('id') id: string) {
     const data = await this.addressesService.remove(id);

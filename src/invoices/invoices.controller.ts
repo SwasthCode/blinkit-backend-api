@@ -1,4 +1,3 @@
-
 import {
   Controller,
   Get,
@@ -10,7 +9,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  Req,
 } from '@nestjs/common';
 import {
   ApiTags,
