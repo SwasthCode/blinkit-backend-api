@@ -41,6 +41,9 @@ export class ProductVariant {
 
 @Schema({ timestamps: true })
 export class Product {
+  @Prop({ unique: true, required: true })
+  product_id: string;
+
   @Prop({ required: true })
   name: string;
 

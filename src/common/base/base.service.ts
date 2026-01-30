@@ -1,4 +1,4 @@
-import { Model, Document } from 'mongoose';
+import { Model, Document, Types, isValidObjectId } from 'mongoose';
 import {
   Injectable,
   NotFoundException,
@@ -65,8 +65,7 @@ export class BaseService<T extends Document> {
       }
     }
 
-    let q = this.model.find(query);
-
+    let q: any = this.model.find(query);
     if (select) {
       q = q.select(select.split(',').join(' '));
     }
@@ -87,6 +86,9 @@ export class BaseService<T extends Document> {
   }
 
   async findOne(id: string): Promise<T> {
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException(`Invalid ID format: ${id}`);
+    }
     const doc = await this.model.findById(id).exec();
     if (!doc) throw new NotFoundException(`Item not found with ID: ${id}`);
     return doc;
@@ -135,6 +137,7 @@ export class BaseService<T extends Document> {
   }
 
   async update(id: string, updateDto: any): Promise<T> {
+    if (!isValidObjectId(id)) throw new NotFoundException(`Invalid ID format: ${id}`);
     const updated = await this.model
       .findByIdAndUpdate(id, updateDto, {
         new: true,
@@ -158,6 +161,7 @@ export class BaseService<T extends Document> {
   }
 
   async remove(id: string): Promise<void> {
+    if (!isValidObjectId(id)) throw new NotFoundException(`Invalid ID format: ${id}`);
     const result = await this.model.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException(`Item not found with ID: ${id}`);
   }

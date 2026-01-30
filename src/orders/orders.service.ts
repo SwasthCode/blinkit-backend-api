@@ -12,6 +12,7 @@ import { CartService } from '../cart/cart.service';
 import { CreateDirectOrderDto } from './dto/create-direct-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { ProductsService } from '../products/products.service';
+import { UsersService } from '../users/users.service';
 import { generateOrderId } from '../common/utils/helper';
 import { populateUserRoles } from '../common/utils/rolePopulat.util';
 
@@ -22,6 +23,7 @@ export class OrdersService extends BaseService<OrderDocument> {
     @InjectModel(Role.name) private roleModel: Model<RoleDocument>,
     private readonly cartService: CartService,
     private readonly productsService: ProductsService,
+    private readonly usersService: UsersService,
   ) {
     super(orderModel);
     this.searchFields = ['status', 'payment_status', 'shipping_address', 'shipping_phone', 'customer_name', 'order_id'];
@@ -55,20 +57,91 @@ export class OrdersService extends BaseService<OrderDocument> {
 
     const orderId = generateOrderId();
 
+    const defaultWorker = {
+      user_id: null,
+      name: null,
+      phone: null,
+      status: null,
+      accepted_at: null,
+      updated_at: null,
+      remark_msg: null,
+      status_history: []
+    };
+
+    const pickerId = createDirectOrderDto.picker_obj?.id || createDirectOrderDto.picker_id;
+    let pickerObj: any = { ...defaultWorker };
+    if (pickerId) {
+      try {
+        const picker = await this.usersService.findOne(pickerId);
+        if (picker) {
+          pickerObj = {
+            user_id: picker._id,
+            name: `${picker.first_name || ''} ${picker.last_name || ''}`.trim() || picker.username,
+            phone: picker.phone_number,
+            status: 'assigned',
+            updated_at: new Date(),
+            remark_msg: createDirectOrderDto.picker_obj?.remark || null,
+            status_history: [{ status: 'assigned', changedAt: new Date(), comment: 'Picker assigned during order creation' }]
+          };
+        }
+      } catch (e) {
+        console.warn('Failed to fetch picker details:', e.message);
+      }
+    }
+
+    const packerId = createDirectOrderDto.packer_obj?.id || createDirectOrderDto.packer_id;
+    let packerObj: any = { ...defaultWorker };
+    if (packerId) {
+      try {
+        const packer = await this.usersService.findOne(packerId);
+        if (packer) {
+          packerObj = {
+            user_id: packer._id,
+            name: `${packer.first_name || ''} ${packer.last_name || ''}`.trim() || packer.username,
+            phone: packer.phone_number,
+            status: 'assigned',
+            updated_at: new Date(),
+            remark_msg: createDirectOrderDto.packer_obj?.remark || null,
+            status_history: [{ status: 'assigned', changedAt: new Date(), comment: 'Packer assigned during order creation' }]
+          };
+        }
+      } catch (e) {
+        console.warn('Failed to fetch packer details:', e.message);
+      }
+    }
+
+    const paymentMethod = createDirectOrderDto.payment?.method || createDirectOrderDto.payment_method || 'COD';
+    const autoStatus = paymentMethod.toLowerCase() === 'cod' ? 'confirmed' : 'pending';
+    const finalStatus = createDirectOrderDto.order_status || createDirectOrderDto.status || autoStatus;
+
     const order = new this.orderModel({
       order_id: orderId,
-      user_id: new Types.ObjectId(userId),
-      address_id: new Types.ObjectId(createDirectOrderDto.address_id),
-      packer_id: createDirectOrderDto.packer_id ? new Types.ObjectId(createDirectOrderDto.packer_id) : undefined,
-      picker_id: createDirectOrderDto.picker_id ? new Types.ObjectId(createDirectOrderDto.picker_id) : undefined,
+      user_id: new (Types.ObjectId as any)(userId),
+      address_id: new (Types.ObjectId as any)(createDirectOrderDto.address_id),
+      // packer_id: packerId ? new (Types.ObjectId as any)(packerId) : undefined,
+      // picker_id: pickerId ? new (Types.ObjectId as any)(pickerId) : undefined,
       items: orderItems,
-      total_amount: totalAmount,
-      payment_method: createDirectOrderDto.payment_method || 'COD',
-      status: 'pending',
-      payment_status: 'pending',
+      total_amount: createDirectOrderDto.total_amount || totalAmount,
+      // payment_method: paymentMethod,
+      // status: finalStatus,
+      // payment_status: createDirectOrderDto.payment?.status || 'pending',
+      payment_details: {
+        method: paymentMethod,
+        status: createDirectOrderDto.payment?.status || 'pending',
+        transaction_id: createDirectOrderDto.payment?.transaction_id || null,
+        gateway: createDirectOrderDto.payment?.gateway ||
+          (paymentMethod.toLowerCase() === 'online' ? 'razorpay' : null),
+        currency: createDirectOrderDto.payment?.currency || 'INR',
+        payable_amount: createDirectOrderDto.payment?.payable_amount || (createDirectOrderDto.total_amount || totalAmount),
+        paid_amount: createDirectOrderDto.payment?.paid_amount || 0,
+        payment_time: createDirectOrderDto.payment?.payment_time || null,
+      },
+      order_remark: createDirectOrderDto.order_remark,
+      picker_obj: pickerObj,
+      packer_obj: packerObj,
       status_history: [
         {
-          status: 'pending',
+          status: finalStatus,
           changedAt: new Date(),
           comment: 'Order placed',
         },
@@ -115,7 +188,7 @@ export class OrdersService extends BaseService<OrderDocument> {
     if (isAdmin) {
       if (updateOrderDto.items) {
         order.items = updateOrderDto.items.map((item: any) => ({
-          product_id: new Types.ObjectId(item.product_id),
+          product_id: new (Types.ObjectId as any)(item.product_id),
           name: item.name,
           image: item.image,
           price: item.price,
@@ -131,16 +204,16 @@ export class OrdersService extends BaseService<OrderDocument> {
       if (updateOrderDto.shipping_address) order.shipping_address = updateOrderDto.shipping_address;
       if (updateOrderDto.shipping_phone) order.shipping_phone = updateOrderDto.shipping_phone;
       if (updateOrderDto.customer_name) order.customer_name = updateOrderDto.customer_name;
-      if (updateOrderDto.address_id) order.address_id = new Types.ObjectId(updateOrderDto.address_id);
-      if (updateOrderDto.packer_id) order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
-      if (updateOrderDto.picker_id) order.picker_id = new Types.ObjectId(updateOrderDto.picker_id);
+      if (updateOrderDto.address_id) order.address_id = new (Types.ObjectId as any)(updateOrderDto.address_id);
+      if (updateOrderDto.packer_id) order.packer_id = new (Types.ObjectId as any)(updateOrderDto.packer_id);
+      if (updateOrderDto.picker_id) order.picker_id = new (Types.ObjectId as any)(updateOrderDto.picker_id);
       if (updateOrderDto.status) order.status = updateOrderDto.status.toLowerCase();
     }
 
     if (isPicker) {
       if (updateOrderDto.picker_accepted !== undefined) order.picker_accepted = updateOrderDto.picker_accepted;
       if (updateOrderDto.picker_remark !== undefined) order.picker_remark = updateOrderDto.picker_remark;
-      if (updateOrderDto.packer_id) order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
+      if (updateOrderDto.packer_id) order.packer_id = new (Types.ObjectId as any)(updateOrderDto.packer_id);
       if (updateOrderDto.status) order.status = updateOrderDto.status.toLowerCase();
     }
 
@@ -165,11 +238,19 @@ export class OrdersService extends BaseService<OrderDocument> {
   async findOne(id: string): Promise<any> {
     const order = await this.orderModel
       .findById(id)
-      .populate('user_id', '-addresses -password')
-      .populate('packer_id', 'first_name last_name')
-      .populate('picker_id', 'first_name last_name')
-      .populate('address_id')
-      .populate('items.product_id')
+      .populate('user_id', '-addresses -password -is_active -is_deleted -status')
+      // .populate('packer_id', 'first_name last_name')
+      // .populate('picker_id', 'first_name last_name')
+      .populate('address_id', '-name -user_id')
+      .populate({
+        path: 'items.product_id',
+        select: '-stock',
+        populate: [
+          { path: 'category_id', select: 'name' },
+          { path: 'subcategory_id', select: 'name' },
+          { path: 'brand_id' },
+        ],
+      })
       .lean()
       .exec();
 
@@ -220,19 +301,37 @@ export class OrdersService extends BaseService<OrderDocument> {
           delete (productObj as any).id;
         }
 
+        const { category_id, subcategory_id, brand_id, ...prodRest } = productObj;
+
         return {
-          ...productObj,
+          ...prodRest,
+          category: category_id,
+          subcategory: subcategory_id,
+          brand: brand_id,
           quantity: item.quantity,
         };
       }
       return item;
     });
 
+    const defaultWorker = {
+      user_id: null,
+      name: null,
+      phone: null,
+      status: null,
+      accepted_at: null,
+      updated_at: null,
+      remark_msg: null,
+      status_history: []
+    };
+
     return {
       ...rest,
       user,
       address,
       items,
+      picker_obj: rest.picker_obj || defaultWorker,
+      packer_obj: rest.packer_obj || defaultWorker,
     };
   }
 
@@ -286,11 +385,18 @@ export class OrdersService extends BaseService<OrderDocument> {
 
   async findByUser(userId: string): Promise<any[]> {
     const orders = await this.orderModel
-      .find({ user_id: new Types.ObjectId(userId) })
+      .find({ user_id: new (Types.ObjectId as any)(userId) })
       .sort({ createdAt: -1 })
       .populate('user_id', '-addresses -password')
       .populate('address_id')
-      .populate('items.product_id')
+      .populate({
+        path: 'items.product_id',
+        populate: [
+          { path: 'category_id', select: 'name' },
+          { path: 'subcategory_id', select: 'name' },
+          { path: 'brand_id' },
+        ],
+      })
       .lean()
       .exec();
 
@@ -354,7 +460,7 @@ export class OrdersService extends BaseService<OrderDocument> {
 
   async getMyPicks(userId: string): Promise<any[]> {
     const orders = await this.orderModel
-      .find({ picker_id: new Types.ObjectId(userId) })
+      .find({ picker_id: new (Types.ObjectId as any)(userId) })
       .sort({ createdAt: -1 })
       .populate('user_id', '-addresses -password')
       .populate('packer_id', 'first_name last_name')
@@ -369,7 +475,7 @@ export class OrdersService extends BaseService<OrderDocument> {
 
   async getMyPacks(userId: string): Promise<any[]> {
     const orders = await this.orderModel
-      .find({ packer_id: new Types.ObjectId(userId) })
+      .find({ packer_id: new (Types.ObjectId as any)(userId) })
       .sort({ createdAt: -1 })
       .populate('user_id', '-addresses -password')
       .populate('packer_id', 'first_name last_name')

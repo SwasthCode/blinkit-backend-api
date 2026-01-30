@@ -4,6 +4,10 @@ import { IsOptional, IsArray, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {
+    @ApiProperty({ description: 'New images to add', required: false, type: 'array', items: { type: 'string', format: 'binary' } })
+    @IsOptional()
+    images?: any[];
+
     @ApiProperty({
         description: 'List of image _ids to remove from the product',
         example: '["64b5f93...", "64b5f94..."]',

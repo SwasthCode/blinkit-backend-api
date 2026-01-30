@@ -40,9 +40,10 @@ export class OrdersController extends BaseController<OrderDocument> {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create an order' })
   @ApiResponse({ status: 201, description: 'Order created successfully' })
-  async createDirect(
-    @Req() req: any,
+  // @ts-ignore
+  async create(
     @Body() createDirectOrderDto: CreateDirectOrderDto,
+    @Req() req: any,
   ) {
     const userId = req.user?._id || createDirectOrderDto.user_id;
 

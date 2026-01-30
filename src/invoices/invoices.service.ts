@@ -38,7 +38,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
 
     // Check if invoice already exists for this order
     const existingInvoice = await this.invoiceModel
-      .findOne({ order_id: new Types.ObjectId(order_id) })
+      .findOne({ order_id: new (Types.ObjectId as any)(order_id) })
       .exec();
 
     if (existingInvoice) {
@@ -49,7 +49,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
 
     // Generate Invoice Data from Order
     const invoiceData = {
-      order_id: new Types.ObjectId(order_id),
+      order_id: new (Types.ObjectId as any)(order_id),
       user_id: order.user_id._id,
       invoice_number: `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       issued_at: new Date(),
@@ -66,7 +66,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
 
   async findByOrder(orderId: string): Promise<InvoiceDocument> {
     const invoice = await this.invoiceModel
-      .findOne({ order_id: new Types.ObjectId(orderId) })
+      .findOne({ order_id: new (Types.ObjectId as any)(orderId) })
       .populate('user_id', 'first_name last_name email phone_number')
       .populate('order_id', 'status')
       .exec();

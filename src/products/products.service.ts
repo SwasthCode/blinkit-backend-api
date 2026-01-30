@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types, isValidObjectId } from 'mongoose';
 import { BaseService } from '../common/base/base.service';
 import { Product, ProductDocument } from '../schemas/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 import { FirebaseService } from '../common/firebase/firebase.service';
+import { generateProductId } from '../common/utils/helper';
 
 @Injectable()
 export class ProductsService extends BaseService<ProductDocument> {
@@ -29,7 +30,13 @@ export class ProductsService extends BaseService<ProductDocument> {
       const imageUrls = await Promise.all(uploadPromises);
       createProductDto.images = imageUrls.map((url) => ({ url }));
     }
-    const createdProduct = new this.productModel(createProductDto);
+
+    const productId = generateProductId();
+
+    const createdProduct = new this.productModel({
+      ...createProductDto,
+      product_id: productId,
+    });
     const saved = await createdProduct.save();
     const populated = await this.productModel
       .findById(saved._id)
@@ -94,6 +101,9 @@ export class ProductsService extends BaseService<ProductDocument> {
   }
 
   async findOne(id: string): Promise<any> {
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException(`Invalid Product ID format: ${id}`);
+    }
     const doc = await this.productModel
       .findById(id)
       .populate('category_id', 'name')
@@ -146,6 +156,7 @@ export class ProductsService extends BaseService<ProductDocument> {
     updateProductDto: UpdateProductDto,
     files?: Express.Multer.File[],
   ): Promise<any> {
+    if (!isValidObjectId(id)) throw new NotFoundException(`Invalid Product ID format: ${id}`);
     const existingProduct = await this.productModel.findById(id);
     if (!existingProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -194,6 +205,7 @@ export class ProductsService extends BaseService<ProductDocument> {
   }
 
   async remove(id: string): Promise<any> {
+    if (!isValidObjectId(id)) throw new NotFoundException(`Invalid Product ID format: ${id}`);
     const deletedProduct = await this.productModel.findByIdAndDelete(id).exec();
     if (!deletedProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);

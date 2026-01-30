@@ -24,6 +24,46 @@ export class OrderItem {
   brand_name?: string;
 }
 
+@Schema()
+export class WorkerAssignment {
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  user_id: Types.ObjectId;
+
+  @Prop()
+  name: string;
+
+  @Prop()
+  phone: string;
+
+  @Prop({ default: 'pending' })
+  status: string;
+
+  @Prop()
+  accepted_at?: Date;
+
+  @Prop()
+  updated_at?: Date;
+
+  @Prop()
+  remark_msg?: string;
+
+  @Prop({
+    type: [
+      {
+        status: { type: String },
+        changedAt: { type: Date, default: Date.now },
+        comment: { type: String },
+      },
+    ],
+    default: [],
+  })
+  status_history: {
+    status: string;
+    changedAt: Date;
+    comment?: string;
+  }[];
+}
+
 @Schema({ timestamps: true })
 export class Order {
   @Prop({ unique: true, required: true })
@@ -81,6 +121,7 @@ export class Order {
     required: true,
     enum: [
       'pending',
+      'confirmed',
       'ready',
       'hold',
       'ship',
@@ -102,6 +143,18 @@ export class Order {
 
   @Prop()
   payment_method: string; // COD, Online, etc.
+
+  @Prop({ type: Object })
+  payment_details: any;
+
+  @Prop()
+  order_remark?: string;
+
+  @Prop({ type: WorkerAssignment })
+  picker_obj?: WorkerAssignment;
+
+  @Prop({ type: WorkerAssignment })
+  packer_obj?: WorkerAssignment;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
