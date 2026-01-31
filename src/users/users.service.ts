@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
@@ -22,7 +26,14 @@ export class UsersService extends BaseService<UserDocument> {
     private readonly jwtService: JwtService,
   ) {
     super(userModel);
-    this.searchFields = ['first_name', 'last_name', 'email', 'phone_number', 'status', 'username'];
+    this.searchFields = [
+      'first_name',
+      'last_name',
+      'email',
+      'phone_number',
+      'status',
+      'username',
+    ];
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
@@ -83,7 +94,10 @@ export class UsersService extends BaseService<UserDocument> {
 
     // If it's just a username/password login:
     const user = await this.model.findOne({ username: loginDto.username });
-    if (!user || user.password !== PasswordUtil.encryptPassword(loginDto.password)) {
+    if (
+      !user ||
+      user.password !== PasswordUtil.encryptPassword(loginDto.password)
+    ) {
       throw new UnauthorizedException('Invalid credentials');
     }
     return successResponse(user, 'Login successful');
@@ -99,7 +113,7 @@ export class UsersService extends BaseService<UserDocument> {
       throw new UnauthorizedException('Invalid OTP');
     }
 
-    let user = await this.findByPhone(phone_number);
+    const user = await this.findByPhone(phone_number);
 
     if (!user) {
       throw new NotFoundException('User with this phone number not found');
@@ -188,7 +202,10 @@ export class UsersService extends BaseService<UserDocument> {
       q = q.select(select.split(/[,\s]+/).join(' '));
     }
 
-    if (Object.keys(sortOptions).length > 0 || typeof sortOptions === 'string') {
+    if (
+      Object.keys(sortOptions).length > 0 ||
+      typeof sortOptions === 'string'
+    ) {
       q = q.sort(sortOptions);
     }
 
@@ -207,8 +224,6 @@ export class UsersService extends BaseService<UserDocument> {
 
     return users as any;
   }
-
-
 
   async findByPhone(phone_number: string): Promise<UserDocument | null> {
     return this.model.findOne({ phone_number }).exec();
@@ -316,11 +331,14 @@ export class UsersService extends BaseService<UserDocument> {
       updateDto.profile_image = imageUrl;
     }
 
-    const user = await this.model.findByIdAndUpdate(
-      userId,
-      { $set: updateDto },
-      { new: true, runValidators: true },
-    ).lean().exec();
+    const user = await this.model
+      .findByIdAndUpdate(
+        userId,
+        { $set: updateDto },
+        { new: true, runValidators: true },
+      )
+      .lean()
+      .exec();
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -346,8 +364,6 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
   async getUserStats() {
-
-
     const totalUsers = await this.model.countDocuments();
 
     const monthlyCounts = await this.model.aggregate([

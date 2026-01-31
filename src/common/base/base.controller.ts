@@ -16,7 +16,7 @@ import { BaseService } from './base.service';
 import { successResponse } from './base.response';
 
 export class BaseController<T extends Document> {
-  constructor(protected readonly baseService: BaseService<T>) { }
+  constructor(protected readonly baseService: BaseService<T>) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -95,8 +95,6 @@ export class BaseController<T extends Document> {
     }
     return successResponse(data, 'Data fetched successfully');
   }
-
-
 
   @Get(':id')
   @ApiOperation({ summary: 'Get entity by ID' })

@@ -59,7 +59,7 @@ export class CategoriesService extends BaseService<CategoryDocument> {
     if (filter) {
       try {
         query = JSON.parse(filter);
-      } catch (e) { }
+      } catch (e) {}
     }
 
     const q = this.categoryModel
@@ -129,11 +129,15 @@ export class CategoriesService extends BaseService<CategoryDocument> {
     const mainCategory = main_category_id;
     const brand = brand_id;
 
-    if (mainCategory && typeof mainCategory === 'object' && 'id' in mainCategory) {
-      delete (mainCategory as any).id;
+    if (
+      mainCategory &&
+      typeof mainCategory === 'object' &&
+      'id' in mainCategory
+    ) {
+      delete mainCategory.id;
     }
     if (brand && typeof brand === 'object' && 'id' in brand) {
-      delete (brand as any).id;
+      delete brand.id;
     }
 
     return {

@@ -30,7 +30,10 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
     file?: Express.Multer.File,
   ): Promise<MainCategoryDocument> {
     console.log('MainCategoriesService.create - DTO:', createMainCategoryDto);
-    console.log('MainCategoriesService.create - File received:', file ? file.originalname : 'No file');
+    console.log(
+      'MainCategoriesService.create - File received:',
+      file ? file.originalname : 'No file',
+    );
     if (file) {
       const imageUrl = await this.firebaseService.uploadFile(
         file,
@@ -121,7 +124,10 @@ export class MainCategoriesService extends BaseService<MainCategoryDocument> {
   ): Promise<MainCategoryDocument> {
     console.log('MainCategoriesService.update - ID:', id);
     console.log('MainCategoriesService.update - DTO:', updateMainCategoryDto);
-    console.log('MainCategoriesService.update - File received:', file ? file.originalname : 'No file');
+    console.log(
+      'MainCategoriesService.update - File received:',
+      file ? file.originalname : 'No file',
+    );
     if (file) {
       const imageUrl = await this.firebaseService.uploadFile(
         file,

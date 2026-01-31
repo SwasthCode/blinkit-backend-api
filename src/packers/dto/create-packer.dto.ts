@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsOptional, IsEmail, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEmail,
+  IsEnum,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePackerDto {
@@ -17,7 +23,11 @@ export class CreatePackerDto {
   @IsOptional()
   email?: string;
 
-  @ApiProperty({ example: 'active', enum: ['active', 'inactive'], required: false })
+  @ApiProperty({
+    example: 'active',
+    enum: ['active', 'inactive'],
+    required: false,
+  })
   @IsEnum(['active', 'inactive'])
   @IsOptional()
   status?: string;

@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested, IsEnum } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+  IsEnum,
+  IsBoolean,
+} from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
 export class UpdateOrderItemDto {
@@ -34,6 +43,48 @@ export class UpdateOrderItemDto {
   brand_name?: string;
 }
 
+export class WorkerUpdateDto {
+  @ApiProperty({ example: '65a...', description: 'User ID', required: false })
+  @IsOptional()
+  @IsString()
+  id?: string;
+
+  @ApiProperty({ example: '65a...', description: 'User ID', required: false })
+  @IsOptional()
+  @IsString()
+  user_id?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  remark?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  remark_msg?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @IsOptional()
+  name?: string;
+
+  @IsOptional()
+  phone?: string;
+
+  @IsOptional()
+  updated_at?: any;
+
+  @IsOptional()
+  status_history?: any[];
+
+  @IsOptional()
+  _id?: string;
+}
+
 export class UpdateOrderStatusDto {
   @ApiProperty({ type: [UpdateOrderItemDto], required: false })
   @IsOptional()
@@ -63,7 +114,9 @@ export class UpdateOrderStatusDto {
     required: false,
   })
   @IsOptional()
-  @Transform(({ value }) => typeof value === 'string' ? value.toLowerCase() : value)
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.toLowerCase() : value,
+  )
   @IsEnum([
     'pending',
     'ready',
@@ -91,7 +144,11 @@ export class UpdateOrderStatusDto {
   @IsString()
   customer_name?: string;
 
-  @ApiProperty({ example: '65a...', description: 'Address ID', required: false })
+  @ApiProperty({
+    example: '65a...',
+    description: 'Address ID',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   address_id?: string;
@@ -108,6 +165,7 @@ export class UpdateOrderStatusDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsBoolean()
   picker_accepted?: boolean;
 
   @ApiProperty({ required: false })
@@ -120,19 +178,27 @@ export class UpdateOrderStatusDto {
   @IsString()
   packer_remark?: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ type: WorkerUpdateDto, required: false })
   @IsOptional()
-  picker_obj?: {
-    id: string;
-    remark?: string;
-  };
+  @ValidateNested()
+  @Type(() => WorkerUpdateDto)
+  picker_obj?: WorkerUpdateDto;
+
+  @ApiProperty({ type: WorkerUpdateDto, required: false })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => WorkerUpdateDto)
+  packer_obj?: WorkerUpdateDto;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  packer_obj?: {
-    id: string;
-    remark?: string;
-  };
+  @IsString()
+  order_remark?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  remark_msg?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

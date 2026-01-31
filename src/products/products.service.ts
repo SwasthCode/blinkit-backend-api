@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, isValidObjectId } from 'mongoose';
 import { BaseService } from '../common/base/base.service';
@@ -16,7 +20,14 @@ export class ProductsService extends BaseService<ProductDocument> {
     private readonly firebaseService: FirebaseService,
   ) {
     super(productModel);
-    this.searchFields = ['name', 'description', 'manufacturer', 'manufacturerAddress', 'countryOfOrigin', 'shelfLife'];
+    this.searchFields = [
+      'name',
+      'description',
+      'manufacturer',
+      'manufacturerAddress',
+      'countryOfOrigin',
+      'shelfLife',
+    ];
   }
 
   async create(
@@ -140,17 +151,13 @@ export class ProductsService extends BaseService<ProductDocument> {
     const brand = brand_id;
 
     if (category && typeof category === 'object' && 'id' in category) {
-      delete (category as any).id;
+      delete category.id;
     }
-    if (
-      subcategory &&
-      typeof subcategory === 'object' &&
-      'id' in subcategory
-    ) {
-      delete (subcategory as any).id;
+    if (subcategory && typeof subcategory === 'object' && 'id' in subcategory) {
+      delete subcategory.id;
     }
     if (brand && typeof brand === 'object' && 'id' in brand) {
-      delete (brand as any).id;
+      delete brand.id;
     }
 
     return {
@@ -166,7 +173,8 @@ export class ProductsService extends BaseService<ProductDocument> {
     updateProductDto: UpdateProductDto,
     files?: Express.Multer.File[],
   ): Promise<any> {
-    if (!isValidObjectId(id)) throw new NotFoundException(`Invalid Product ID format: ${id}`);
+    if (!isValidObjectId(id))
+      throw new NotFoundException(`Invalid Product ID format: ${id}`);
     const existingProduct = await this.productModel.findById(id);
     if (!existingProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -174,7 +182,10 @@ export class ProductsService extends BaseService<ProductDocument> {
 
     let currentImages = existingProduct.images || [];
 
-    if (updateProductDto.removedImageIds && updateProductDto.removedImageIds.length > 0) {
+    if (
+      updateProductDto.removedImageIds &&
+      updateProductDto.removedImageIds.length > 0
+    ) {
       const removedIds = updateProductDto.removedImageIds;
       currentImages = currentImages.filter(
         (img: any) => !removedIds.includes(img._id.toString()),
@@ -215,7 +226,8 @@ export class ProductsService extends BaseService<ProductDocument> {
   }
 
   async remove(id: string): Promise<any> {
-    if (!isValidObjectId(id)) throw new NotFoundException(`Invalid Product ID format: ${id}`);
+    if (!isValidObjectId(id))
+      throw new NotFoundException(`Invalid Product ID format: ${id}`);
     const deletedProduct = await this.productModel.findByIdAndDelete(id).exec();
     if (!deletedProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -256,24 +268,27 @@ export class ProductsService extends BaseService<ProductDocument> {
   }
 
   async decreaseStock(productId: string, quantity: number): Promise<void> {
-    const result = await this.productModel.updateOne(
-      { _id: productId, stock: { $gte: quantity } },
-      { $inc: { stock: -quantity } }
-    ).exec();
+    const result = await this.productModel
+      .updateOne(
+        { _id: productId, stock: { $gte: quantity } },
+        { $inc: { stock: -quantity } },
+      )
+      .exec();
 
     if (result.modifiedCount === 0) {
       const product = await this.productModel.findById(productId);
       if (!product) {
         throw new NotFoundException(`Product with ID ${productId} not found`);
       }
-      throw new BadRequestException(`Insufficient stock for product: ${product.name}`);
+      throw new BadRequestException(
+        `Insufficient stock for product: ${product.name}`,
+      );
     }
   }
 
   async increaseStock(productId: string, quantity: number): Promise<void> {
-    await this.productModel.updateOne(
-      { _id: productId },
-      { $inc: { stock: quantity } }
-    ).exec();
+    await this.productModel
+      .updateOne({ _id: productId }, { $inc: { stock: quantity } })
+      .exec();
   }
 }

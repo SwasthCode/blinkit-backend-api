@@ -12,7 +12,7 @@ import { UpdateUserDto } from '../../users/dto';
 export class BaseService<T extends Document> {
   protected searchFields: string[] = [];
 
-  constructor(protected readonly model: Model<T>) { }
+  constructor(protected readonly model: Model<T>) {}
 
   async create(createDto: any): Promise<T> {
     const created = new this.model(createDto);
@@ -137,7 +137,8 @@ export class BaseService<T extends Document> {
   }
 
   async update(id: string, updateDto: any): Promise<T> {
-    if (!isValidObjectId(id)) throw new NotFoundException(`Invalid ID format: ${id}`);
+    if (!isValidObjectId(id))
+      throw new NotFoundException(`Invalid ID format: ${id}`);
     const updated = await this.model
       .findByIdAndUpdate(id, updateDto, {
         new: true,
@@ -161,7 +162,8 @@ export class BaseService<T extends Document> {
   }
 
   async remove(id: string): Promise<void> {
-    if (!isValidObjectId(id)) throw new NotFoundException(`Invalid ID format: ${id}`);
+    if (!isValidObjectId(id))
+      throw new NotFoundException(`Invalid ID format: ${id}`);
     const result = await this.model.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException(`Item not found with ID: ${id}`);
   }

@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { PackersService } from './packers.service';
 import { CreatePackerDto, UpdatePackerDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -46,7 +61,10 @@ export class PackersController extends BaseController<PackerDocument> {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('authentication')
   @ApiOperation({ summary: 'Update packer details' })
-  async update(@Param('id') id: string, @Body() updatePackerDto: UpdatePackerDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updatePackerDto: UpdatePackerDto,
+  ) {
     const data = await this.packersService.update(id, updatePackerDto);
     return successResponse(data, 'Packer updated successfully');
   }

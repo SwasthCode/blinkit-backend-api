@@ -7,7 +7,7 @@ import { RemoveFromCartDto } from './dto/remove-from-cart.dto';
 
 @Injectable()
 export class CartService {
-  constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) { }
+  constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
 
   async getCart(userId: string): Promise<CartDocument> {
     let cart = await this.cartModel
@@ -55,7 +55,11 @@ export class CartService {
   ): Promise<CartDocument> {
     await this.cartModel.updateOne(
       { user_id: userId },
-      { $pull: { items: { product_id: new (Types.ObjectId as any)(productId) } } },
+      {
+        $pull: {
+          items: { product_id: new (Types.ObjectId as any)(productId) },
+        },
+      },
     );
     return this.getCart(userId);
   }

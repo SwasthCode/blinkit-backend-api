@@ -113,7 +113,11 @@ export class CreateDirectOrderDto {
   @Type(() => DirectOrderItemDto)
   items: DirectOrderItemDto[];
 
-  @ApiProperty({ example: 100, description: 'Total Order Amount', required: false })
+  @ApiProperty({
+    example: 100,
+    description: 'Total Order Amount',
+    required: false,
+  })
   @IsOptional()
   @IsNumber()
   total_amount?: number;
@@ -124,7 +128,11 @@ export class CreateDirectOrderDto {
   @Type(() => PaymentDto)
   payment?: PaymentDto;
 
-  @ApiProperty({ example: 'pending', description: 'Order Status', required: false })
+  @ApiProperty({
+    example: 'pending',
+    description: 'Order Status',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   order_status?: string;
@@ -145,4 +153,3 @@ export class CreateDirectOrderDto {
   @IsString()
   payment_method?: string;
 }
-

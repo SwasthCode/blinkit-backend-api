@@ -37,8 +37,6 @@ export class ReviewsService extends BaseService<ReviewDocument> {
     return createdReview.save();
   }
 
-
-
   async update(
     id: string,
     updateReviewDto: UpdateReviewDto,

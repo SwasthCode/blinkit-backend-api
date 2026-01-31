@@ -22,7 +22,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @ApiTags('Add To Cart')
 @Controller('cart')
 export class CartController {
-  constructor(private readonly cartService: CartService) { }
+  constructor(private readonly cartService: CartService) {}
 
   @Post('add')
   @UseGuards(JwtAuthGuard)
@@ -53,10 +53,6 @@ export class CartController {
     const data = await this.cartService.getCart(req.user._id);
     return successResponse(data, 'Cart fetched successfully');
   }
-
-
-
-
 
   @Delete()
   @UseGuards(JwtAuthGuard)

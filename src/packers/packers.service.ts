@@ -6,7 +6,9 @@ import { Packer, PackerDocument } from '../schemas/packer.schema';
 
 @Injectable()
 export class PackersService extends BaseService<PackerDocument> {
-  constructor(@InjectModel(Packer.name) private packerModel: Model<PackerDocument>) {
+  constructor(
+    @InjectModel(Packer.name) private packerModel: Model<PackerDocument>,
+  ) {
     super(packerModel);
   }
 }

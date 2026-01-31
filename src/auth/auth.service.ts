@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { LoginDto, LoginWithOtpDto } from './dto';
@@ -102,7 +106,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid OTP');
     }
 
-    let user = await this.usersService.findByPhone(phone_number);
+    const user = await this.usersService.findByPhone(phone_number);
 
     if (!user) {
       throw new NotFoundException('User with this phone number not found');
@@ -141,7 +145,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid OTP');
     }
 
-    let user = await this.usersService.findByPhone(phone_number);
+    const user = await this.usersService.findByPhone(phone_number);
 
     if (!user) {
       throw new NotFoundException('User with this phone number not found');

@@ -15,7 +15,7 @@ import { PasswordUtil } from 'src/common/utils';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -63,8 +63,6 @@ export class AuthController {
   async getDashboardStats() {
     return this.authService.getDashboardStats();
   }
-
-
 
   // @Get('decrypt-password/:encryptedPassword')
   // @HttpCode(HttpStatus.OK)
