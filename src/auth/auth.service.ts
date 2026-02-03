@@ -61,8 +61,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const decryptedPassword = PasswordUtil.decryptPassword(user.password);
-    if (decryptedPassword !== loginDto.password) {
+    try {
+      const decryptedPassword = PasswordUtil.decryptPassword(user.password);
+
+      if (decryptedPassword !== loginDto.password) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+    } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
