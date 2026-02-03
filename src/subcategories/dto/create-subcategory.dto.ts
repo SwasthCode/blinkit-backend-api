@@ -41,7 +41,11 @@ export class CreateSubCategoryDto {
   @IsOptional()
   status?: string;
 
-  @ApiProperty({ example: '65a123...', description: 'Brand ID', required: false })
+  @ApiProperty({
+    example: '65a123...',
+    description: 'Brand ID',
+    required: false,
+  })
   @IsOptional()
   @IsMongoId()
   brand_id?: string;

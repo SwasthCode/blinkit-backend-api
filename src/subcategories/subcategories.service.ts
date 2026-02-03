@@ -48,7 +48,7 @@ export class SubCategoriesService extends BaseService<SubCategoryDocument> {
     if (filter) {
       try {
         query = JSON.parse(filter);
-      } catch (e) { }
+      } catch (e) {}
     }
 
     const q = this.subCategoryModel
@@ -118,10 +118,10 @@ export class SubCategoriesService extends BaseService<SubCategoryDocument> {
     const brand = brand_id;
 
     if (category && typeof category === 'object' && 'id' in category) {
-      delete (category as any).id;
+      delete category.id;
     }
     if (brand && typeof brand === 'object' && 'id' in brand) {
-      delete (brand as any).id;
+      delete brand.id;
     }
 
     return {

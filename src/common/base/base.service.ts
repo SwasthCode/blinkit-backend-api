@@ -12,7 +12,7 @@ import { UpdateUserDto } from '../../users/dto';
 export class BaseService<T extends Document> {
   protected searchFields: string[] = [];
 
-  constructor(protected readonly model: Model<T>) { }
+  constructor(protected readonly model: Model<T>) {}
 
   async create(createDto: any): Promise<T> {
     const created = new this.model(createDto);

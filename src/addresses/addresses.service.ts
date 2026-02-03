@@ -13,12 +13,20 @@ export class AddressesService extends BaseService<AddressDocument> {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {
     super(addressModel);
-    this.searchFields = ['name', 'shipping_phone', 'pincode', 'locality', 'address', 'city', 'state', 'landmark', 'alternate_phone'];
+    this.searchFields = [
+      'name',
+      'shipping_phone',
+      'pincode',
+      'locality',
+      'address',
+      'city',
+      'state',
+      'landmark',
+      'alternate_phone',
+    ];
   }
 
-  async create(
-    createAddressDto: any,
-  ): Promise<AddressDocument> {
+  async create(createAddressDto: any): Promise<AddressDocument> {
     const userId = createAddressDto.userInfo?._id || createAddressDto.user_id;
 
     if (createAddressDto.isDefault && userId) {
@@ -42,8 +50,6 @@ export class AddressesService extends BaseService<AddressDocument> {
   async findAllByUser(userId: string): Promise<AddressDocument[]> {
     return this.addressModel.find({ user_id: userId }).exec();
   }
-
-
 
   async remove(id: string): Promise<any> {
     const result = await this.addressModel.findByIdAndDelete(id).exec();

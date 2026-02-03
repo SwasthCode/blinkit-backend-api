@@ -30,4 +30,4 @@ import { Role, RoleSchema } from '../schemas/role.schema';
   providers: [UsersService],
   exports: [UsersService],
 })
-export class UsersModule { }
+export class UsersModule {}

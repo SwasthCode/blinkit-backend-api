@@ -3,7 +3,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BrandsController } from './brands.controller';
 import { BrandsService } from './brands.service';
 import { Brand, BrandSchema } from '../schemas/brand.schema';
-import { MainCategory, MainCategorySchema } from '../schemas/main-category.schema';
+import {
+  MainCategory,
+  MainCategorySchema,
+} from '../schemas/main-category.schema';
 
 @Module({
   imports: [
@@ -16,4 +19,4 @@ import { MainCategory, MainCategorySchema } from '../schemas/main-category.schem
   providers: [BrandsService],
   exports: [BrandsService],
 })
-export class BrandsModule { }
+export class BrandsModule {}

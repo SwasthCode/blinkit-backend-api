@@ -22,4 +22,4 @@ import { ProductsModule } from '../products/products.module';
   providers: [OrdersService],
   exports: [OrdersService],
 })
-export class OrdersModule { }
+export class OrdersModule {}

@@ -15,7 +15,14 @@ export class ProductsService extends BaseService<ProductDocument> {
     private readonly firebaseService: FirebaseService,
   ) {
     super(productModel);
-    this.searchFields = ['name', 'description', 'manufacturer', 'manufacturerAddress', 'countryOfOrigin', 'shelfLife'];
+    this.searchFields = [
+      'name',
+      'description',
+      'manufacturer',
+      'manufacturerAddress',
+      'countryOfOrigin',
+      'shelfLife',
+    ];
   }
 
   async create(
@@ -120,17 +127,13 @@ export class ProductsService extends BaseService<ProductDocument> {
     const brand = brand_id;
 
     if (category && typeof category === 'object' && 'id' in category) {
-      delete (category as any).id;
+      delete category.id;
     }
-    if (
-      subcategory &&
-      typeof subcategory === 'object' &&
-      'id' in subcategory
-    ) {
-      delete (subcategory as any).id;
+    if (subcategory && typeof subcategory === 'object' && 'id' in subcategory) {
+      delete subcategory.id;
     }
     if (brand && typeof brand === 'object' && 'id' in brand) {
-      delete (brand as any).id;
+      delete brand.id;
     }
 
     return {
@@ -153,7 +156,10 @@ export class ProductsService extends BaseService<ProductDocument> {
 
     let currentImages = existingProduct.images || [];
 
-    if (updateProductDto.removedImageIds && updateProductDto.removedImageIds.length > 0) {
+    if (
+      updateProductDto.removedImageIds &&
+      updateProductDto.removedImageIds.length > 0
+    ) {
       const removedIds = updateProductDto.removedImageIds;
       currentImages = currentImages.filter(
         (img: any) => !removedIds.includes(img._id.toString()),

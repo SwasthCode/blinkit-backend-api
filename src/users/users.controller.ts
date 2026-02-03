@@ -51,7 +51,6 @@ export class UsersController extends BaseController<UserDocument> {
     return successResponse(data, 'User created successfully', 201);
   }
 
-
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login with Phone Number' })
@@ -188,5 +187,4 @@ export class UsersController extends BaseController<UserDocument> {
   async findOne(@Param('id') id: string) {
     return super.findOne(id);
   }
-
 }

@@ -49,7 +49,9 @@ export class BrandsService extends BaseService<BrandDocument> {
       }
     }
 
-    const q = this.brandModel.find(query).populate('main_category_id', 'name image');
+    const q = this.brandModel
+      .find(query)
+      .populate('main_category_id', 'name image');
 
     if (select) q.select(select.split(/[,\s]+/).join(' '));
     if (sortOptions) q.sort(sortOptions);
@@ -103,7 +105,9 @@ export class BrandsService extends BaseService<BrandDocument> {
   private transformBrand(brand: any) {
     // Handle both Mongoose documents and plain objects (from lean)
     const brandObj =
-      typeof brand.toObject === 'function' ? brand.toObject({ virtuals: true }) : brand;
+      typeof brand.toObject === 'function'
+        ? brand.toObject({ virtuals: true })
+        : brand;
 
     const { main_category_id, ...rest } = brandObj;
 

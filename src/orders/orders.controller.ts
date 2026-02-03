@@ -19,10 +19,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
-import {
-  CreateDirectOrderDto,
-  UpdateOrderStatusDto,
-} from './dto';
+import { CreateDirectOrderDto, UpdateOrderStatusDto } from './dto';
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -104,7 +101,11 @@ export class OrdersController extends BaseController<OrderDocument> {
     @Body() updateOrderStatusDto: UpdateOrderStatusDto,
     @Req() req?: any,
   ) {
-    const data = await this.ordersService.updateOrder(id, updateOrderStatusDto, req?.user);
+    const data = await this.ordersService.updateOrder(
+      id,
+      updateOrderStatusDto,
+      req?.user,
+    );
     return successResponse(data, 'Order updated successfully');
   }
 }

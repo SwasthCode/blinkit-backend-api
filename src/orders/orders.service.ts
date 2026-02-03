@@ -24,7 +24,14 @@ export class OrdersService extends BaseService<OrderDocument> {
     private readonly productsService: ProductsService,
   ) {
     super(orderModel);
-    this.searchFields = ['status', 'payment_status', 'shipping_address', 'shipping_phone', 'customer_name', 'order_id'];
+    this.searchFields = [
+      'status',
+      'payment_status',
+      'shipping_address',
+      'shipping_phone',
+      'customer_name',
+      'order_id',
+    ];
   }
 
   async createDirectOrder(
@@ -59,8 +66,12 @@ export class OrdersService extends BaseService<OrderDocument> {
       order_id: orderId,
       user_id: new Types.ObjectId(userId),
       address_id: new Types.ObjectId(createDirectOrderDto.address_id),
-      packer_id: createDirectOrderDto.packer_id ? new Types.ObjectId(createDirectOrderDto.packer_id) : undefined,
-      picker_id: createDirectOrderDto.picker_id ? new Types.ObjectId(createDirectOrderDto.picker_id) : undefined,
+      packer_id: createDirectOrderDto.packer_id
+        ? new Types.ObjectId(createDirectOrderDto.packer_id)
+        : undefined,
+      picker_id: createDirectOrderDto.picker_id
+        ? new Types.ObjectId(createDirectOrderDto.picker_id)
+        : undefined,
       items: orderItems,
       total_amount: totalAmount,
       payment_method: createDirectOrderDto.payment_method || 'COD',
@@ -79,23 +90,38 @@ export class OrdersService extends BaseService<OrderDocument> {
     return this.findOne((savedOrder as any)._id.toString());
   }
 
-  async updateOrder(id: string, updateOrderDto: UpdateOrderStatusDto, user?: any): Promise<any> {
+  async updateOrder(
+    id: string,
+    updateOrderDto: UpdateOrderStatusDto,
+    user?: any,
+  ): Promise<any> {
     const order = await this.orderModel.findById(id);
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
     // Role-based field restrictions
-    const userRoleKeys = user?.role?.map((r: any) =>
-      typeof r === 'object' ? r.key?.toLowerCase() : r?.toString().toLowerCase()
-    ) || [];
+    const userRoleKeys =
+      user?.role?.map((r: any) =>
+        typeof r === 'object'
+          ? r.key?.toLowerCase()
+          : r?.toString().toLowerCase(),
+      ) || [];
 
-    const isAdmin = userRoleKeys.includes('admin') || userRoleKeys.includes('1');
+    const isAdmin =
+      userRoleKeys.includes('admin') || userRoleKeys.includes('1');
     const isPicker = userRoleKeys.includes('picker');
     const isPacker = userRoleKeys.includes('packer');
 
-    const restrictedStatuses = ['shipped', 'delivered', 'returned', 'cancelled'];
-    const isRestricted = restrictedStatuses.includes(order.status.toLowerCase());
+    const restrictedStatuses = [
+      'shipped',
+      'delivered',
+      'returned',
+      'cancelled',
+    ];
+    const isRestricted = restrictedStatuses.includes(
+      order.status.toLowerCase(),
+    );
 
     if (isRestricted && isAdmin) {
       const isContentUpdate =
@@ -107,7 +133,9 @@ export class OrdersService extends BaseService<OrderDocument> {
         updateOrderDto.address_id;
 
       if (isContentUpdate) {
-        throw new BadRequestException(`Cannot update order details when status is ${order.status}`);
+        throw new BadRequestException(
+          `Cannot update order details when status is ${order.status}`,
+        );
       }
     }
 
@@ -128,25 +156,38 @@ export class OrdersService extends BaseService<OrderDocument> {
         order.total_amount = updateOrderDto.total_amount;
       }
 
-      if (updateOrderDto.shipping_address) order.shipping_address = updateOrderDto.shipping_address;
-      if (updateOrderDto.shipping_phone) order.shipping_phone = updateOrderDto.shipping_phone;
-      if (updateOrderDto.customer_name) order.customer_name = updateOrderDto.customer_name;
-      if (updateOrderDto.address_id) order.address_id = new Types.ObjectId(updateOrderDto.address_id);
-      if (updateOrderDto.packer_id) order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
-      if (updateOrderDto.picker_id) order.picker_id = new Types.ObjectId(updateOrderDto.picker_id);
-      if (updateOrderDto.status) order.status = updateOrderDto.status.toLowerCase();
+      if (updateOrderDto.shipping_address)
+        order.shipping_address = updateOrderDto.shipping_address;
+      if (updateOrderDto.shipping_phone)
+        order.shipping_phone = updateOrderDto.shipping_phone;
+      if (updateOrderDto.customer_name)
+        order.customer_name = updateOrderDto.customer_name;
+      if (updateOrderDto.address_id)
+        order.address_id = new Types.ObjectId(updateOrderDto.address_id);
+      if (updateOrderDto.packer_id)
+        order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
+      if (updateOrderDto.picker_id)
+        order.picker_id = new Types.ObjectId(updateOrderDto.picker_id);
+      if (updateOrderDto.status)
+        order.status = updateOrderDto.status.toLowerCase();
     }
 
     if (isPicker) {
-      if (updateOrderDto.picker_accepted !== undefined) order.picker_accepted = updateOrderDto.picker_accepted;
-      if (updateOrderDto.picker_remark !== undefined) order.picker_remark = updateOrderDto.picker_remark;
-      if (updateOrderDto.packer_id) order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
-      if (updateOrderDto.status) order.status = updateOrderDto.status.toLowerCase();
+      if (updateOrderDto.picker_accepted !== undefined)
+        order.picker_accepted = updateOrderDto.picker_accepted;
+      if (updateOrderDto.picker_remark !== undefined)
+        order.picker_remark = updateOrderDto.picker_remark;
+      if (updateOrderDto.packer_id)
+        order.packer_id = new Types.ObjectId(updateOrderDto.packer_id);
+      if (updateOrderDto.status)
+        order.status = updateOrderDto.status.toLowerCase();
     }
 
     if (isPacker) {
-      if (updateOrderDto.packer_remark !== undefined) order.packer_remark = updateOrderDto.packer_remark;
-      if (updateOrderDto.status) order.status = updateOrderDto.status.toLowerCase();
+      if (updateOrderDto.packer_remark !== undefined)
+        order.packer_remark = updateOrderDto.packer_remark;
+      if (updateOrderDto.status)
+        order.status = updateOrderDto.status.toLowerCase();
     }
 
     // Handle status history if status changed
@@ -200,10 +241,10 @@ export class OrdersService extends BaseService<OrderDocument> {
     const address = address_id;
 
     if (user && typeof user === 'object' && 'id' in user) {
-      delete (user as any).id;
+      delete user.id;
     }
     if (address && typeof address === 'object' && 'id' in address) {
-      delete (address as any).id;
+      delete address.id;
     }
 
     const items = rest.items.map((item: any) => {
@@ -217,7 +258,7 @@ export class OrdersService extends BaseService<OrderDocument> {
               : product;
 
         if ('id' in productObj) {
-          delete (productObj as any).id;
+          delete productObj.id;
         }
 
         return {

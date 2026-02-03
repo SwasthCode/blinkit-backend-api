@@ -7,10 +7,7 @@ import {
   MainCategorySchema,
 } from '../schemas/main-category.schema';
 import { Category, CategorySchema } from '../schemas/category.schema';
-import {
-  SubCategory,
-  SubCategorySchema,
-} from '../schemas/subcategory.schema';
+import { SubCategory, SubCategorySchema } from '../schemas/subcategory.schema';
 
 @Module({
   imports: [
@@ -24,4 +21,4 @@ import {
   providers: [MainCategoriesService],
   exports: [MainCategoriesService],
 })
-export class MainCategoriesModule { }
+export class MainCategoriesModule {}

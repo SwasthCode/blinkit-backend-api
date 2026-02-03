@@ -82,4 +82,4 @@ import { Packer, PackerSchema } from './schemas/packer.schema';
   providers: [AppService],
   exports: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

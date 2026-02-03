@@ -1,4 +1,3 @@
-
 import {
   Injectable,
   NotFoundException,
@@ -25,12 +24,12 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
     const { order_id } = createInvoiceDto;
 
     // Check if order exists
-    const order = await this.orderModel
+    const order = (await this.orderModel
       .findById(order_id)
       .populate('user_id')
       .populate('address_id')
       .lean()
-      .exec() as any;
+      .exec()) as any;
 
     if (!order) {
       throw new NotFoundException(`Order with ID ${order_id} not found`);
@@ -83,7 +82,7 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
     if (filter) {
       try {
         query = JSON.parse(filter);
-      } catch (e) { }
+      } catch (e) {}
     }
 
     const q = this.invoiceModel
@@ -115,7 +114,8 @@ export class InvoicesService extends BaseService<InvoiceDocument> {
       .populate('order_id', 'status')
       .exec();
 
-    if (!invoice) throw new NotFoundException(`Invoice with ID ${id} not found`);
+    if (!invoice)
+      throw new NotFoundException(`Invoice with ID ${id} not found`);
     return invoice;
   }
 }

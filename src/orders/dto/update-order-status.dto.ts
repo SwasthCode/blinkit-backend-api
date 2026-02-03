@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested, IsEnum } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+  IsEnum,
+} from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
 export class UpdateOrderItemDto {
@@ -63,7 +71,9 @@ export class UpdateOrderStatusDto {
     required: false,
   })
   @IsOptional()
-  @Transform(({ value }) => typeof value === 'string' ? value.toLowerCase() : value)
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.toLowerCase() : value,
+  )
   @IsEnum([
     'pending',
     'ready',
@@ -91,7 +101,11 @@ export class UpdateOrderStatusDto {
   @IsString()
   customer_name?: string;
 
-  @ApiProperty({ example: '65a...', description: 'Address ID', required: false })
+  @ApiProperty({
+    example: '65a...',
+    description: 'Address ID',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   address_id?: string;
