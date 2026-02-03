@@ -105,11 +105,10 @@ export class UsersService extends BaseService<UserDocument> {
       throw new NotFoundException('User with this phone number not found');
     }
 
-    if (!user) {
-      throw new Error('Failed to identify user');
-    }
-
     const userObj = user.toObject();
+
+    // Populate role details
+    await populateUserRoles(this.userRoleModel, [userObj]);
 
     const accessToken = this.jwtService.sign(
       {
