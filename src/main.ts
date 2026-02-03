@@ -33,8 +33,8 @@ async function createApp(): Promise<express.Express> {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('Blinkt API')
-    .setDescription('The Blinkt API description')
+    .setTitle('Khana Fast API')
+    .setDescription('The Khana Fast API description')
     .setVersion('1.0')
     // .addTag('api')
     .addBearerAuth(
