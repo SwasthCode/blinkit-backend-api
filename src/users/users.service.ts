@@ -157,6 +157,11 @@ export class UsersService extends BaseService<UserDocument> {
       }
     }
 
+
+    // Exclude users with role 1 (admin) from results
+    query.role = { $nin: [1] };
+
+
     // Apply Search
     if (search && this.searchFields.length > 0) {
       const searchRegex = { $regex: search, $options: 'i' };
@@ -199,6 +204,7 @@ export class UsersService extends BaseService<UserDocument> {
     if (limit) {
       q = q.limit(Number(limit));
     }
+
 
     const users = await q.lean().exec();
 
