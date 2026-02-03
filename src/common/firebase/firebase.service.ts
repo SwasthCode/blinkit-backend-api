@@ -8,7 +8,7 @@ export class FirebaseService implements OnModuleInit {
   private storage: Storage;
   private bucket: any;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) { }
 
   onModuleInit() {
     const projectId = this.configService.get<string>('FIREBASE_PROJECT_ID');
