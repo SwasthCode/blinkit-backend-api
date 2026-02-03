@@ -146,9 +146,11 @@ export class UsersService extends BaseService<UserDocument> {
 
         // Transformation: Handle role.role_id filter
         // Since roles are stored as number[] (role_ids) in the User collection,
-        // we convert {"role.role_id": value} to {"role": value}
+        // we convert {"role.role_id": value} to {"role": value} to match against the array
         if (query['role.role_id'] !== undefined) {
-          query.role = query['role.role_id'];
+          const roleId = query['role.role_id'];
+          // Use $in operator to match the role_id in the array
+          query.role = Array.isArray(roleId) ? { $in: roleId } : roleId;
           delete query['role.role_id'];
         }
       } catch (e) {
@@ -156,10 +158,17 @@ export class UsersService extends BaseService<UserDocument> {
       }
     }
 
+    // Always exclude users with role 1 (admin) from results
+    // Combine with existing query using $and to ensure admin exclusion works with any filter
+    const adminExclusionFilter = { role: { $nin: [1] } };
 
-    // Exclude users with role 1 (admin) from results
-    query.role = { $nin: [1] };
-
+    if (Object.keys(query).length > 0) {
+      // If there's already a query, combine it with admin exclusion using $and
+      query = { $and: [query, adminExclusionFilter] };
+    } else {
+      // If no query exists, just apply admin exclusion
+      query = adminExclusionFilter;
+    }
 
     // Apply Search
     if (search && this.searchFields.length > 0) {
@@ -203,7 +212,6 @@ export class UsersService extends BaseService<UserDocument> {
     if (limit) {
       q = q.limit(Number(limit));
     }
-
 
     const users = await q.lean().exec();
 
