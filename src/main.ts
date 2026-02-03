@@ -8,7 +8,7 @@ import express from 'express';
 import * as os from 'os';
 
 let cachedApp: express.Express;
-
+ 
 async function createApp(): Promise<express.Express> {
   if (cachedApp) {
     return cachedApp;
@@ -101,3 +101,4 @@ if (require.main === module) {
   }
   void bootstrap();
 }
+
