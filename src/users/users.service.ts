@@ -222,7 +222,6 @@ export class UsersService extends BaseService<UserDocument> {
   }
 
 
-
   async findByPhone(phone_number: string): Promise<UserDocument | null> {
     return this.model.findOne({ phone_number }).exec();
   }

@@ -10,7 +10,91 @@ import { RoleType } from '../common/utils/enum';
 export class RolesService extends BaseService<RoleDocument> {
   constructor(@InjectModel(Role.name) roleModel: Model<RoleDocument>) {
     super(roleModel);
+    this.searchFields = ['name', 'key', 'status'];
   }
+
+  /**
+   * Override findAll to exclude admin role from results
+   * @param options - Query options (filter, search, select, sort, limit, skip)
+   * @returns Promise<RoleDocument[]> - Array of roles (excluding admin)
+   */
+  async findAll(options: {
+    filter?: string;
+    search?: string;
+    select?: string;
+    sort?: string;
+    limit?: number | string;
+    skip?: number | string;
+  }): Promise<RoleDocument[]> {
+    const { filter, search, select, sort, limit, skip } = options;
+
+    let query: any = {};
+    if (filter) {
+      try {
+        query = JSON.parse(filter);
+      } catch (e) {
+        console.warn('Invalid JSON filter in RolesService:', filter);
+      }
+    }
+
+    // Always exclude admin role (role_id = 1) from results
+    // Combine with existing query using $and to ensure admin exclusion works with any filter
+    const adminExclusionFilter = { role_id: { $ne: 1 } };
+
+    if (Object.keys(query).length > 0) {
+      // If there's already a query, combine it with admin exclusion using $and
+      query = { $and: [query, adminExclusionFilter] };
+    } else {
+      // If no query exists, just apply admin exclusion
+      query = adminExclusionFilter;
+    }
+
+    // Apply Search
+    if (search && this.searchFields.length > 0) {
+      const searchRegex = { $regex: search, $options: 'i' };
+      const searchQuery = {
+        $or: this.searchFields.map((field) => ({
+          [field]: searchRegex,
+        })),
+      };
+
+      if (Object.keys(query).length > 0) {
+        query = { $and: [query, searchQuery] };
+      } else {
+        query = searchQuery;
+      }
+    }
+
+    let sortOptions: any = {};
+    if (sort) {
+      try {
+        sortOptions = JSON.parse(sort);
+      } catch (e) {
+        sortOptions = sort;
+      }
+    }
+
+    let q = this.model.find(query);
+
+    if (select) {
+      q = q.select(select.split(/[,\s]+/).join(' '));
+    }
+
+    if (Object.keys(sortOptions).length > 0 || typeof sortOptions === 'string') {
+      q = q.sort(sortOptions);
+    }
+
+    if (skip) {
+      q = q.skip(Number(skip));
+    }
+
+    if (limit) {
+      q = q.limit(Number(limit));
+    }
+
+    return q.lean().exec() as any;
+  }
+
 
   /**
    * Override create method to auto-generate key, role_id, and role_type
