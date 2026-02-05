@@ -30,9 +30,13 @@ export class OrdersService extends BaseService<OrderDocument> {
     this.searchFields = ['status', 'payment_status', 'shipping_address', 'shipping_phone', 'customer_name', 'order_id'];
   }
 
-  async addShift(createShiftDto: CreateShiftDto): Promise<any> {
-    const shift = new this.shiftModel(createShiftDto);
+  async addShift(userId: string, createShiftDto: CreateShiftDto): Promise<any> {
+    const shift = new this.shiftModel({ ...createShiftDto, user_id: new Types.ObjectId(userId) });
     return await shift.save();
+  }
+
+  async getShifts(userId: string): Promise<any[]> {
+    return await this.shiftModel.find({ user_id: new Types.ObjectId(userId) }).sort({ createdAt: -1 }).exec();
   }
 
   async createDirectOrder(

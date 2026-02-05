@@ -60,12 +60,26 @@ export class OrdersController extends BaseController<OrderDocument> {
     return successResponse(data, 'Order created successfully', 201);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('authentication')
   @Post('shift')
   @ApiOperation({ summary: 'Add a shift for delivery' })
   @ApiResponse({ status: 201, description: 'Shift added successfully' })
-  async addShift(@Body() createShiftDto: CreateShiftDto) {
-    const data = await this.ordersService.addShift(createShiftDto);
+  async addShift(@Req() req: any, @Body() createShiftDto: CreateShiftDto) {
+    const userId = req.user._id;
+    const data = await this.ordersService.addShift(userId, createShiftDto);
     return successResponse(data, 'Shift added successfully', 201);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('authentication')
+  @Get('shift')
+  @ApiOperation({ summary: 'Get shifts for logged in user' })
+  @ApiResponse({ status: 200, description: 'Shifts fetched successfully' })
+  async getShifts(@Req() req: any) {
+    const userId = req.user._id;
+    const data = await this.ordersService.getShifts(userId);
+    return successResponse(data, 'Shifts fetched successfully');
   }
 
   @Get()
@@ -76,7 +90,7 @@ export class OrdersController extends BaseController<OrderDocument> {
   }
 
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('authentication')
   @Get('my-picks')
   @ApiOperation({ summary: 'Get assigned orders for picker' })
   async getMyPicks(@Req() req: any) {
@@ -86,7 +100,7 @@ export class OrdersController extends BaseController<OrderDocument> {
   }
 
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('authentication')
   @Get('my-packs')
   @ApiOperation({ summary: 'Get assigned orders for packer' })
   async getMyPacks(@Req() req: any) {
@@ -104,7 +118,7 @@ export class OrdersController extends BaseController<OrderDocument> {
   }
 
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('authentication')
   @Put(':id')
   @ApiOperation({ summary: 'Update order (status, items, or total_amount)' })
   @ApiParam({ name: 'id', description: 'Order ID' })
