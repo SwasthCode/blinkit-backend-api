@@ -35,8 +35,9 @@ export class OrdersService extends BaseService<OrderDocument> {
     return await shift.save();
   }
 
-  async getShifts(userId: string): Promise<any[]> {
-    return await this.shiftModel.find({ user_id: new Types.ObjectId(userId) }).sort({ createdAt: -1 }).exec();
+  async getShifts(userId?: string): Promise<any[]> {
+    const filter = userId ? { user_id: new Types.ObjectId(userId) } : {};
+    return await this.shiftModel.find(filter).sort({ createdAt: -1 }).exec();
   }
 
   async createDirectOrder(

@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsNotEmpty } from 'class-validator';
 
 export class CreateShiftDto {
+    @ApiProperty({ example: '60d0fe4f5311236168a109ca', description: 'User ID (optional if token provided)', required: false })
+    user_id?: string;
+
     @ApiProperty({ example: '2023-10-27T08:00:00.000Z', description: 'Start time of the shift' })
     @IsDateString()
     @IsNotEmpty()

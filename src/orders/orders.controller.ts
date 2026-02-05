@@ -60,24 +60,27 @@ export class OrdersController extends BaseController<OrderDocument> {
     return successResponse(data, 'Order created successfully', 201);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
   @Post('shift')
   @ApiOperation({ summary: 'Add a shift for delivery' })
   @ApiResponse({ status: 201, description: 'Shift added successfully' })
   async addShift(@Req() req: any, @Body() createShiftDto: CreateShiftDto) {
-    const userId = req.user._id;
+    const userId = req.user?._id || createShiftDto.user_id;
+
+    if (!userId) {
+      return successResponse(null, 'User ID is required in token or body', 400);
+    }
+
     const data = await this.ordersService.addShift(userId, createShiftDto);
     return successResponse(data, 'Shift added successfully', 201);
   }
 
 
   @Get('shift')
-  @ApiOperation({ summary: 'Get shifts for logged in user' })
+  @ApiOperation({ summary: 'Get all shifts' })
   @ApiResponse({ status: 200, description: 'Shifts fetched successfully' })
-  async getShifts(@Req() req: any) {
-    const userId = req.user._id;
-    const data = await this.ordersService.getShifts(userId);
+  async getShifts() {
+    // Always fetch all shifts
+    const data = await this.ordersService.getShifts();
     return successResponse(data, 'Shifts fetched successfully');
   }
 
