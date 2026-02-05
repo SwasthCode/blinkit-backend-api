@@ -22,6 +22,7 @@ import { OrdersService } from './orders.service';
 import {
   CreateDirectOrderDto,
   UpdateOrderStatusDto,
+  CreateShiftDto,
 } from './dto';
 import { successResponse } from '../common/base/base.response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -57,6 +58,14 @@ export class OrdersController extends BaseController<OrderDocument> {
       createDirectOrderDto,
     );
     return successResponse(data, 'Order created successfully', 201);
+  }
+
+  @Post('shift')
+  @ApiOperation({ summary: 'Add a shift for delivery' })
+  @ApiResponse({ status: 201, description: 'Shift added successfully' })
+  async addShift(@Body() createShiftDto: CreateShiftDto) {
+    const data = await this.ordersService.addShift(createShiftDto);
+    return successResponse(data, 'Shift added successfully', 201);
   }
 
   @Get()

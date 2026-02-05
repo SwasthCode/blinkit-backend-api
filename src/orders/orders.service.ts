@@ -14,17 +14,25 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { ProductsService } from '../products/products.service';
 import { generateOrderId } from '../common/utils/helper';
 import { populateUserRoles } from '../common/utils/rolePopulat.util';
+import { Shift, ShiftDocument } from '../schemas/shift.schema';
+import { CreateShiftDto } from './dto/create-shift.dto';
 
 @Injectable()
 export class OrdersService extends BaseService<OrderDocument> {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(Role.name) private roleModel: Model<RoleDocument>,
+    @InjectModel(Shift.name) private shiftModel: Model<ShiftDocument>,
     private readonly cartService: CartService,
     private readonly productsService: ProductsService,
   ) {
     super(orderModel);
     this.searchFields = ['status', 'payment_status', 'shipping_address', 'shipping_phone', 'customer_name', 'order_id'];
+  }
+
+  async addShift(createShiftDto: CreateShiftDto): Promise<any> {
+    const shift = new this.shiftModel(createShiftDto);
+    return await shift.save();
   }
 
   async createDirectOrder(

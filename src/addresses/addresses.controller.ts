@@ -9,14 +9,12 @@ import {
   HttpStatus,
   UseGuards,
   Req,
-  UnauthorizedException,
   Query,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AddressesService } from './addresses.service';
 import { CreateAddressDto } from './dto';

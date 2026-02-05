@@ -4,6 +4,7 @@ import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { Order, OrderSchema } from '../schemas/order.schema';
 import { Role, RoleSchema } from '../schemas/role.schema';
+import { Shift, ShiftSchema } from '../schemas/shift.schema';
 import { CartModule } from '../cart/cart.module';
 import { AuthModule } from '../auth/auth.module';
 import { ProductsModule } from '../products/products.module';
@@ -13,6 +14,7 @@ import { ProductsModule } from '../products/products.module';
     MongooseModule.forFeature([
       { name: Order.name, schema: OrderSchema },
       { name: Role.name, schema: RoleSchema },
+      { name: Shift.name, schema: ShiftSchema },
     ]),
     forwardRef(() => CartModule),
     forwardRef(() => AuthModule),
