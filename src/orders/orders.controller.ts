@@ -71,8 +71,7 @@ export class OrdersController extends BaseController<OrderDocument> {
     return successResponse(data, 'Shift added successfully', 201);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('authentication')
+
   @Get('shift')
   @ApiOperation({ summary: 'Get shifts for logged in user' })
   @ApiResponse({ status: 200, description: 'Shifts fetched successfully' })
